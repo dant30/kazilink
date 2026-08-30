@@ -12,31 +12,47 @@ export function useEmploymentHistory() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
-  useEffect(() => {
-    let active = true
+  const refetch = async () => {
     setLoading(true)
     setError('')
 
-    listEmploymentHistory()
-      .then((data) => {
+    try {
+      const data = await listEmploymentHistory()
+      setRecords(results(data as EmploymentHistoryListResponse))
+    } catch (reason) {
+      setError((reason as Error).message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    let active = true
+    const load = async () => {
+      setLoading(true)
+      setError('')
+
+      try {
+        const data = await listEmploymentHistory()
         if (!active) return
         setRecords(results(data as EmploymentHistoryListResponse))
-      })
-      .catch((reason: Error) => {
+      } catch (reason) {
         if (!active) return
-        setError(reason.message)
-      })
-      .finally(() => {
+        setError((reason as Error).message)
+      } finally {
         if (!active) return
         setLoading(false)
-      })
+      }
+    }
+
+    void load()
 
     return () => {
       active = false
     }
   }, [])
 
-  return { records, loading, error }
+  return { records, loading, error, refetch }
 }
 
 export function useEmploymentRecord(id: number) {

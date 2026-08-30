@@ -11,6 +11,9 @@ export function useEstablishments(filters: EstablishmentFilters = {}) {
   const [establishments, setEstablishments] = useState<Establishment[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [refreshKey, setRefreshKey] = useState(0)
+
+  const refetch = () => setRefreshKey((value) => value + 1)
 
   useEffect(() => {
     let active = true
@@ -34,9 +37,9 @@ export function useEstablishments(filters: EstablishmentFilters = {}) {
     return () => {
       active = false
     }
-  }, [filters.q, filters.type])
+  }, [filters.q, filters.type, refreshKey])
 
-  return { establishments, loading, error }
+  return { establishments, loading, error, refetch }
 }
 
 export function useEstablishment(id: number) {

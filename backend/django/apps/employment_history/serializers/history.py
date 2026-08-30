@@ -1,23 +1,28 @@
 from django.utils import timezone
 from rest_framework import serializers
 
+from apps.accounts.models import EmployerProfile, WorkerProfile
+from apps.establishments.models import Establishment
+
 from ..models import EmploymentRecord, HistoryAccessLog
 
 
 class EmploymentRecordSerializer(serializers.ModelSerializer):
     worker_name = serializers.CharField(source='worker.user.full_name', read_only=True)
+    worker_id = serializers.PrimaryKeyRelatedField(source='worker', queryset=WorkerProfile.objects.all(), write_only=True, required=False)
+    establishment_id = serializers.PrimaryKeyRelatedField(source='establishment', queryset=Establishment.objects.all(), write_only=True, required=False, allow_null=True)
+    employer_id = serializers.PrimaryKeyRelatedField(source='employer', queryset=EmployerProfile.objects.all(), write_only=True, required=False, allow_null=True)
 
     class Meta:
         model = EmploymentRecord
         fields = (
-            'id', 'worker', 'worker_name', 'establishment_name', 'establishment_type',
-            'location', 'position', 'start_date', 'end_date', 'is_current',
-            'responsibilities', 'reference_contact_name', 'reference_contact_phone',
-            'reference_role', 'verification_status', 'verified_at', 'verified_by',
-            'verification_notes',
+            'id', 'worker', 'worker_id', 'worker_name', 'employer', 'employer_id', 'establishment', 'establishment_id',
+            'establishment_name', 'establishment_type', 'location', 'position', 'start_date', 'end_date', 'is_current',
+            'responsibilities', 'reference_contact_name', 'reference_contact_phone', 'reference_role',
+            'verification_status', 'verified_at', 'verified_by', 'verification_notes',
         )
         read_only_fields = (
-            'id', 'worker', 'worker_name', 'verification_status', 'verified_at',
+            'id', 'worker', 'worker_name', 'employer', 'establishment', 'verification_status', 'verified_at',
             'verified_by', 'verification_notes',
         )
 

@@ -4,9 +4,30 @@ from ..models import EmploymentRecord, HistoryAccessLog
 
 
 @transaction.atomic
-def create_record(*, worker, validated_data):
-	if not worker.user.is_worker:
-		raise PermissionError('Only workers can add employment history.')
+def create_record(*, worker=None, employer=None, validated_data):
+	if worker is not None and not worker.user.is_worker:
+		raise PermissionError('Only workers can add personal employment history.')
+	if employer is not None and not employer.user.is_employer:
+		raise PermissionError('Only employers can add employment history on behalf of workers.')
+
+	if employer is not None:
+		worker_obj = worker
+		if worker_obj is None:
+			raise PermissionError('A worker is required to add employment history.')
+		establishment = validated_data.get('establishment') or validated_data.get('establishment_id')
+		if establishment is None:
+			raise PermissionError('Please select an establishment for this work record.')
+		if not employer.establishments.filter(pk=(establishment.pk if hasattr(establishment, 'pk') else establishment)).exists():
+			raise PermissionError('You can only add employment history for one of your establishments.')
+		payload = dict(validated_data)
+		payload.pop('establishment_id', None)
+		payload.pop('worker_id', None)
+		payload['employer'] = employer
+		payload['worker'] = worker_obj
+		return EmploymentRecord.objects.create(**payload)
+
+	if worker is None:
+		raise PermissionError('A worker is required to add employment history.')
 	return EmploymentRecord.objects.create(worker=worker, **validated_data)
 
 

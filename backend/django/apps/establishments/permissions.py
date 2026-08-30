@@ -15,7 +15,10 @@ class CanManageEstablishment(BasePermission):
 		return bool(
 			request.user.is_employer
 			and hasattr(request.user, 'employer_profile')
-			and obj.employer_profiles.filter(pk=request.user.employer_profile.pk).exists()
+			and (
+				obj.employer_profiles.filter(pk=request.user.employer_profile.pk).exists()
+				or obj.employers.filter(pk=request.user.employer_profile.pk).exists()
+			)
 		)
 
 

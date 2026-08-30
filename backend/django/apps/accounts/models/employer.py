@@ -11,6 +11,9 @@ class EmployerProfile(models.Model):
 	establishment = models.ForeignKey(
 		'establishments.Establishment', on_delete=models.SET_NULL, null=True, blank=True, related_name='employer_profiles'
 	)
+	establishments = models.ManyToManyField(
+		'establishments.Establishment', related_name='employers', blank=True
+	)
 	contact_person = models.CharField(max_length=255)
 	active_jobs_count = models.PositiveIntegerField(default=0)
 	total_hires = models.PositiveIntegerField(default=0)

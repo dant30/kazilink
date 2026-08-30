@@ -10,7 +10,7 @@ def create_job(*, employer, validated_data):
 	if not employer.user.is_employer:
 		raise PermissionError('Only employer accounts can create jobs.')
 	establishment = validated_data.get('establishment')
-	if establishment and not establishment.employer_profiles.filter(pk=employer.pk).exists():
+	if establishment and not employer.establishments.filter(pk=establishment.pk).exists():
 		raise PermissionError('You can only post jobs for your establishment.')
 	return Job.objects.create(employer=employer, **validated_data)
 
@@ -18,7 +18,7 @@ def create_job(*, employer, validated_data):
 @transaction.atomic
 def update_job(*, job, validated_data):
 	establishment = validated_data.get('establishment')
-	if establishment and not establishment.employer_profiles.filter(pk=job.employer_id).exists():
+	if establishment and not job.employer.establishments.filter(pk=establishment.pk).exists():
 		raise PermissionError('You can only post jobs for your establishment.')
 	for field, value in validated_data.items():
 		setattr(job, field, value)

@@ -16,12 +16,12 @@ interface DataTableProps<T> {
 }
 
 export function DataTable<T>({
-  data,
+  data = [],
   columns,
   keyExtractor,
   emptyMessage = 'No records found.',
 }: DataTableProps<T>) {
-  if (data.length === 0) {
+  if (!data || data.length === 0) {
     return (
       <div className="p-8 text-center bg-white rounded-2xl border border-slate-200 text-slate-400 text-sm">
         {emptyMessage}

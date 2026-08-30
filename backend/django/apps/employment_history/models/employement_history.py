@@ -8,6 +8,8 @@ class EmploymentRecord(models.Model):
 		REJECTED = 'rejected', 'Rejected'
 
 	worker = models.ForeignKey('accounts.WorkerProfile', on_delete=models.CASCADE, related_name='employment_history')
+	employer = models.ForeignKey('accounts.EmployerProfile', on_delete=models.SET_NULL, null=True, blank=True, related_name='employment_records_added')
+	establishment = models.ForeignKey('establishments.Establishment', on_delete=models.SET_NULL, null=True, blank=True, related_name='employment_records')
 	establishment_name = models.CharField(max_length=255)
 	establishment_type = models.CharField(max_length=100, blank=True)
 	location = models.CharField(max_length=100, blank=True)

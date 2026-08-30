@@ -4,6 +4,8 @@ export type EmploymentRecord = {
   id: number
   worker: number
   worker_name?: string
+  employer?: number | null
+  establishment?: number | null
   establishment_name: string
   establishment_type: string
   location: string
@@ -36,6 +38,9 @@ export type EmploymentHistoryFilters = {
 }
 
 export type EmploymentRecordInput = {
+  worker_id?: number
+  employer_id?: number
+  establishment_id?: number
   establishment_name: string
   establishment_type?: string
   location?: string

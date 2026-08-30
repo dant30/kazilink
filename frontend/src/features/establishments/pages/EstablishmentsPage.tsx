@@ -2,17 +2,58 @@ import { ArrowRight, Building2, MapPin, Search, ShieldCheck, Sparkles } from 'lu
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 
+import { useAuthStore } from '../../auth/store/authStore'
 import { useEstablishments } from '../hooks'
-import type { EstablishmentFilters } from '../types'
+import { createEstablishment } from '../services'
+import type { EstablishmentFilters, EstablishmentInput } from '../types'
+
+const blankForm: EstablishmentInput = {
+  name: '',
+  establishment_type: '',
+  location: '',
+  address: '',
+  logo: '',
+}
 
 export function EstablishmentsPage() {
+  const { user } = useAuthStore()
+  const isEmployer = Boolean(user?.is_employer)
   const [filters, setFilters] = useState<EstablishmentFilters>({ q: '', type: '' })
-  const { establishments, loading, error } = useEstablishments(filters)
+  const [showCreateForm, setShowCreateForm] = useState(false)
+  const [form, setForm] = useState<EstablishmentInput>(blankForm)
+  const [saving, setSaving] = useState(false)
+  const [formError, setFormError] = useState('')
+  const { establishments, loading, error, refetch } = useEstablishments(filters)
 
   const spotlight = useMemo(
     () => establishments.filter((item) => item.is_verified).slice(0, 3),
     [establishments],
   )
+
+  const updateForm = (key: keyof EstablishmentInput, value: string) => {
+    setForm((current) => ({ ...current, [key]: value }))
+    setFormError('')
+  }
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault()
+    setSaving(true)
+    setFormError('')
+
+    try {
+      await createEstablishment({
+        ...form,
+        logo: form.logo || null,
+      })
+      setForm(blankForm)
+      setShowCreateForm(false)
+      refetch()
+    } catch (reason) {
+      setFormError(reason instanceof Error ? reason.message : 'Unable to create this establishment.')
+    } finally {
+      setSaving(false)
+    }
+  }
 
   return (
     <section className="mx-auto max-w-7xl space-y-6 px-4 py-8 sm:px-6 lg:px-8">
@@ -34,6 +75,94 @@ export function EstablishmentsPage() {
         <OverviewCard label="Locations" value={new Set(establishments.map((item) => item.location)).size} icon={<MapPin className="h-5 w-5" />} />
         <OverviewCard label="Profiles" value={establishments.reduce((sum, item) => sum + (item.verified_employers_count ?? 0), 0)} icon={<Building2 className="h-5 w-5" />} />
       </div>
+
+      {isEmployer && (
+        <div className="card-kazilink p-5 sm:p-6">
+          <div className="flex flex-col gap-4 border-b border-slate-200 pb-4 md:flex-row md:items-center md:justify-between">
+            <div>
+              <h2 className="text-lg font-black text-slate-900">Add your establishment</h2>
+              <p className="text-xs text-slate-500">Create an employer-owned venue profile for hiring and verification.</p>
+            </div>
+            {!showCreateForm && (
+              <button
+                type="button"
+                onClick={() => setShowCreateForm(true)}
+                className="inline-flex items-center justify-center rounded-xl bg-[#FF6B00] px-4 py-2.5 text-sm font-bold text-white transition hover:bg-[#E55F00]"
+              >
+                + New establishment
+              </button>
+            )}
+          </div>
+
+          {showCreateForm && (
+            <form onSubmit={handleSubmit} className="mt-6 grid gap-5 md:grid-cols-2">
+              <label className="space-y-2 text-sm font-semibold text-slate-700">
+                <span>Establishment name</span>
+                <input
+                  required
+                  value={form.name}
+                  onChange={(event) => updateForm('name', event.target.value)}
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-700 placeholder:text-slate-400 focus:border-[#FF6B00] focus:bg-white focus:outline-none"
+                />
+              </label>
+
+              <label className="space-y-2 text-sm font-semibold text-slate-700">
+                <span>Type</span>
+                <input
+                  required
+                  value={form.establishment_type}
+                  onChange={(event) => updateForm('establishment_type', event.target.value)}
+                  placeholder="Restaurant, Hotel, Cafe"
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-700 placeholder:text-slate-400 focus:border-[#FF6B00] focus:bg-white focus:outline-none"
+                />
+              </label>
+
+              <label className="space-y-2 text-sm font-semibold text-slate-700">
+                <span>Location</span>
+                <input
+                  required
+                  value={form.location}
+                  onChange={(event) => updateForm('location', event.target.value)}
+                  placeholder="Nairobi"
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-700 placeholder:text-slate-400 focus:border-[#FF6B00] focus:bg-white focus:outline-none"
+                />
+              </label>
+
+              <label className="space-y-2 text-sm font-semibold text-slate-700">
+                <span>Logo URL</span>
+                <input
+                  value={form.logo ?? ''}
+                  onChange={(event) => updateForm('logo', event.target.value)}
+                  placeholder="https://example.com/logo.png"
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-700 placeholder:text-slate-400 focus:border-[#FF6B00] focus:bg-white focus:outline-none"
+                />
+              </label>
+
+              <label className="space-y-2 text-sm font-semibold text-slate-700 md:col-span-2">
+                <span>Address</span>
+                <textarea
+                  required
+                  value={form.address}
+                  onChange={(event) => updateForm('address', event.target.value)}
+                  rows={3}
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-700 placeholder:text-slate-400 focus:border-[#FF6B00] focus:bg-white focus:outline-none"
+                />
+              </label>
+
+              {formError && <p className="md:col-span-2 rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">{formError}</p>}
+
+              <div className="md:col-span-2 flex justify-end gap-3">
+                <button type="button" onClick={() => { setShowCreateForm(false); setForm(blankForm); setFormError('') }} className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-700 transition hover:bg-slate-50">
+                  Cancel
+                </button>
+                <button type="submit" disabled={saving} className="rounded-xl bg-[#FF6B00] px-5 py-2.5 text-sm font-bold text-white transition hover:bg-[#E55F00] disabled:cursor-not-allowed disabled:opacity-70">
+                  {saving ? 'Saving...' : 'Create establishment'}
+                </button>
+              </div>
+            </form>
+          )}
+        </div>
+      )}
 
       <div className="card-kazilink p-5 sm:p-6">
         <div className="flex flex-col gap-4 border-b border-slate-200 pb-4 md:flex-row md:items-center md:justify-between">

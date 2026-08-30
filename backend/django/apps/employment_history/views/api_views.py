@@ -18,19 +18,39 @@ from apps.accounts.models import WorkerProfile
 class WorkerHistoryListCreateView(generics.ListCreateAPIView):
 	permission_classes = [IsWorkerOwner]
 
+	def get_permissions(self):
+		if self.request.method == 'POST' and getattr(self.request.user, 'is_employer', False):
+			return [IsEmployerHistoryViewer()]
+		return [IsWorkerOwner()]
+
 	def get_serializer_class(self):
 		return EmploymentRecordSerializer
 
 	def get_queryset(self):
+		if getattr(self.request.user, 'is_employer', False):
+			return EmploymentRecord.objects.filter(employer__user=self.request.user).order_by('-is_current', '-start_date')
 		return EmploymentRecord.objects.filter(worker__user=self.request.user).order_by('-is_current', '-start_date')
 
 	def perform_create(self, serializer):
+		if getattr(self.request.user, 'is_employer', False):
+			worker_id = serializer.validated_data.get('worker_id') or serializer.validated_data.get('worker')
+			if worker_id is None:
+				raise ValueError('A worker is required.')
+			self.record = create_record(
+				employer=self.request.user.employer_profile,
+				worker=worker_id,
+				validated_data=serializer.validated_data,
+			)
+			return
 		self.record = create_record(worker=self.request.user.worker_profile, validated_data=serializer.validated_data)
 
 	def create(self, request, *args, **kwargs):
 		serializer = self.get_serializer(data=request.data)
 		serializer.is_valid(raise_exception=True)
-		self.perform_create(serializer)
+		try:
+			self.perform_create(serializer)
+		except (PermissionError, ValueError) as exc:
+			return Response({'detail': str(exc)}, status=status.HTTP_403_FORBIDDEN if isinstance(exc, PermissionError) else status.HTTP_400_BAD_REQUEST)
 		return Response(EmploymentRecordSerializer(self.record).data, status=status.HTTP_201_CREATED)
 
 
