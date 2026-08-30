@@ -10,6 +10,7 @@ export interface FormActionsProps {
   align?: 'left' | 'center' | 'right' | 'between'
   className?: string
   extraActions?: React.ReactNode
+  fullWidth?: boolean
 }
 
 export const FormActions: React.FC<FormActionsProps> = ({
@@ -21,6 +22,7 @@ export const FormActions: React.FC<FormActionsProps> = ({
   align = 'right',
   className = '',
   extraActions,
+  fullWidth = false,
 }) => {
   const alignmentClasses = {
     left: 'justify-start',
@@ -49,7 +51,7 @@ export const FormActions: React.FC<FormActionsProps> = ({
       <button
         type="submit"
         disabled={loading || disabled}
-        className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#FF6B00] px-5 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-[#E55F00] transition-colors disabled:opacity-50"
+        className={`inline-flex items-center justify-center gap-2 rounded-xl bg-[#FF6B00] px-5 py-2.5 text-xs font-bold text-white shadow-sm transition-colors hover:bg-[#E55F00] disabled:opacity-50 ${fullWidth ? 'w-full' : ''}`}
       >
         {loading && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
         {submitLabel}

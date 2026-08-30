@@ -1,7 +1,7 @@
-// frontend/src/features/auth/pages/VerifyPhonePage.tsx
 import { useState, type FormEvent } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 
+import { Button } from '../../../shared/components/ui/Button'
 import { AuthField, AuthPanel } from '../components'
 import { verifyPhone } from '../services'
 import { authStore } from '../store'
@@ -31,8 +31,12 @@ export function VerifyPhonePage() {
   }
 
   return (
-    <AuthPanel eyebrow="One last step" title="Verify your phone">
-      <form className="auth-form" onSubmit={submit}>
+    <AuthPanel
+      eyebrow="One last step"
+      title="Verify your phone"
+      subtitle="Confirm your number to activate your KaziLink account and get started."
+    >
+      <form className="space-y-5" onSubmit={submit}>
         <AuthField
           label="Phone number"
           required
@@ -47,10 +51,16 @@ export function VerifyPhonePage() {
           value={code}
           onChange={(event) => setCode(event.target.value)}
         />
-        {error && <div className="feedback error">{error}</div>}
-        <button className="button button-primary" disabled={saving} type="submit">
+
+        {error && (
+          <div className="rounded-2xl border border-rose-200 bg-rose-50 px-3.5 py-2.5 text-sm font-medium text-rose-700">
+            {error}
+          </div>
+        )}
+
+        <Button type="submit" variant="primary" size="lg" className="w-full" isLoading={saving}>
           {saving ? 'Verifying...' : 'Verify phone'}
-        </button>
+        </Button>
       </form>
     </AuthPanel>
   )
