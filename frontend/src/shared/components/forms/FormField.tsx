@@ -1,4 +1,3 @@
-// frontend/src/shared/components/forms/FormField.tsx
 import React from 'react';
 
 interface FormFieldProps {

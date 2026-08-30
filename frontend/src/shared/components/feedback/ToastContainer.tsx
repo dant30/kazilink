@@ -50,7 +50,8 @@ export const ToastContainer: FC<ToastContainerProps> = ({ toasts: propToasts, re
     }
   }, [])
 
-  const activeToasts = propToasts ?? internalToasts
+  const rawToasts = propToasts !== undefined ? propToasts : internalToasts
+  const activeToasts = Array.isArray(rawToasts) ? rawToasts : []
   const handleRemove = propRemoveToast ?? ((id: Toast['id']) => {
     setInternalToasts((prev) => prev.filter((t) => t.id !== id))
   })
