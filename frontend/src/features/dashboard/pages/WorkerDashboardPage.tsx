@@ -1,0 +1,26 @@
+// frontend/src/features/dashboard/pages/WorkerDashboardPage.tsx
+import { ArrowRight, Briefcase, CheckCircle2, Clock, MessageSquare, ShieldCheck } from 'lucide-react'
+import { Link, Navigate } from 'react-router-dom'
+
+import { useAuthStore } from '../../auth'
+import { useJobs } from '../../jobs/hooks'
+import { DashboardStat } from '../components'
+
+export function WorkerDashboardPage() {
+	const { user } = useAuthStore()
+	const { jobs, loading, error } = useJobs({ urgent: true })
+	if (user?.is_employer && !user.is_worker) return <Navigate to="/dashboard/employer" replace />
+
+	return (
+		<section className="mx-auto max-w-7xl space-y-8 p-4 sm:p-6">
+			<header className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#0A2540] via-[#153B64] to-[#0E2E4E] p-6 text-white shadow-sm sm:p-8">
+				<div className="relative z-10 max-w-2xl space-y-3"><span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold"><span className="h-2 w-2 rounded-full bg-[#FF6B00]" /> Worker workspace</span><h1 className="font-display text-2xl font-black text-white sm:text-4xl">Your next shift starts here.</h1><p className="text-sm leading-relaxed text-slate-200 sm:text-base">Find reliable hospitality work, keep your history current, and build a profile employers can trust.</p><Link to="/jobs" className="btn-primary-orange inline-flex text-xs sm:text-sm">Find open shifts <ArrowRight className="h-4 w-4" /></Link></div>
+			</header>
+			<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4"><DashboardStat label="Open shifts" value={jobs.length} description="Urgent opportunities available" icon={<Briefcase className="h-5 w-5" />} accent="orange" /><DashboardStat label="Profile strength" value="Build" description="Add history to stand out" icon={<ShieldCheck className="h-5 w-5" />} accent="navy" /><DashboardStat label="Reliability" value="Ready" description="Keep your attendance strong" icon={<Clock className="h-5 w-5" />} accent="emerald" /><DashboardStat label="Messages" value="Open" description="Stay responsive to employers" icon={<MessageSquare className="h-5 w-5" />} accent="amber" /></div>
+			<div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+				<div className="card-kazilink space-y-4 p-6"><div className="flex items-center justify-between gap-4"><div><h2 className="font-display text-lg font-bold text-slate-900">Recommended urgent shifts</h2><p className="text-xs text-slate-500">Roles looking for immediate confirmation</p></div><Link to="/jobs" className="flex items-center gap-1 text-xs font-bold text-[#FF6B00]">Browse all <ArrowRight className="h-3.5 w-3.5" /></Link></div>{loading && <p className="text-sm text-slate-500">Loading shifts...</p>}{error && <p className="text-sm text-rose-600">{error}</p>}<div className="space-y-3">{jobs.slice(0, 4).map((job) => <Link key={job.id} to={`/jobs/${job.id}`} className="block rounded-xl border border-slate-100 bg-slate-50 p-4 transition hover:border-orange-200 hover:bg-white"><div className="flex items-start justify-between gap-3"><div><h3 className="text-sm font-bold text-slate-900">{job.title}</h3><p className="mt-1 text-xs text-slate-500">{job.location} · {job.job_type}</p></div><span className="text-sm font-black text-[#0A2540]">KSh {job.pay_amount_ksh.toLocaleString()}</span></div></Link>)}{!loading && !error && jobs.length === 0 && <p className="rounded-xl bg-slate-50 p-6 text-center text-sm text-slate-500">No urgent shifts are available right now.</p>}</div></div>
+				<div className="card-kazilink space-y-4 p-6"><div><h2 className="font-display text-lg font-bold text-slate-900">Keep your work passport ready</h2><p className="text-xs text-slate-500">Small updates make it easier to get selected</p></div><Link to="/profile" className="flex items-start gap-3 rounded-xl border border-slate-100 bg-slate-50 p-4 hover:border-orange-200 hover:bg-orange-50"><CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-[#FF6B00]" /><span><strong className="block text-sm text-slate-900">Complete your profile</strong><span className="text-xs text-slate-500">Add your roles, location, availability, and expected rate.</span></span></Link><Link to="/employment-history" className="flex items-start gap-3 rounded-xl border border-slate-100 bg-slate-50 p-4 hover:border-orange-200 hover:bg-orange-50"><CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-[#FF6B00]" /><span><strong className="block text-sm text-slate-900">Verify employment history</strong><span className="text-xs text-slate-500">Give employers confidence with confirmed experience.</span></span></Link><Link to="/messages" className="flex items-start gap-3 rounded-xl border border-slate-100 bg-slate-50 p-4 hover:border-orange-200 hover:bg-orange-50"><MessageSquare className="mt-0.5 h-5 w-5 shrink-0 text-[#0A2540]" /><span><strong className="block text-sm text-slate-900">Check messages</strong><span className="text-xs text-slate-500">Respond quickly when a venue reaches out.</span></span></Link></div>
+			</div>
+		</section>
+	)
+}

@@ -1,0 +1,133 @@
+import { ArrowRight, Briefcase, MapPin, Search, Sparkles } from 'lucide-react'
+import { useState } from 'react'
+import { Link } from 'react-router-dom'
+
+import { useAuthStore } from '../../auth/store/authStore'
+import { JobCard, JobFilters } from '../components'
+import { useJobs } from '../hooks'
+import type { JobFilters as JobFilterValues } from '../services'
+
+export function JobsPage() {
+  const { user } = useAuthStore()
+  const isEmployer = Boolean(user?.is_employer)
+  const isWorker = Boolean(user?.is_worker)
+  const [filters, setFilters] = useState<JobFilterValues>({ q: '', location: '', category: '', job_type: '' })
+  const { jobs, loading, error } = useJobs(filters)
+
+  const heroTitle = isEmployer
+    ? 'Hire trusted hospitality talent faster.'
+    : isWorker
+      ? 'Find work that fits your schedule.'
+      : 'Discover verified hospitality roles.'
+
+  const heroDescription = isEmployer
+    ? 'Post new roles, review applicants, and build a stronger team with trusted local talent.'
+    : isWorker
+      ? 'Browse shifts, weekend gigs, and full-time roles from verified employers across Kenya.'
+      : 'Search current openings, compare pay, and apply to roles that match your availability.'
+
+  return (
+    <section className="mx-auto max-w-7xl space-y-8 px-4 py-8 sm:px-6 lg:px-8">
+      <header className="overflow-hidden rounded-[28px] bg-gradient-to-r from-[#0A2540] via-[#123860] to-[#0E2E4E] p-6 text-white shadow-sm sm:p-8">
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+          <div className="max-w-2xl">
+            <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-slate-200">
+              <Sparkles className="h-3.5 w-3.5 text-[#FF6B00]" />
+              {isEmployer ? 'Employer marketplace' : isWorker ? 'Worker marketplace' : 'KaziLink marketplace'}
+            </div>
+            <h1 className="font-display text-3xl font-black text-white sm:text-4xl">{heroTitle}</h1>
+            <p className="mt-3 max-w-xl text-sm leading-relaxed text-slate-300 sm:text-base">{heroDescription}</p>
+          </div>
+
+          {isEmployer ? (
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <Link
+                to="/jobs/new"
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#FF6B00] px-4 py-3 text-sm font-bold text-white transition hover:bg-[#E55F00]"
+              >
+                <Briefcase className="h-4 w-4" />
+                Post a job
+              </Link>
+              <Link
+                to="/dashboard/employer"
+                className="inline-flex items-center justify-center rounded-xl border border-white/20 bg-white/5 px-4 py-3 text-sm font-bold text-white transition hover:bg-white/10"
+              >
+                Employer dashboard
+              </Link>
+            </div>
+          ) : (
+            <Link
+              to={user ? '/applications' : '/login'}
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#FF6B00] px-4 py-3 text-sm font-bold text-white transition hover:bg-[#E55F00]"
+            >
+              <Briefcase className="h-4 w-4" />
+              {user ? 'My applications' : 'Sign in to apply'}
+            </Link>
+          )}
+        </div>
+      </header>
+
+      <div className="grid gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm md:grid-cols-3">
+        <div className="rounded-xl bg-slate-50 p-4">
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">Live roles</p>
+          <p className="mt-2 text-2xl font-black text-[#0A2540]">{jobs.length}</p>
+        </div>
+        <div className="rounded-xl bg-slate-50 p-4">
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">Verified employers</p>
+          <p className="mt-2 text-2xl font-black text-[#0A2540]">24/7</p>
+        </div>
+        <div className="rounded-xl bg-slate-50 p-4">
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">Fast response</p>
+          <p className="mt-2 text-2xl font-black text-[#0A2540]">Same day</p>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <div className="flex items-center gap-2 text-sm font-bold uppercase tracking-[0.18em] text-[#FF6B00]">
+          <Search className="h-4 w-4" />
+          {isEmployer ? 'Manage hiring needs' : 'Search roles'}
+        </div>
+        <JobFilters filters={filters} onChange={setFilters} />
+      </div>
+
+      {loading && (
+        <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center text-sm text-slate-500 shadow-sm">
+          Loading opportunities...
+        </div>
+      )}
+
+      {error && (
+        <div className="rounded-2xl border border-rose-200 bg-rose-50 p-6 text-sm font-medium text-rose-700 shadow-sm">
+          {error}
+        </div>
+      )}
+
+      {!loading && !error && (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2 text-sm font-semibold text-slate-600">
+              <MapPin className="h-4 w-4 text-[#FF6B00]" />
+              {jobs.length ? `${jobs.length} positions found` : 'No results yet'}
+            </div>
+            <Link to="/jobs" className="inline-flex items-center gap-1 text-xs font-bold uppercase tracking-[0.14em] text-[#0A2540]">
+              Refresh
+              <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
+
+          {jobs.length ? (
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+              {jobs.map((job) => (
+                <JobCard key={job.id} job={job} />
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-10 text-center text-sm text-slate-500">
+              No open jobs match these filters. Try adjusting the search criteria.
+            </div>
+          )}
+        </div>
+      )}
+    </section>
+  )
+}

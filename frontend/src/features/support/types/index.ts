@@ -1,0 +1,1 @@
+export type SupportTicket = { id: number; user: number; user_name: string; subject: string; description: string; status: string; assigned_to: number | null; assigned_to_name: string | null; created_at: string; updated_at: string }

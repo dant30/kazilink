@@ -1,0 +1,1 @@
+export type FraudAlert = { id: number; target_type: string; target_id: string; target_name: string; reason: string; severity: string; status: string; detected_at: string; details: string; resolved_at: string | null; resolved_by: number | null }

@@ -1,0 +1,74 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+.Python
+venv/
+.venv/
+env/
+ENV/
+.python-version
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+coverage.xml
+htmlcov/
+*.sqlite3
+*.log
+
+# Django
+*.pot
+*.pyc
+*.pyo
+*.pyd
+.env
+.env.*
+.local.env
+backend/django/.env
+backend/django/*.sqlite3
+backend/django/media/
+backend/django/staticfiles/
+backend/django/**/migrations/*.py
+!backend/django/**/migrations/__init__.py
+
+# Node / frontend
+node_modules/
+frontend/node_modules/
+frontend/dist/
+frontend/build/
+frontend/.vite/
+frontend/.cache/
+frontend/.parcel-cache/
+
+# Build outputs
+build/
+dist/
+out/
+coverage/
+
+# OS/editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+*.tmp
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Docker/local data
+*.pid
+*.seed
+*.tar
+*.zip
+
+# Misc generated assets
+*.bak

@@ -1,0 +1,514 @@
+kazilink/
+│
+├── README.md
+├── .gitignore
+├── .env.example
+├── docker-compose.yml
+├── Makefile
+│
+├── backend/
+│   ├── .env                                 # Environment variables
+│   │
+│   ├── core/                                # Shared business logic & cross‑cutting
+│   │   ├── services/
+│   │   │   └── payment.py                   # Kept (generic payment helpers)
+│   │   ├── exceptions/                      # Custom exception classes
+│   │   ├── security/                        # Encryption, hashing, JWT
+│   │   ├── storage/                         # File storage (S3, local)
+│   │   ├── logging/                         # Structured logging
+│   │   ├── throttling/                      # Rate‑limiting
+│   │   ├── cache/                           # Redis / Memcached backends
+│   │   ├── permissions/                     # Global RBAC
+│   │   └── authentication/                  # Custom auth backends
+│   │
+│   ├── django/                              # Django project root
+│   │   ├── manage.py
+│   │   ├── config/
+│   │   │   ├── __init__.py
+│   │   │   ├── settings/
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── base.py
+│   │   │   │   ├── development.py
+│   │   │   │   ├── production.py
+│   │   │   │   └── testing.py
+│   │   │   ├── urls.py
+│   │   │   ├── asgi.py
+│   │   │   ├── wsgi.py
+│   │   │   └── celery.py                    # Celery app
+│   │   │
+│   │   ├── apps/
+│   │   │   │
+│   │   │   ├── accounts/                    # (was users)
+│   │   │   │   ├── migrations/
+│   │   │   │   ├── models/
+│   │   │   │   │   ├── __init__.py
+│   │   │   │   │   ├── user.py
+│   │   │   │   │   ├── profile.py
+│   │   │   │   │   ├── worker.py
+│   │   │   │   │   ├── employer.py
+│   │   │   │   │   ├── verification.py     # Identity/phone verification
+│   │   │   │   │   └── role.py
+│   │   │   │   ├── serializers/
+│   │   │   │   ├── services/
+│   │   │   │   │   ├── authentication.py
+│   │   │   │   │   ├── registration.py
+│   │   │   │   │   └── verification.py     # Kept here
+│   │   │   │   ├── views/
+│   │   │   │   │   ├── api_views.py
+│   │   │   │   │   └── admin_views.py
+│   │   │   │   ├── urls.py
+│   │   │   │   ├── tasks.py
+│   │   │   │   ├── permissions.py
+│   │   │   │   ├── middleware.py
+│   │   │   │   ├── signals.py
+│   │   │   │   ├── apps.py
+│   │   │   │   ├── admin.py
+│   │   │   │   └── tests/
+│   │   │   │
+│   │   │   ├── establishments/              # (was businesses)
+│   │   │   │   ├── migrations/
+│   │   │   │   ├── models.py
+│   │   │   │   ├── serializers/
+│   │   │   │   ├── services/
+│   │   │   │   ├── views/
+│   │   │   │   │   ├── api_views.py
+│   │   │   │   │   └── admin_views.py
+│   │   │   │   ├── urls.py
+│   │   │   │   ├── tasks.py
+│   │   │   │   ├── permissions.py
+│   │   │   │   ├── middleware.py
+│   │   │   │   ├── signals.py
+│   │   │   │   ├── apps.py
+│   │   │   │   ├── admin.py
+│   │   │   │   └── tests/
+│   │   │   │
+│   │   │   ├── jobs/
+│   │   │   │   ├── migrations/
+│   │   │   │   ├── models.py
+│   │   │   │   ├── serializers/
+│   │   │   │   ├── services/
+│   │   │   │   │   ├── job_service.py
+│   │   │   │   │   ├── search.py
+│   │   │   │   │   └── matching.py          # Only here now
+│   │   │   │   ├── views/
+│   │   │   │   │   ├── api_views.py
+│   │   │   │   │   └── admin_views.py
+│   │   │   │   ├── urls.py
+│   │   │   │   ├── tasks.py
+│   │   │   │   ├── permissions.py
+│   │   │   │   ├── middleware.py
+│   │   │   │   ├── signals.py
+│   │   │   │   ├── apps.py
+│   │   │   │   ├── admin.py
+│   │   │   │   └── tests/
+│   │   │   │
+│   │   │   ├── job_applications/            # (was applications)
+│   │   │   │   ├── migrations/
+│   │   │   │   ├── models.py
+│   │   │   │   ├── serializers/
+│   │   │   │   ├── services/
+│   │   │   │   ├── views/
+│   │   │   │   │   ├── api_views.py
+│   │   │   │   │   └── admin_views.py
+│   │   │   │   ├── urls.py
+│   │   │   │   ├── tasks.py
+│   │   │   │   ├── permissions.py
+│   │   │   │   ├── middleware.py
+│   │   │   │   ├── signals.py
+│   │   │   │   ├── apps.py
+│   │   │   │   ├── admin.py
+│   │   │   │   └── tests/
+│   │   │   │
+│   │   │   ├── employment_history/          # (was employment)
+│   │   │   │   ├── migrations/
+│   │   │   │   ├── models.py
+│   │   │   │   ├── serializers/
+│   │   │   │   ├── services/
+│   │   │   │   │   ├── history_service.py
+│   │   │   │   │   ├── verification.py     # Employment verification
+│   │   │   │   │   └── reference_service.py
+│   │   │   │   ├── views/
+│   │   │   │   │   ├── api_views.py
+│   │   │   │   │   └── admin_views.py
+│   │   │   │   ├── urls.py
+│   │   │   │   ├── tasks.py
+│   │   │   │   ├── permissions.py
+│   │   │   │   ├── middleware.py
+│   │   │   │   ├── signals.py
+│   │   │   │   ├── apps.py
+│   │   │   │   ├── admin.py
+│   │   │   │   └── tests/
+│   │   │   │
+│   │   │   ├── ratings/                     # (was reviews)
+│   │   │   │   ├── migrations/
+│   │   │   │   ├── models.py
+│   │   │   │   ├── serializers/
+│   │   │   │   ├── services/
+│   │   │   │   ├── views/
+│   │   │   │   │   ├── api_views.py
+│   │   │   │   │   └── admin_views.py
+│   │   │   │   ├── urls.py
+│   │   │   │   ├── tasks.py
+│   │   │   │   ├── permissions.py
+│   │   │   │   ├── middleware.py
+│   │   │   │   ├── signals.py
+│   │   │   │   ├── apps.py
+│   │   │   │   ├── admin.py
+│   │   │   │   └── tests/
+│   │   │   │
+│   │   │   ├── messaging/                   # NEW (split from notifications)
+│   │   │   │   ├── migrations/
+│   │   │   │   ├── models.py               # Conversation, Message, Participant, etc.
+│   │   │   │   ├── consumers.py            # WebSocket handlers
+│   │   │   │   ├── routing.py              # WS routing
+│   │   │   │   ├── serializers/
+│   │   │   │   ├── services/
+│   │   │   │   │   └── messaging.py
+│   │   │   │   ├── views/
+│   │   │   │   │   ├── api_views.py
+│   │   │   │   │   └── admin_views.py
+│   │   │   │   ├── urls.py
+│   │   │   │   ├── tasks.py
+│   │   │   │   ├── permissions.py
+│   │   │   │   ├── middleware.py
+│   │   │   │   ├── signals.py
+│   │   │   │   ├── apps.py
+│   │   │   │   ├── admin.py
+│   │   │   │   └── tests/
+│   │   │   │
+│   │   │   ├── notifications/               # (was communications, now only alerts)
+│   │   │   │   ├── migrations/
+│   │   │   │   ├── models.py               # Notification, NotificationPreference
+│   │   │   │   ├── serializers/
+│   │   │   │   ├── services/
+│   │   │   │   │   └── notification.py     # Email, SMS, push
+│   │   │   │   ├── views/
+│   │   │   │   │   ├── api_views.py
+│   │   │   │   │   └── admin_views.py
+│   │   │   │   ├── urls.py
+│   │   │   │   ├── tasks.py
+│   │   │   │   ├── permissions.py
+│   │   │   │   ├── middleware.py
+│   │   │   │   ├── signals.py
+│   │   │   │   ├── apps.py
+│   │   │   │   ├── admin.py
+│   │   │   │   └── tests/
+│   │   │   │
+│   │   │   ├── payments/
+│   │   │   │   ├── migrations/
+│   │   │   │   ├── models.py
+│   │   │   │   ├── serializers/
+│   │   │   │   ├── services/
+│   │   │   │   │   ├── payment_service.py
+│   │   │   │   │   ├── mpesa.py
+│   │   │   │   │   └── refunds.py
+│   │   │   │   ├── views/
+│   │   │   │   │   ├── api_views.py
+│   │   │   │   │   └── admin_views.py
+│   │   │   │   ├── urls.py
+│   │   │   │   ├── tasks.py
+│   │   │   │   ├── permissions.py
+│   │   │   │   ├── middleware.py
+│   │   │   │   ├── signals.py
+│   │   │   │   ├── apps.py
+│   │   │   │   ├── admin.py
+│   │   │   │   ├── webhooks.py
+│   │   │   │   └── tests/
+│   │   │   │
+│   │   │   ├── subscriptions/
+│   │   │   │   ├── migrations/
+│   │   │   │   ├── models.py
+│   │   │   │   ├── serializers/
+│   │   │   │   ├── services/
+│   │   │   │   ├── views/
+│   │   │   │   │   ├── api_views.py
+│   │   │   │   │   └── admin_views.py
+│   │   │   │   ├── urls.py
+│   │   │   │   ├── tasks.py
+│   │   │   │   ├── permissions.py
+│   │   │   │   ├── middleware.py
+│   │   │   │   ├── signals.py
+│   │   │   │   ├── apps.py
+│   │   │   │   ├── admin.py
+│   │   │   │   └── tests/
+│   │   │   │
+│   │   │   ├── analytics/                   # (merged reports into this)
+│   │   │   │   ├── migrations/
+│   │   │   │   ├── models.py
+│   │   │   │   ├── serializers/
+│   │   │   │   ├── services/
+│   │   │   │   │   ├── metrics.py
+│   │   │   │   │   ├── reporting.py
+│   │   │   │   │   └── exports.py
+│   │   │   │   ├── views/
+│   │   │   │   │   ├── api_views.py
+│   │   │   │   │   └── admin_views.py
+│   │   │   │   ├── urls.py
+│   │   │   │   ├── tasks.py
+│   │   │   │   ├── permissions.py
+│   │   │   │   ├── middleware.py
+│   │   │   │   ├── signals.py
+│   │   │   │   ├── apps.py
+│   │   │   │   ├── admin.py
+│   │   │   │   └── tests/
+│   │   │   │
+│   │   │   ├── support/                     # NEW: Tickets, FAQs, contact
+│   │   │   │   ├── migrations/
+│   │   │   │   ├── models.py
+│   │   │   │   ├── serializers/
+│   │   │   │   ├── services/
+│   │   │   │   │   └── ticket_service.py
+│   │   │   │   ├── views/
+│   │   │   │   │   ├── api_views.py
+│   │   │   │   │   └── admin_views.py
+│   │   │   │   ├── urls.py
+│   │   │   │   ├── tasks.py
+│   │   │   │   ├── permissions.py
+│   │   │   │   ├── middleware.py
+│   │   │   │   ├── signals.py
+│   │   │   │   ├── apps.py
+│   │   │   │   ├── admin.py
+│   │   │   │   └── tests/
+│   │   │   │
+│   │   │   ├── fraud/                       # (kept)
+│   │   │   │   ├── migrations/
+│   │   │   │   ├── models.py
+│   │   │   │   ├── serializers/
+│   │   │   │   ├── services/
+│   │   │   │   │   └── detection.py
+│   │   │   │   ├── views/
+│   │   │   │   │   ├── api_views.py
+│   │   │   │   │   └── admin_views.py
+│   │   │   │   ├── urls.py
+│   │   │   │   ├── tasks.py
+│   │   │   │   ├── permissions.py
+│   │   │   │   ├── middleware.py
+│   │   │   │   ├── signals.py
+│   │   │   │   ├── apps.py
+│   │   │   │   ├── admin.py
+│   │   │   │   └── tests/
+│   │   │   │
+│   │   │   └── audit/                       # (kept – compliance)
+│   │   │       ├── migrations/
+│   │   │       ├── models.py
+│   │   │       ├── serializers/
+│   │   │       ├── services/
+│   │   │       ├── views/
+│   │   │       │   ├── api_views.py
+│   │   │       │   └── admin_views.py
+│   │   │       ├── urls.py
+│   │   │       ├── tasks.py
+│   │   │       ├── permissions.py
+│   │   │       ├── middleware.py
+│   │   │       ├── signals.py
+│   │   │       ├── apps.py
+│   │   │       ├── admin.py
+│   │   │       └── tests/
+│   │   │
+│   │   └── requirements/
+│   │       ├── base.txt
+│   │       ├── development.txt
+│   │       └── production.txt
+│   │
+│   └── Dockerfile
+│
+├── frontend/
+│   ├── .env                                 # Environment variables
+│   ├── index.html                           # Main HTML entry (Vite root)
+│   │
+│   ├── public/
+│   │   ├── offline.html                     # PWA offline fallback
+│   │   ├── service-worker.js                # Service worker registration
+│   │   └── manifest.json                    # PWA manifest
+│   │
+│   ├── src/
+│   │   ├── core/                            # Core infrastructure
+│   │   │   ├── api/                         # Axios / fetch setup, interceptors
+│   │   │   ├── contexts/                    # React contexts (auth, theme)
+│   │   │   ├── locale/                      # i18n translations
+│   │   │   ├── storage/                     # localStorage / sessionStorage helpers
+│   │   │   └── utils/                       # Generic utilities (formatting, validators)
+│   │   │
+│   │   ├── shared/                          # Reusable UI & layouts
+│   │   │   ├── components/
+│   │   │   │   ├── ui/                      # Atomic: Button, ProgressBar, etc.
+│   │   │   │   ├── tables/                  # Data tables, row renderers
+│   │   │   │   ├── forms/                   # Form wrappers, inputs, validation
+│   │   │   │   ├── charts/                  # Chart components (Line, Bar, Pie)
+│   │   │   │   └── cards/                   # Card layouts, stats cards
+│   │   │   └── layouts/
+│   │   │       ├── Sidebar.tsx
+│   │   │       ├── Header.tsx
+│   │   │       ├── MainLayout.tsx
+│   │   │       ├── Footer.tsx
+│   │   │       └── FloatingButton.tsx
+│   │   │
+│   │   ├── styles/                          # Global styles
+│   │   │   ├── animations.css
+│   │   │   ├── variables.css
+│   │   │   ├── global.css
+│   │   │   └── components.css
+│   │   │
+│   │   ├── router/                          # Route definitions
+│   │   │   ├── public.tsx                   # Routes for home, about, contact (unauthenticated)
+│   │   │   ├── private.tsx                  # Authenticated routes (worker/employer dashboards)
+│   │   │   └── admin.tsx                    # Admin‑only routes
+│   │   │
+│   │   ├── features/                        # Feature‑based modules (pages removed)
+│   │   │   │
+│   │   │   ├── home/                        # NEW: Landing page for all visitors
+│   │   │   │   ├── components/
+│   │   │   │   ├── pages/                   # Home, About, Contact, Pricing, Features
+│   │   │   │   ├── services/                # Landing page API calls (e.g., stats)
+│   │   │   │   ├── types/
+│   │   │   │   ├── store/
+│   │   │   │   └── hooks/
+│   │   │   │
+│   │   │   ├── auth/
+│   │   │   │   ├── components/
+│   │   │   │   ├── pages/                   # Login, Register, Reset Password
+│   │   │   │   ├── services/
+│   │   │   │   ├── types/
+│   │   │   │   ├── store/
+│   │   │   │   └── hooks/
+│   │   │   │
+│   │   │   ├── accounts/                    # (was users) – account management
+│   │   │   │   ├── components/
+│   │   │   │   ├── pages/                   # Profile, Security, Settings
+│   │   │   │   ├── services/
+│   │   │   │   ├── types/
+│   │   │   │   ├── store/
+│   │   │   │   └── hooks/
+│   │   │   │
+│   │   │   ├── workers/                     # Worker experience (frontend only)
+│   │   │   │   ├── components/
+│   │   │   │   ├── pages/                   # Dashboard, MyProfile, FindJobs, Applications, Availability, EmploymentHistory
+│   │   │   │   ├── services/
+│   │   │   │   ├── types/
+│   │   │   │   ├── store/
+│   │   │   │   └── hooks/
+│   │   │   │
+│   │   │   ├── employers/                   # Employer experience (frontend only)
+│   │   │   │   ├── components/
+│   │   │   │   ├── pages/                   # Dashboard, PostJob, MyJobs, FindWorkers, Applications, Shortlisted, Billing
+│   │   │   │   ├── services/
+│   │   │   │   ├── types/
+│   │   │   │   ├── store/
+│   │   │   │   └── hooks/
+│   │   │   │
+│   │   │   ├── establishments/              # (was businesses)
+│   │   │   │   ├── components/
+│   │   │   │   ├── pages/                   # Establishment listings, detail page
+│   │   │   │   ├── services/
+│   │   │   │   ├── types/
+│   │   │   │   ├── store/
+│   │   │   │   └── hooks/
+│   │   │   │
+│   │   │   ├── jobs/
+│   │   │   │   ├── components/
+│   │   │   │   ├── pages/                   # Job list, detail, post job
+│   │   │   │   ├── services/
+│   │   │   │   ├── types/
+│   │   │   │   ├── store/
+│   │   │   │   └── hooks/
+│   │   │   │
+│   │   │   ├── job_applications/            # (was applications)
+│   │   │   │   ├── components/
+│   │   │   │   ├── pages/                   # My applications, application detail
+│   │   │   │   ├── services/
+│   │   │   │   ├── types/
+│   │   │   │   ├── store/
+│   │   │   │   └── hooks/
+│   │   │   │
+│   │   │   ├── employment_history/          # (was employment)
+│   │   │   │   ├── components/
+│   │   │   │   ├── pages/                   # Work history, add/verify history
+│   │   │   │   ├── services/
+│   │   │   │   ├── types/
+│   │   │   │   ├── store/
+│   │   │   │   └── hooks/
+│   │   │   │
+│   │   │   ├── ratings/                     # (was reviews)
+│   │   │   │   ├── components/
+│   │   │   │   ├── pages/                   # Ratings list, write rating
+│   │   │   │   ├── services/
+│   │   │   │   ├── types/
+│   │   │   │   ├── store/
+│   │   │   │   └── hooks/
+│   │   │   │
+│   │   │   ├── messaging/                   # NEW: chat (frontend)
+│   │   │   │   ├── components/
+│   │   │   │   ├── pages/                   # Inbox, conversation view
+│   │   │   │   ├── services/                # Chat API, WebSocket
+│   │   │   │   ├── types/                   # Message, Conversation
+│   │   │   │   ├── store/                   # Chat state
+│   │   │   │   └── hooks/                   # useChat
+│   │   │   │
+│   │   │   ├── notifications/               # Alerts (frontend)
+│   │   │   │   ├── components/
+│   │   │   │   ├── pages/                   # Notification settings, list
+│   │   │   │   ├── services/                # Notification API
+│   │   │   │   ├── types/
+│   │   │   │   ├── store/
+│   │   │   │   └── hooks/                   # useNotifications
+│   │   │   │
+│   │   │   ├── payments/
+│   │   │   │   ├── components/
+│   │   │   │   ├── pages/                   # Payment methods, transaction history
+│   │   │   │   ├── services/
+│   │   │   │   ├── types/
+│   │   │   │   ├── store/
+│   │   │   │   └── hooks/
+│   │   │   │
+│   │   │   ├── analytics/                   # Dashboards, KPI reports
+│   │   │   │   ├── components/
+│   │   │   │   ├── pages/                   # Dashboards, reports viewer
+│   │   │   │   ├── services/
+│   │   │   │   ├── types/
+│   │   │   │   ├── store/
+│   │   │   │   └── hooks/
+│   │   │   │
+│   │   │   ├── support/                     # Tickets, FAQ
+│   │   │   │   ├── components/
+│   │   │   │   ├── pages/                   # Ticket list, create ticket, FAQ
+│   │   │   │   ├── services/
+│   │   │   │   ├── types/
+│   │   │   │   ├── store/
+│   │   │   │   └── hooks/
+│   │   │   │
+│   │   │   └── admin/                       # NEW: Admin dashboard & management
+│   │   │       ├── components/
+│   │   │       ├── pages/                   # Admin dashboard, user management, verification queue, reports
+│   │   │       ├── services/                # Admin API calls
+│   │   │       ├── types/
+│   │   │       ├── store/
+│   │   │       └── hooks/
+│   │   │
+│   │   ├── app.tsx                          # Main App component with routes
+│   │   ├── main.tsx                         # Entry point
+│   │   └── index.css                        # CSS entry (imports styles/)
+│   │
+│   ├── package.json
+│   ├── vite.config.ts
+│   ├── tsconfig.json
+│   ├── tailwind.config.ts
+│   └── Dockerfile
+│
+├── infrastructure/
+│   ├── nginx/
+│   ├── docker/
+│   ├── scripts/
+│   └── monitoring/
+│
+├── docs/
+│   ├── architecture.md
+│   ├── api.md
+│   ├── database.md
+│   ├── security.md
+│   ├── deployment.md
+│   └── business-rules.md
+│
+└── tests/
+    ├── integration/
+    ├── e2e/
+    └── performance/

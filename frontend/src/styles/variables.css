@@ -1,0 +1,31 @@
+:root {
+  /* KaziLink Brand Palette based on Official Logo */
+  --kazilink-navy: #0A2540;
+  --kazilink-navy-dark: #051829;
+  --kazilink-navy-light: #153B64;
+  --kazilink-navy-surface: #0E2E4E;
+  
+  --kazilink-orange: #FF6B00;
+  --kazilink-orange-hover: #E55F00;
+  --kazilink-orange-light: #FFF4EB;
+  --kazilink-orange-glow: rgba(255, 107, 0, 0.25);
+  
+  --kazilink-slate-bg: #F8FAFC;
+  --kazilink-card-bg: #FFFFFF;
+  --kazilink-border: #E2E8F0;
+  --kazilink-text-primary: #0F172A;
+  --kazilink-text-secondary: #64748B;
+  --kazilink-text-muted: #94A3B8;
+
+  /* Natural Earth & Kenyan Hospitality Theme */
+  --color-ink: #17221b;
+  --color-moss: #2f6b4f;
+  --color-clay: #d86b45;
+  --color-paper: #f7f3ea;
+
+  /* Kenya Verification & Status */
+  --status-verified: #0A2540;
+  --status-active: #FF6B00;
+  --status-success: #16A34A;
+  --status-warning: #D97706;
+}

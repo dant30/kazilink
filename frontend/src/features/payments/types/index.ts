@@ -1,0 +1,1 @@
+export type Transaction = { id: number; employer: number; employer_name: string; transaction_type: string; amount_ksh: number; status: string; provider: string; provider_reference: string; metadata: Record<string, unknown>; created_at: string; completed_at: string | null }

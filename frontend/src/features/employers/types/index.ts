@@ -1,0 +1,1 @@
+export type Employer = { id: number; user: number; contact_person: string; establishment: number | null; active_jobs_count: number; total_hires: number; subscription_plan: string; subscription_expires_at: string | null; verified_business: boolean }

@@ -1,0 +1,1 @@
+export type Worker = { id: number; user: number; primary_role: string; secondary_roles: string[]; location: string; years_of_experience: number; availability: string; rating: string; jobs_completed: number }
