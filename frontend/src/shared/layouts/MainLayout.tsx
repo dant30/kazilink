@@ -7,6 +7,7 @@ import { Header } from './Header'
 import { Sidebar } from './Sidebar'
 import { useAuthStore } from '../../features/auth/store'
 import { ToastContainer } from '../components/feedback'
+import { localStorageStore } from '../../core/storage'
 
 interface MainLayoutProps {
 	children: React.ReactNode
@@ -25,13 +26,13 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children, admin = false 
 
 	if (!storedUser) {
 		try {
-			storedUser = JSON.parse(localStorage.getItem('kazilink.user') ?? 'null') as typeof storedUser
+			storedUser = localStorageStore.get<typeof storedUser>('user')
 		} catch {
 			storedUser = null
 		}
 	}
 
-	const signedIn = Boolean(tokens || user || localStorage.getItem('kazilink.access_token') || storedUser)
+	const signedIn = Boolean(tokens || user || localStorageStore.has('access_token') || storedUser)
 	const isAdmin = admin || Boolean(storedUser?.is_staff || storedUser?.is_superuser)
 
 	return (

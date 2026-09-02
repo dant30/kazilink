@@ -20,6 +20,7 @@ import { authStore, useAuthStore } from '../../features/auth/store'
 import { Sidebar } from './Sidebar'
 import { useNotifications } from '../../features/notifications/hooks/useNotifications'
 import { ACCESS_TOKEN_KEY } from '../../core/api'
+import { localStorageStore } from '../../core/storage'
 
 export function Header() {
 	const navigate = useNavigate()
@@ -48,13 +49,13 @@ export function Header() {
 
 	if (!storedUser) {
 		try {
-			storedUser = JSON.parse(localStorage.getItem('kazilink.user') ?? 'null') as typeof storedUser
+			storedUser = localStorageStore.get<typeof storedUser>('user')
 		} catch {
 			storedUser = null
 		}
 	}
 
-	const signedIn = Boolean(localStorage.getItem(ACCESS_TOKEN_KEY))
+	const signedIn = localStorageStore.has(ACCESS_TOKEN_KEY)
 	const isAdmin = Boolean(storedUser?.is_staff || storedUser?.is_superuser)
 	const isWorker = Boolean(storedUser?.is_worker)
 	const isEmployer = Boolean(storedUser?.is_employer && !storedUser?.is_worker)

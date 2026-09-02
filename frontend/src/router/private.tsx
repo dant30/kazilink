@@ -9,7 +9,7 @@ import { DashboardPage, EmployerDashboardPage, WorkerDashboardPage } from '../fe
 import { EstablishmentDetailPage, EstablishmentsPage } from '../features/establishments/pages'
 import { EmploymentHistoryPage } from '../features/employment_history/pages'
 import { EmployerProfilePage } from '../features/employers/pages'
-import { WorkerProfilePage } from '../features/workers/pages'
+import { WorkerProfilePage, WorkersPage } from '../features/workers/pages'
 import { MessagingPage } from '../features/messaging/pages'
 import { SubscriptionsPage } from '../features/subscriptions/pages'
 import { NotificationsPage } from '../features/notifications/pages'
@@ -28,6 +28,7 @@ export const privateRoutes: RouteObject[] = [
 			{ path: 'dashboard/employer', element: <RequireAuth><EmployerDashboardPage /></RequireAuth> },
 			{ index: true, element: <RequireAuth><DashboardPage /></RequireAuth> },
 			{ path: 'jobs', element: <RequireAuth><JobsPage /></RequireAuth> },
+			{ path: 'workers', element: <RequireAuth><WorkersPage /></RequireAuth> },
 			{ path: 'jobs/new', element: <RequireAuth><PostJobPage /></RequireAuth> },
 			{ path: 'jobs/:jobId', element: <RequireAuth><JobDetailPage /></RequireAuth> },
 			{ path: 'establishments', element: <RequireAuth><EstablishmentsPage /></RequireAuth> },

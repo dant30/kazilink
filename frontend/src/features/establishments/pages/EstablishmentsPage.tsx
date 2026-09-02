@@ -83,14 +83,6 @@ export function EstablishmentsPage() {
       </div>
 
       {isEmployer && (
-        <div className="card-kazilink p-5 sm:p-6">
-          <div className="flex flex-col gap-4 border-b border-slate-200 pb-4 md:flex-row md:items-center md:justify-between">
-            <div>
-              <h2 className="text-lg font-black text-slate-900">Add your establishment</h2>
-              <p className="text-xs text-slate-500">Create an employer-owned venue profile for hiring and verification.</p>
-            </div>
-          </div>
-
           <Modal isOpen={showCreateForm} onClose={() => { setShowCreateForm(false); setForm(blankForm); setFormError('') }} title="Add your establishment" subtitle="Create an employer-owned venue profile for hiring and verification." maxWidth="lg">
             <form id="establishment-form" onSubmit={handleSubmit} className="space-y-5">
               <FormSection title="Venue details" description="Add the information workers and the verification team will use." icon={<Building2 className="h-4 w-4" />} divider={false}>
@@ -149,7 +141,6 @@ export function EstablishmentsPage() {
               <FormActions submitLabel="Create establishment" loading={saving} onCancel={() => { setShowCreateForm(false); setForm(blankForm); setFormError('') }} />
             </form>
           </Modal>
-        </div>
       )}
 
       <div className="card-kazilink p-5 sm:p-6">

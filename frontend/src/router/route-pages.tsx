@@ -3,14 +3,15 @@ import { Navigate, Outlet, useLocation } from 'react-router-dom'
 import type { ReactNode } from 'react'
 
 import { MainLayout } from '../shared/layouts/MainLayout'
+import { localStorageStore } from '../core/storage'
 
 function hasSession() {
-  return Boolean(localStorage.getItem('kazilink.access_token'))
+  return localStorageStore.has('access_token')
 }
 
 function isAdmin() {
   try {
-    const user = JSON.parse(localStorage.getItem('kazilink.user') ?? '{}') as { is_staff?: boolean; is_superuser?: boolean }
+    const user = localStorageStore.get<{ is_staff?: boolean; is_superuser?: boolean }>('user', {}) ?? {}
     return Boolean(user.is_staff || user.is_superuser)
   } catch {
     return false

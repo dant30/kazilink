@@ -5,6 +5,7 @@ import { LandingPage, TermsPage } from '../features/home/pages'
 import { PublicLayout, UnauthorizedPage } from './route-pages'
 import { ForgotPasswordPage, LoginPage, RegisterPage, VerifyPhonePage } from '../features/auth/pages'
 import { JobDetailPage, JobsPage } from '../features/jobs/pages'
+import { WorkersPage } from '../features/workers/pages'
 
 export const publicRoutes: RouteObject[] = [
 	{
@@ -18,7 +19,7 @@ export const publicRoutes: RouteObject[] = [
 			{ path: 'forgot-password', element: <ForgotPasswordPage /> },
 			{ path: 'jobs', element: <JobsPage /> },
 			{ path: 'jobs/:jobId', element: <JobDetailPage /> },
-			{ path: 'workers', element: <JobsPage /> },
+			{ path: 'workers', element: <WorkersPage /> },
 			{ path: 'unauthorized', element: <UnauthorizedPage /> },
 		],
 	},

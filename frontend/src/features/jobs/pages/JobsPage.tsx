@@ -1,9 +1,12 @@
-import { ArrowRight, Briefcase, MapPin, Search, Sparkles } from 'lucide-react'
+import { ArrowRight, Briefcase, Building2, MapPin, Search, Sparkles, TimerReset } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 
 import { PageHeader } from '../../../shared/components/ui/PageHeader'
 import { Pagination } from '../../../shared/components/ui/Pagination'
+import { StatCard } from '../../../shared/components/cards/StatCard'
+import { ErrorBoundary } from '../../../shared/components/ui/ErrorBoundary'
+import { Skeleton } from '../../../shared/components/ui/Skeleton'
 import { useAuthStore } from '../../auth/store/authStore'
 import { JobCard, JobFilters } from '../components'
 import { useJobs } from '../hooks'
@@ -18,6 +21,8 @@ export function JobsPage() {
   const { jobs, loading, error } = useJobs(filters)
   const pageSize = 9
   const visibleJobs = useMemo(() => jobs.slice((page - 1) * pageSize, page * pageSize), [jobs, page])
+  const employerCount = useMemo(() => new Set(jobs.map((job) => job.employer)).size, [jobs])
+  const urgentJobCount = useMemo(() => jobs.filter((job) => job.is_urgent).length, [jobs])
 
   const updateFilters = (nextFilters: JobFilterValues) => {
     setFilters(nextFilters)
@@ -37,7 +42,8 @@ export function JobsPage() {
       : 'Search current openings, compare pay, and apply to roles that match your availability.'
 
   return (
-    <section className="mx-auto max-w-7xl space-y-8 px-4 py-8 sm:px-6 lg:px-8">
+    <ErrorBoundary>
+      <section className="mx-auto max-w-7xl space-y-8 px-4 py-8 sm:px-6 lg:px-8">
       <PageHeader
         eyebrow={isEmployer ? 'Employer marketplace' : isWorker ? 'Worker marketplace' : 'KaziLink marketplace'}
         title={heroTitle}
@@ -66,19 +72,12 @@ export function JobsPage() {
         }
       />
 
-      <div className="grid gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm md:grid-cols-3">
-        <div className="rounded-xl bg-slate-50 p-4">
-          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">Live roles</p>
-          <p className="mt-2 text-2xl font-black text-[#0A2540]">{jobs.length}</p>
-        </div>
-        <div className="rounded-xl bg-slate-50 p-4">
-          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">Verified employers</p>
-          <p className="mt-2 text-2xl font-black text-[#0A2540]">24/7</p>
-        </div>
-        <div className="rounded-xl bg-slate-50 p-4">
-          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">Fast response</p>
-          <p className="mt-2 text-2xl font-black text-[#0A2540]">Same day</p>
-        </div>
+      <div className="grid gap-4 md:grid-cols-3">
+        {loading ? Array.from({ length: 3 }, (_, index) => <Skeleton key={index} className="h-24 rounded-2xl" />) : <>
+          <StatCard title="Live roles" value={jobs.length} subtitle="Current marketplace listings" icon={<Briefcase className="h-5 w-5" />} />
+          <StatCard title="Employers" value={employerCount} subtitle="Employers represented" icon={<Building2 className="h-5 w-5" />} iconBg="bg-orange-50 text-[#FF6B00]" />
+          <StatCard title="Urgent roles" value={urgentJobCount} subtitle="Roles needing a quick hire" icon={<TimerReset className="h-5 w-5" />} iconBg="bg-amber-50 text-amber-600" />
+        </>}
       </div>
 
       <div className="space-y-4">
@@ -90,8 +89,8 @@ export function JobsPage() {
       </div>
 
       {loading && (
-        <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center text-sm text-slate-500 shadow-sm">
-          Loading opportunities...
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3" aria-label="Loading opportunities" aria-busy="true">
+          {Array.from({ length: 6 }, (_, index) => <Skeleton key={index} className="h-64 rounded-2xl" />)}
         </div>
       )}
 
@@ -128,6 +127,7 @@ export function JobsPage() {
           <Pagination page={page} pageSize={pageSize} total={jobs.length} onPageChange={setPage} />
         </div>
       )}
-    </section>
+      </section>
+    </ErrorBoundary>
   )
 }

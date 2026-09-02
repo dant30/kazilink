@@ -17,6 +17,7 @@ import {
 } from 'lucide-react'
 
 import { useAuthStore } from '../../features/auth/store'
+import { localStorageStore } from '../../core/storage'
 
 const workerNavItems = [
 	{ path: '/dashboard/worker', label: 'Worker Dashboard', icon: Home },
@@ -84,7 +85,7 @@ export function Sidebar({ admin = false, mobileDrawer = false, onItemClick }: Si
 
 	if (!storedUser) {
 		try {
-			storedUser = JSON.parse(localStorage.getItem('kazilink.user') ?? 'null') as typeof storedUser
+			storedUser = localStorageStore.get<typeof storedUser>('user')
 		} catch {
 			storedUser = null
 		}
@@ -102,9 +103,9 @@ export function Sidebar({ admin = false, mobileDrawer = false, onItemClick }: Si
 		? {
 				label: 'Log out',
 				onClick: () => {
-					localStorage.removeItem('kazilink.access_token')
-					localStorage.removeItem('kazilink.refresh_token')
-					localStorage.removeItem('kazilink.user')
+					localStorageStore.remove('access_token')
+					localStorageStore.remove('refresh_token')
+					localStorageStore.remove('user')
 					navigate('/login')
 				},
 			}
