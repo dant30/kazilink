@@ -9,6 +9,7 @@ import { FormActions, FormField, FormSection } from '../../../../shared/componen
 import { DataTable } from '../../../../shared/components/tables'
 import { StatCard } from '../../../../shared/components/cards/StatCard'
 import { PageHeader } from '../../../../shared/components/ui/PageHeader'
+import { Skeleton } from '../../../../shared/components/ui/Skeleton'
 import { useAdminRatings } from '../../hooks/useAdminRatings'
 import type { Review, ReviewUpdateInput } from '../../../ratings/types'
 

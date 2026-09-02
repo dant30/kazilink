@@ -4,6 +4,7 @@ import { Button } from '../../../shared/components/ui/Button'
 import { Modal } from '../../../shared/components/ui/Modal'
 import { PageHeader } from '../../../shared/components/ui/PageHeader'
 import { Pagination } from '../../../shared/components/ui/Pagination'
+import { Skeleton } from '../../../shared/components/ui/Skeleton'
 import { SupportTicketForm, SupportTicketList } from '../components'
 import { useSupport } from '../hooks/useSupport'
 
@@ -41,7 +42,7 @@ export function SupportPage() {
             Refresh
           </Button>
         </div>
-        {loading && !tickets.length ? <p className="py-8 text-center text-sm text-slate-500">Loading tickets...</p> : <><SupportTicketList tickets={visibleTickets} onClose={close} closingId={closingId} /><Pagination page={page} pageSize={pageSize} total={tickets.length} onPageChange={setPage} className="mt-4" /></>}
+        {loading && !tickets.length ? <div className="space-y-3 py-8" aria-label="Loading tickets" aria-busy="true"><Skeleton className="h-16 w-full rounded-2xl" /><Skeleton className="h-16 w-full rounded-2xl" /><Skeleton className="h-16 w-full rounded-2xl" /></div> : <><SupportTicketList tickets={visibleTickets} onClose={close} closingId={closingId} /><Pagination page={page} pageSize={pageSize} total={tickets.length} onPageChange={setPage} className="mt-4" /></>}
       </section>
 
       <Modal isOpen={formOpen} onClose={() => setFormOpen(false)} title="Contact support" subtitle="Your request will be sent to the KaziLink support team." maxWidth="lg">

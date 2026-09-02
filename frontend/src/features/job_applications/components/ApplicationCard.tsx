@@ -10,12 +10,14 @@ export function ApplicationCard({ application }: { application: JobApplication }
       to={`/applications/${application.id}`}
       className="group block rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-orange-200 hover:shadow-md"
     >
-      <div className="flex items-start justify-between gap-3">
-        <div>
+      <div className="flex flex-col items-start gap-3 sm:flex-row sm:justify-between">
+        <div className="min-w-0">
           <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500">Application</p>
-          <h3 className="mt-2 text-lg font-black text-slate-900">{application.job_title || 'Role application'}</h3>
+          <h3 className="mt-2 break-words text-lg font-black text-slate-900">{application.job_title || 'Role application'}</h3>
         </div>
-        <ApplicationStatusBadge status={application.status} />
+        <div className="max-w-full shrink-0">
+          <ApplicationStatusBadge status={application.status} />
+        </div>
       </div>
 
       <div className="mt-4 space-y-2 text-sm text-slate-600">

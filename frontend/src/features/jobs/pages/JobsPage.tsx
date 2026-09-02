@@ -7,6 +7,7 @@ import { Pagination } from '../../../shared/components/ui/Pagination'
 import { StatCard } from '../../../shared/components/cards/StatCard'
 import { ErrorBoundary } from '../../../shared/components/ui/ErrorBoundary'
 import { Skeleton } from '../../../shared/components/ui/Skeleton'
+import { EmptyState } from '../../../shared/components/feedback'
 import { useAuthStore } from '../../auth/store/authStore'
 import { JobCard, JobFilters } from '../components'
 import { useJobs } from '../hooks'
@@ -120,9 +121,7 @@ export function JobsPage() {
               ))}
             </div>
           ) : (
-            <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-10 text-center text-sm text-slate-500">
-              No open jobs match these filters. Try adjusting the search criteria.
-            </div>
+            <EmptyState title="No open jobs match these filters" description="Try adjusting the search criteria." icon={<Briefcase className="h-8 w-8" />} />
           )}
           <Pagination page={page} pageSize={pageSize} total={jobs.length} onPageChange={setPage} />
         </div>

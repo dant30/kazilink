@@ -10,6 +10,8 @@ import { PageHeader } from '../../../shared/components/ui/PageHeader'
 import { Pagination } from '../../../shared/components/ui/Pagination'
 import { Select } from '../../../shared/components/ui/Select'
 import { ErrorBoundary } from '../../../shared/components/ui/ErrorBoundary'
+import { EmptyState } from '../../../shared/components/feedback'
+import { Skeleton } from '../../../shared/components/ui/Skeleton'
 
 const statusOptions: Array<{ value: JobApplicationStatus | ''; label: string }> = [
   { value: '', label: 'All statuses' },
@@ -75,15 +77,17 @@ export function ApplicationsPage() {
           </div>
         </div>
 
-        {loading && <p className="mt-6 text-sm text-slate-500">Loading applications...</p>}
+        {loading && <div className="mt-6 grid gap-4 lg:grid-cols-2" aria-label="Loading applications" aria-busy="true">{Array.from({ length: 4 }, (_, index) => <Skeleton key={index} className="h-48 rounded-2xl" />)}</div>}
         {error && <p className="mt-6 rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">{error}</p>}
 
         {!loading && !error && applications.length === 0 && (
-          <div className="mt-6 rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-10 text-center">
-            <ListFilter className="mx-auto h-8 w-8 text-slate-300" />
-            <h3 className="mt-3 text-base font-black text-slate-800">No applications found</h3>
-            <p className="mt-1 text-sm text-slate-500">Try changing the filter or revisit your current job listing.</p>
-          </div>
+          <EmptyState
+            title="No applications found"
+            description="Try changing the filter or revisit your current job listing."
+            icon={<ListFilter className="h-8 w-8" />}
+            size="md"
+            className="mt-6"
+          />
         )}
 
         {!loading && !error && applications.length > 0 && (

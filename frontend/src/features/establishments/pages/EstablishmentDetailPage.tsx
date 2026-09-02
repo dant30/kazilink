@@ -2,13 +2,14 @@ import { ArrowLeft, Building2, CheckCircle2, MapPin, ShieldCheck } from 'lucide-
 import { Link, useParams } from 'react-router-dom'
 
 import { useEstablishment } from '../hooks'
+import { Skeleton } from '../../../shared/components/ui/Skeleton'
 
 export function EstablishmentDetailPage() {
   const { establishmentId } = useParams()
   const { establishment, loading, error } = useEstablishment(Number(establishmentId))
 
   if (loading) {
-    return <section className="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:px-8"><div className="rounded-2xl border border-slate-200 bg-white p-8 text-center text-sm text-slate-500 shadow-sm">Loading establishment...</div></section>
+    return <section className="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:px-8"><Skeleton className="h-96 w-full rounded-2xl" aria-label="Loading establishment" /></section>
   }
 
   if (error || !establishment) {

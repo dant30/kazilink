@@ -4,6 +4,8 @@ import { useMemo, useState } from 'react'
 import { useAdminUsers } from '../../hooks'
 import { PageHeader } from '../../../../shared/components/ui/PageHeader'
 import { Pagination } from '../../../../shared/components/ui/Pagination'
+import { Skeleton } from '../../../../shared/components/ui/Skeleton'
+import { EmptyState } from '../../../../shared/components/feedback'
 
 export function AdminUsersPage() {
   const [query, setQuery] = useState('')
@@ -39,13 +41,11 @@ export function AdminUsersPage() {
           </label>
         </div>
 
-        {loading && <p className="mt-6 text-sm text-slate-500">Loading users...</p>}
+        {loading && <div className="mt-6 space-y-3" aria-label="Loading users" aria-busy="true"><Skeleton className="h-20 rounded-2xl" /><Skeleton className="h-20 rounded-2xl" /><Skeleton className="h-20 rounded-2xl" /></div>}
         {error && <p className="mt-6 rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">{error}</p>}
 
         {!loading && !error && filteredUsers.length === 0 && (
-          <div className="mt-6 rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-10 text-center text-sm text-slate-500">
-            No users match the current search.
-          </div>
+          <EmptyState title="No users match the current search" description="Try a different name, phone number, or email address." icon={<Users className="h-8 w-8" />} size="md" className="mt-6" />
         )}
 
         {!loading && !error && filteredUsers.length > 0 && (

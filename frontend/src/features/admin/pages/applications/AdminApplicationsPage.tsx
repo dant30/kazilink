@@ -4,6 +4,7 @@ import { DataTable } from '../../../../shared/components/tables'
 import { StatCard } from '../../../../shared/components/cards/StatCard'
 import { PageHeader } from '../../../../shared/components/ui/PageHeader'
 import { Select } from '../../../../shared/components/ui/Select'
+import { Skeleton } from '../../../../shared/components/ui/Skeleton'
 import { ErrorBoundary } from '../../../../shared/components/ui/ErrorBoundary'
 import { ApplicationStatusBadge } from '../../../job_applications/components/ApplicationStatusBadge'
 import { useAdminApplications } from '../../hooks/useAdminApplications'
@@ -46,7 +47,7 @@ export function AdminApplicationsPage() {
           </div>
         </div>
         {error && <p className="mb-4 rounded-xl bg-red-50 p-4 text-sm text-red-700">{error}</p>}
-        {loading ? <p className="p-8 text-center text-sm text-slate-500">Loading applications...</p> : <DataTable data={filtered} keyExtractor={(application) => String(application.id)} emptyMessage="No applications match the current filters." columns={[
+        {loading ? <div className="space-y-3 p-8" aria-label="Loading applications" aria-busy="true"><Skeleton className="h-10 w-full" /><Skeleton className="h-10 w-full" /><Skeleton className="h-10 w-full" /></div> : <DataTable data={filtered} keyExtractor={(application) => String(application.id)} emptyMessage="No applications match the current filters." columns={[
           { header: 'Candidate', render: (application) => <div><p className="font-bold text-slate-900">{application.worker_name || `Worker #${application.worker}`}</p><p className="text-xs text-slate-500">{application.worker_phone || 'No phone provided'}</p></div> },
           { header: 'Role', render: (application) => <div><p className="font-semibold text-slate-800">{application.job_title || `Job #${application.job}`}</p><p className="text-xs text-slate-500">{application.employer_name || 'Employer'}</p></div> },
           { header: 'Applied', render: (application) => new Date(application.applied_date).toLocaleDateString() },

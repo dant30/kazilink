@@ -10,6 +10,8 @@ import type { EmploymentRecordInput } from '../types'
 import { DatePicker } from '../../../shared/components/ui/DatePicker'
 import { PageHeader } from '../../../shared/components/ui/PageHeader'
 import { StatCard } from '../../../shared/components/cards/StatCard'
+import { Skeleton } from '../../../shared/components/ui/Skeleton'
+import { EmptyState } from '../../../shared/components/feedback'
 
 const defaultForm: EmploymentRecordInput = {
   worker_id: undefined,
@@ -261,13 +263,11 @@ export function EmploymentHistoryPage() {
           </div>
         </div>
 
-        {loading && <p className="mt-6 text-sm text-slate-500">Loading employment history...</p>}
+        {loading && <div className="mt-6 space-y-4" aria-label="Loading employment history" aria-busy="true"><Skeleton className="h-36 rounded-2xl" /><Skeleton className="h-36 rounded-2xl" /><Skeleton className="h-36 rounded-2xl" /></div>}
         {error && <p className="mt-6 rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">{error}</p>}
 
         {!loading && !error && records.length === 0 && (
-          <div className="mt-6 rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-10 text-center text-sm text-slate-500">
-            No employment history found yet.
-          </div>
+          <EmptyState title="No employment history found yet" description="Verified work history will appear here." icon={<FileText className="h-8 w-8" />} size="md" className="mt-6" />
         )}
 
         {!loading && !error && records.length > 0 && (

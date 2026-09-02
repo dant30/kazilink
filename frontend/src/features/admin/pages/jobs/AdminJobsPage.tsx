@@ -5,6 +5,7 @@ import { StatCard } from '../../../../shared/components/cards/StatCard'
 import { Badge } from '../../../../shared/components/ui/Badge'
 import { PageHeader } from '../../../../shared/components/ui/PageHeader'
 import { Select } from '../../../../shared/components/ui/Select'
+import { Skeleton } from '../../../../shared/components/ui/Skeleton'
 import { ErrorBoundary } from '../../../../shared/components/ui/ErrorBoundary'
 import { useAdminJobs } from '../../hooks/useAdminJobs'
 

@@ -1,8 +1,9 @@
 import { MessageCircle } from 'lucide-react'
 import type { Conversation } from '../types'
+import { EmptyState } from '../../../shared/components/feedback'
 
 export function ConversationList({ conversations, activeId, onSelect }: { conversations: Conversation[]; activeId: number | null; onSelect: (id: number) => void }) {
-  if (!conversations.length) return <div className="flex min-h-40 flex-col items-center justify-center px-5 text-center text-slate-500"><MessageCircle className="mb-3 h-8 w-8 text-slate-300" /><p className="text-sm font-medium">No conversations yet</p><p className="mt-1 text-xs">Your job-related conversations will appear here.</p></div>
+  if (!conversations.length) return <EmptyState title="No conversations yet" description="Your job-related conversations will appear here." icon={<MessageCircle className="h-8 w-8" />} size="sm" className="min-h-40 px-5" />
   return <div className="divide-y divide-slate-100">
     {conversations.map((conversation) => {
       const name = conversation.worker_name || conversation.employer_name || 'Conversation'

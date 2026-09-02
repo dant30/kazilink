@@ -5,6 +5,7 @@ import { useEstablishments } from '../../../establishments/hooks'
 import type { Establishment } from '../../../establishments/types'
 import { StatCard } from '../../../../shared/components/cards/StatCard'
 import { PageHeader } from '../../../../shared/components/ui/PageHeader'
+import { Skeleton } from '../../../../shared/components/ui/Skeleton'
 
 export function AdminEstablishmentsPage() {
   const [query, setQuery] = useState('')
@@ -53,7 +54,7 @@ export function AdminEstablishmentsPage() {
           </label>
         </div>
 
-        {loading && <p className="mt-6 text-sm text-slate-500">Loading venue records...</p>}
+        {loading && <div className="mt-6 grid gap-4 xl:grid-cols-2" aria-label="Loading venue records" aria-busy="true"><Skeleton className="h-48 rounded-2xl" /><Skeleton className="h-48 rounded-2xl" /></div>}
         {error && <p className="mt-6 rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">{error}</p>}
 
         {!loading && !error && (

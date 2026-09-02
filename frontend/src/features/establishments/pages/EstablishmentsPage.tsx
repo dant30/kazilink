@@ -14,6 +14,7 @@ import { Button } from '../../../shared/components/ui/Button'
 import { Modal } from '../../../shared/components/ui/Modal'
 import { PageHeader } from '../../../shared/components/ui/PageHeader'
 import { Pagination } from '../../../shared/components/ui/Pagination'
+import { EmptyState } from '../../../shared/components/feedback'
 
 const blankForm: EstablishmentInput = {
   name: '',
@@ -178,9 +179,7 @@ export function EstablishmentsPage() {
             )}
 
             {establishments.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-10 text-center text-sm text-slate-500">
-                No establishments match your search.
-              </div>
+              <EmptyState title="No establishments match your search" description="Try adjusting the search criteria." icon={<Building2 className="h-8 w-8" />} />
             ) : (
               <div className="grid gap-4 xl:grid-cols-2">
                 {visibleEstablishments.map((establishment) => (

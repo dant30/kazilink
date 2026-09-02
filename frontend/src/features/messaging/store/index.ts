@@ -1,5 +1,7 @@
 import { useSyncExternalStore } from 'react'
 import { messagingServices } from '../services'
+import { authStore } from '../../auth/store'
+import { playNotificationSound } from '../../../core/utils/notificationSound'
 import type { Conversation, Message } from '../types'
 
 type MessagingState = {
@@ -19,6 +21,15 @@ const listeners = new Set<() => void>()
 const notify = () => listeners.forEach((listener) => listener())
 const message = (error: unknown) => error instanceof Error ? error.message : 'Unable to load messages.'
 let conversationsRequest: Promise<Conversation[]> | null = null
+let pollingUsers = 0
+let pollingTimer: ReturnType<typeof setInterval> | null = null
+let visibilityHandler: (() => void) | null = null
+
+const pollMessages = () => {
+	if (typeof document === 'undefined' || document.visibilityState === 'visible') {
+		void messagingStore.fetchConversations().catch(() => undefined)
+	}
+}
 
 export const messagingStore = {
 	getState: () => state,
@@ -37,11 +48,37 @@ export const messagingStore = {
 			.finally(() => { conversationsRequest = null })
 		return conversationsRequest
 	},
+	startPolling() {
+		pollingUsers += 1
+		if (pollingUsers !== 1 || typeof window === 'undefined') return
+
+		pollingTimer = setInterval(pollMessages, 15_000)
+		visibilityHandler = () => {
+			if (document.visibilityState === 'visible') pollMessages()
+		}
+		document.addEventListener('visibilitychange', visibilityHandler)
+	},
+	stopPolling() {
+		pollingUsers = Math.max(0, pollingUsers - 1)
+		if (pollingUsers > 0) return
+
+		if (pollingTimer) {
+			clearInterval(pollingTimer)
+			pollingTimer = null
+		}
+		if (visibilityHandler && typeof document !== 'undefined') {
+			document.removeEventListener('visibilitychange', visibilityHandler)
+			visibilityHandler = null
+		}
+	},
 	async fetchMessages(id: number) {
 		state = { ...state, activeConversationId: id, messagesLoading: true, error: null }; notify()
 		try {
 			const messages = await messagingServices.listMessages(id)
+			const currentUserId = authStore.getState().user?.id
+			const hasIncomingMessage = state.messages.length > 0 && messages.some((item) => item.sender !== currentUserId && !state.messages.some((current) => current.id === item.id))
 			state = { ...state, messages, messagesLoading: false }; notify()
+			if (hasIncomingMessage) playNotificationSound('message')
 			await messagingServices.markRead(id)
 			return messages
 		} catch (error) { state = { ...state, messagesLoading: false, error: message(error) }; notify(); throw error }

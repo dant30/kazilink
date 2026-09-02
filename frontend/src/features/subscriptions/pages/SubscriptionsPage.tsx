@@ -5,6 +5,7 @@ import { Button } from '../../../shared/components/ui/Button'
 import { Input } from '../../../shared/components/ui/Input'
 import { Modal } from '../../../shared/components/ui/Modal'
 import { PageHeader } from '../../../shared/components/ui/PageHeader'
+import { Skeleton } from '../../../shared/components/ui/Skeleton'
 import { useAuthStore } from '../../auth/store'
 import { SubscriptionHistory, SubscriptionPlanCard } from '../components'
 import { useSubscriptions } from '../hooks/useSubscriptions'
@@ -19,7 +20,7 @@ export function SubscriptionsPage() {
   const choose = (plan: string) => setSelectedPlan(plan)
   const confirmCheckout = async (event: FormEvent) => { event.preventDefault(); if (!selectedPlan) return; await checkout(selectedPlan, phone || user?.phone || '').catch(() => undefined); setSelectedPlan(null) }
   if (!isEmployer) return <section className="mx-auto max-w-3xl px-4 py-16 text-center"><h1 className="text-2xl font-black text-[#0A2540]">Employer subscriptions only</h1><p className="mt-2 text-sm text-slate-500">Subscriptions are available for employer accounts.</p></section>
-  if (loading && !plans.length) return <section className="mx-auto max-w-6xl px-4 py-8 text-sm text-slate-500">Loading subscription plans...</section>
+  if (loading && !plans.length) return <section className="mx-auto max-w-6xl space-y-4 px-4 py-8" aria-label="Loading subscription plans" aria-busy="true"><Skeleton className="h-12 w-64 rounded-2xl" />{Array.from({ length: 3 }, (_, index) => <Skeleton key={index} className="h-56 rounded-2xl" />)}</section>
   return <section className="mx-auto max-w-6xl space-y-6 px-4 py-8 sm:px-6 lg:px-8">
     <PageHeader
       eyebrow="Employer billing"

@@ -4,6 +4,7 @@ import { MapPin, Search, ShieldCheck, Star, UserRound } from 'lucide-react'
 import { ErrorBoundary } from '../../../shared/components/ui/ErrorBoundary'
 import { PageHeader } from '../../../shared/components/ui/PageHeader'
 import { Select } from '../../../shared/components/ui/Select'
+import { EmptyState } from '../../../shared/components/feedback'
 import { workerServices } from '../services'
 import type { WorkerProfile } from '../types'
 
@@ -87,7 +88,7 @@ export function WorkersPage() {
                 </article>
               ))}
             </div>
-          ) : <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-10 text-center text-sm text-slate-500">No workers match these filters.</div>
+          ) : <EmptyState title="No workers match these filters" description="Try adjusting the search criteria." icon={<UserRound className="h-8 w-8" />} />
         )}
       </section>
     </ErrorBoundary>

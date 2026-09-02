@@ -5,6 +5,7 @@ import { useVerificationQueue } from '../../../employment_history/hooks'
 import type { EmploymentRecord } from '../../../employment_history/types'
 import { StatCard } from '../../../../shared/components/cards/StatCard'
 import { PageHeader } from '../../../../shared/components/ui/PageHeader'
+import { Skeleton } from '../../../../shared/components/ui/Skeleton'
 
 export function AdminEmploymentVerificationPage() {
   const { records, loading, error } = useVerificationQueue()
@@ -44,7 +45,7 @@ export function AdminEmploymentVerificationPage() {
           </div>
         </div>
 
-        {loading && <p className="mt-6 text-sm text-slate-500">Loading verification queue...</p>}
+        {loading && <div className="mt-6 space-y-4" aria-label="Loading verification queue" aria-busy="true"><Skeleton className="h-36 rounded-2xl" /><Skeleton className="h-36 rounded-2xl" /><Skeleton className="h-36 rounded-2xl" /></div>}
         {error && <p className="mt-6 rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">{error}</p>}
 
         {!loading && !error && records.length === 0 && (

@@ -80,7 +80,7 @@ export function Header() {
 	const unreadNotifications = notifications.filter((notification) => !notification.is_read)
 
 	return (
-		<header className="sticky top-0 z-40 bg-white border-b border-slate-200 shadow-xs">
+		<header className="sticky top-0 z-40 border-b border-slate-200 bg-white shadow-[0_4px_16px_-6px_rgba(10,37,64,0.22)]">
 			{/* Top Banner */}
 			<div className="bg-[#0A2540] text-slate-200 text-xs px-4 py-1.5 flex flex-wrap items-center justify-between gap-2">
 				<div className="flex items-center gap-2">

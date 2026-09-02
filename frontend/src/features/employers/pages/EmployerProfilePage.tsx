@@ -3,6 +3,7 @@ import { Avatar } from '../../../shared/components/ui/Avatar'
 import { Badge } from '../../../shared/components/ui/Badge'
 import { Button } from '../../../shared/components/ui/Button'
 import { PageHeader } from '../../../shared/components/ui/PageHeader'
+import { Skeleton } from '../../../shared/components/ui/Skeleton'
 import { useEmployerProfile } from '../hooks/useEmployerProfile'
 import { useUpdateEmployerProfile } from '../hooks/useUpdateEmployerProfile'
 import { EmployerEstablishmentsCard, EmployerInfoCard, EmployerSettingsCard, EmployerStatsCard } from '../components'
@@ -21,7 +22,7 @@ export function EmployerProfilePage() {
   const changeSetting = async (field: 'auto_shortlist' | 'verified_only', value: boolean) => { await updateProfile({ [field]: value }) }
   const save = async () => { await updateProfile(form) }
 
-  if (loading && !profile) return <section className="mx-auto max-w-6xl px-4 py-8"><p className="text-slate-600">Loading employer profile...</p></section>
+  if (loading && !profile) return <section className="mx-auto max-w-6xl px-4 py-8" aria-label="Loading employer profile" aria-busy="true"><Skeleton className="h-96 w-full rounded-2xl" /></section>
   if (error && !profile) return <section className="mx-auto max-w-6xl px-4 py-8"><div className="rounded-2xl border border-red-200 bg-red-50 p-6 text-center"><p className="font-semibold text-red-700">{error}</p><Button onClick={() => refresh()} className="mt-4">Try again</Button></div></section>
   if (!profile) return null
 
