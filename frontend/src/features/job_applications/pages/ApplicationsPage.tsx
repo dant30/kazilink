@@ -8,6 +8,8 @@ import type { ApplicationFilters, JobApplicationStatus } from '../types'
 import { StatCard } from '../../../shared/components/cards/StatCard'
 import { PageHeader } from '../../../shared/components/ui/PageHeader'
 import { Pagination } from '../../../shared/components/ui/Pagination'
+import { Select } from '../../../shared/components/ui/Select'
+import { ErrorBoundary } from '../../../shared/components/ui/ErrorBoundary'
 
 const statusOptions: Array<{ value: JobApplicationStatus | ''; label: string }> = [
   { value: '', label: 'All statuses' },
@@ -40,7 +42,8 @@ export function ApplicationsPage() {
   }), [applications])
 
   return (
-    <section className="mx-auto max-w-7xl space-y-6 px-4 py-8 sm:px-6 lg:px-8">
+    <ErrorBoundary>
+      <section className="mx-auto max-w-7xl space-y-6 px-4 py-8 sm:px-6 lg:px-8">
       <PageHeader
         eyebrow="Applications"
         title={isEmployer ? 'Applicant pipeline' : isAdmin ? 'Marketplace applications' : 'My applications'}
@@ -68,16 +71,7 @@ export function ApplicationsPage() {
 
           <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2">
             <Filter className="h-4 w-4 text-slate-400" />
-            <select
-              value={statusFilter}
-              onChange={(event) => { setStatusFilter(event.target.value as JobApplicationStatus | ''); setPage(1) }}
-              className="bg-transparent text-sm font-medium text-slate-700 outline-none"
-              aria-label="Filter applications by status"
-            >
-              {statusOptions.map((option) => (
-                <option key={option.value || 'all'} value={option.value}>{option.label}</option>
-              ))}
-            </select>
+            <Select value={statusFilter} onChange={(value) => { setStatusFilter(value as JobApplicationStatus | ''); setPage(1) }} options={statusOptions} className="flex-1" />
           </div>
         </div>
 
@@ -102,6 +96,7 @@ export function ApplicationsPage() {
         {!loading && !error && applications.length > 0 && <Pagination page={page} pageSize={pageSize} total={applications.length} onPageChange={setPage} className="mt-6" />}
       </div>
     </section>
+    </ErrorBoundary>
   )
 }
 

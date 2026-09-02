@@ -5,6 +5,8 @@ import { Link, useParams } from 'react-router-dom'
 import { useAuthStore } from '../../auth/store/authStore'
 import { Button } from '../../../shared/components/ui/Button'
 import { DatePicker } from '../../../shared/components/ui/DatePicker'
+import { Select } from '../../../shared/components/ui/Select'
+import { ErrorBoundary } from '../../../shared/components/ui/ErrorBoundary'
 import { ApplicationStatusBadge } from '../components'
 import { useApplication } from '../hooks'
 import { updateApplicationStatus } from '../services'
@@ -80,7 +82,8 @@ export function ApplicationDetailPage() {
   }
 
   return (
-    <section className="mx-auto max-w-6xl space-y-6 px-4 py-8 sm:px-6 lg:px-8">
+    <ErrorBoundary>
+      <section className="mx-auto max-w-6xl space-y-6 px-4 py-8 sm:px-6 lg:px-8">
       <Link to="/applications" className="inline-flex items-center gap-2 text-sm font-bold text-[#0A2540]">
         <ArrowLeft className="h-4 w-4" />
         Back to applications
@@ -158,18 +161,8 @@ export function ApplicationDetailPage() {
                 <div className="mt-4 space-y-4">
                   <label className="block text-sm font-medium text-slate-700">
                     Status
-                    <select
-                      value={draftStatus}
-                      onChange={(event) => setDraftStatus(event.target.value as JobApplicationStatus)}
-                      className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-800 outline-none transition focus:border-[#FF6B00]"
-                    >
-                      {statusOptions.map((status) => (
-                        <option key={status} value={status}>
-                          {status.replace(/_/g, ' ')}
-                        </option>
-                      ))}
-                    </select>
                   </label>
+                  <Select value={draftStatus} onChange={(value) => setDraftStatus(value as JobApplicationStatus)} options={statusOptions} />
 
                   {draftStatus === 'interview_scheduled' && (
                     <div className="grid gap-4 sm:grid-cols-2">
@@ -217,6 +210,7 @@ export function ApplicationDetailPage() {
           </aside>
         </div>
       </div>
-    </section>
+      </section>
+    </ErrorBoundary>
   )
 }

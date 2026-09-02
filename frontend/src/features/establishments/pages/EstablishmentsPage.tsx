@@ -3,6 +3,8 @@ import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 
 import { useAuthStore } from '../../auth/store/authStore'
+import { Select } from '../../../shared/components/ui/Select'
+import { ErrorBoundary } from '../../../shared/components/ui/ErrorBoundary'
 import { useEstablishments } from '../hooks'
 import { createEstablishment } from '../services'
 import type { EstablishmentFilters, EstablishmentInput } from '../types'
@@ -42,6 +44,8 @@ export function EstablishmentsPage() {
     [establishments],
   )
 
+  const typeOptions = [{ value: '', label: 'All types' }, { value: 'Restaurant', label: 'Restaurant' }, { value: 'Hotel', label: 'Hotel' }, { value: 'Cafe', label: 'Cafe' }, { value: 'Hospitality', label: 'Hospitality' }]
+
   const updateForm = (key: keyof EstablishmentInput, value: string) => {
     setForm((current) => ({ ...current, [key]: value }))
     setFormError('')
@@ -68,7 +72,8 @@ export function EstablishmentsPage() {
   }
 
   return (
-    <section className="mx-auto max-w-7xl space-y-6 px-4 py-8 sm:px-6 lg:px-8">
+    <ErrorBoundary>
+      <section className="mx-auto max-w-7xl space-y-6 px-4 py-8 sm:px-6 lg:px-8">
       <PageHeader eyebrow="Establishments" title="Verified hospitality venues" actions={<div className="flex items-center gap-3"><div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-2 text-xs text-slate-200"><Sparkles className="h-4 w-4 text-[#FF6B00]" />{establishments.length} listings</div>{isEmployer && <Button type="button" onClick={() => setShowCreateForm(true)}><Building2 className="h-4 w-4" />New establishment</Button>}</div>} />
 
       <div className="grid gap-4 md:grid-cols-3">
@@ -164,17 +169,7 @@ export function EstablishmentsPage() {
                 className="w-44 bg-transparent outline-none placeholder:text-slate-400"
               />
             </label>
-            <select
-              value={filters.type ?? ''}
-              onChange={(event) => { setFilters((current) => ({ ...current, type: event.target.value })); setPage(1) }}
-              className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none"
-            >
-              <option value="">All types</option>
-              <option value="Restaurant">Restaurant</option>
-              <option value="Hotel">Hotel</option>
-              <option value="Cafe">Cafe</option>
-              <option value="Hospitality">Hospitality</option>
-            </select>
+            <Select value={filters.type ?? ''} onChange={(value) => { setFilters((current) => ({ ...current, type: value })); setPage(1) }} options={typeOptions} className="flex-1" />
           </div>
         </div>
 
@@ -229,6 +224,7 @@ export function EstablishmentsPage() {
         )}
       </div>
     </section>
+    </ErrorBoundary>
   )
 }
 
