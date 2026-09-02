@@ -12,6 +12,7 @@ interface DatePickerProps {
   className?: string;
   helperText?: string;
   quickPresets?: boolean;
+  disabled?: boolean;
 }
 
 export const DatePicker: React.FC<DatePickerProps> = ({
@@ -25,6 +26,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
   className = '',
   helperText,
   quickPresets = true,
+  disabled = false,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -145,8 +147,18 @@ export const DatePicker: React.FC<DatePickerProps> = ({
 
       {/* Input Trigger */}
       <div
-        onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between px-3.5 py-2.5 bg-slate-50 border border-slate-300 hover:border-slate-400 rounded-xl text-sm cursor-pointer transition focus-within:ring-2 focus-within:ring-[#0A2540]/20 bg-white"
+        role="button"
+        tabIndex={disabled ? -1 : 0}
+        aria-disabled={disabled}
+        aria-expanded={isOpen}
+        onClick={() => !disabled && setIsOpen(!isOpen)}
+        onKeyDown={(event) => {
+          if (!disabled && (event.key === 'Enter' || event.key === ' ')) {
+            event.preventDefault();
+            setIsOpen(!isOpen);
+          }
+        }}
+        className={`w-full flex items-center justify-between px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm transition focus-within:ring-2 focus-within:ring-[#0A2540]/20 ${disabled ? 'cursor-not-allowed bg-slate-100 opacity-60' : 'cursor-pointer bg-white hover:border-slate-400'}`}
       >
         <div className="flex items-center gap-2.5 text-slate-800 font-medium">
           <CalendarIcon className="w-4 h-4 text-[#FF6B00]" />
@@ -158,7 +170,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
         </div>
 
         <div className="flex items-center gap-1">
-          {value && (
+          {value && !disabled && (
             <button
               type="button"
               onClick={(e) => {
@@ -181,7 +193,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
       )}
 
       {/* Calendar Dropdown Popover */}
-      {isOpen && (
+      {isOpen && !disabled && (
         <div className="absolute top-full left-0 mt-1.5 z-50 bg-white rounded-2xl shadow-2xl border border-slate-200 p-4 w-72 sm:w-80 animate-fade-in">
           
           {/* Quick Presets */}
@@ -271,19 +283,21 @@ export const DatePicker: React.FC<DatePickerProps> = ({
               const isSelected = value === dateStr;
               const isToday = formatDateString(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()) === dateStr;
               const isPast = minDate ? dateStr < minDate : false;
+              const isAfterMax = maxDate ? dateStr > maxDate : false;
+              const isDisabled = isPast || isAfterMax;
 
               return (
                 <button
                   key={`day-${day}`}
                   type="button"
-                  disabled={isPast}
+                  disabled={isDisabled}
                   onClick={() => handleSelectDay(day)}
                   className={`text-xs py-1.5 rounded-lg font-semibold transition ${
                     isSelected
                       ? 'bg-[#0A2540] text-white font-bold shadow-xs'
                       : isToday
                       ? 'bg-amber-100 text-amber-900 border border-amber-300'
-                      : isPast
+                      : isDisabled
                       ? 'text-slate-300 cursor-not-allowed'
                       : 'text-slate-700 hover:bg-orange-50 hover:text-[#FF6B00]'
                   }`}

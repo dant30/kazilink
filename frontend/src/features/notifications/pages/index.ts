@@ -1,1 +1,1 @@
-// Pages
+export { NotificationsPage } from './NotificationsPage'

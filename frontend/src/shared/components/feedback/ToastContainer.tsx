@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import type { FC } from 'react'
 import { CheckCircle2, AlertCircle, Info, AlertTriangle, X } from 'lucide-react'
 
@@ -35,34 +35,44 @@ export const toast = {
 
 export const ToastContainer: FC<ToastContainerProps> = ({ toasts: propToasts, removeToast: propRemoveToast }) => {
   const [internalToasts, setInternalToasts] = useState<Toast[]>([])
+  const timers = useRef(new Map<Toast['id'], ReturnType<typeof setTimeout>>())
+
+  const removeInternalToast = (id: Toast['id']) => {
+    const timer = timers.current.get(id)
+    if (timer) {
+      clearTimeout(timer)
+      timers.current.delete(id)
+    }
+    setInternalToasts((prev) => prev.filter((toast) => toast.id !== id))
+  }
 
   useEffect(() => {
     const handleNewToast: ToastListener = (newToast) => {
       setInternalToasts((prev) => [...prev, newToast])
-      setTimeout(() => {
-        setInternalToasts((prev) => prev.filter((t) => t.id !== newToast.id))
-      }, 4000)
+      const timer = setTimeout(() => removeInternalToast(newToast.id), 4000)
+      timers.current.set(newToast.id, timer)
     }
 
     listeners.add(handleNewToast)
     return () => {
       listeners.delete(handleNewToast)
+      timers.current.forEach((timer) => clearTimeout(timer))
+      timers.current.clear()
     }
   }, [])
 
   const rawToasts = propToasts !== undefined ? propToasts : internalToasts
   const activeToasts = Array.isArray(rawToasts) ? rawToasts : []
-  const handleRemove = propRemoveToast ?? ((id: Toast['id']) => {
-    setInternalToasts((prev) => prev.filter((t) => t.id !== id))
-  })
+  const handleRemove = propRemoveToast ?? removeInternalToast
 
   if (!activeToasts || activeToasts.length === 0) return null
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none">
+    <div className="fixed bottom-4 right-4 z-50 flex w-full max-w-sm flex-col gap-2 pointer-events-none" aria-live="polite" aria-atomic="false">
       {activeToasts.map((t) => (
         <div
           key={t.id}
+          role={t.type === 'error' ? 'alert' : 'status'}
           className={`pointer-events-auto p-4 rounded-2xl shadow-xl border backdrop-blur-md flex items-start gap-3 transform transition-all duration-300 animate-slide-up ${
             t.type === 'success'
               ? 'bg-[#0A2540] text-white border-emerald-500/30'
@@ -84,8 +94,10 @@ export const ToastContainer: FC<ToastContainerProps> = ({ toasts: propToasts, re
             {t.message && <p className="text-xs text-slate-200 mt-0.5 leading-relaxed">{t.message}</p>}
           </div>
           <button
+            type="button"
             onClick={() => handleRemove(t.id)}
-            className="text-slate-400 hover:text-white p-1"
+            aria-label={`Dismiss ${t.title}`}
+            className="p-1 text-slate-400 hover:text-white"
           >
             <X className="w-4 h-4" />
           </button>

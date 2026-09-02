@@ -1,9 +1,11 @@
-import { ArrowLeft, Briefcase, Sparkles } from 'lucide-react'
+import { ArrowLeft, Briefcase } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
 import { useAuthStore } from '../../auth/store/authStore'
 import { Button } from '../../../shared/components/ui/Button'
+import { Modal } from '../../../shared/components/ui/Modal'
+import { PageHeader } from '../../../shared/components/ui/PageHeader'
 import { JobForm, type JobFormValues } from '../components'
 import { createJob } from '../services'
 
@@ -63,40 +65,15 @@ export function PostJobPage() {
   }
 
   return (
-    <section className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
+    <section className="mx-auto max-w-5xl space-y-6 px-4 py-8 sm:px-6 lg:px-8">
       <Link to="/jobs" className="inline-flex items-center gap-2 text-sm font-bold text-[#0A2540]">
         <ArrowLeft className="h-4 w-4" />
         Back to jobs
       </Link>
-
-      <div className="mt-6 overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-sm">
-        <div className="bg-gradient-to-r from-[#0A2540] via-[#123860] to-[#0E2E4E] p-6 text-white sm:p-8">
-          <div className="flex items-center gap-3">
-            <div className="rounded-xl bg-[#FF6B00] p-2 text-white">
-              <Briefcase className="h-5 w-5" />
-            </div>
-            <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-300">Employer workspace</p>
-              <h1 className="mt-1 text-2xl font-black text-white sm:text-3xl">Post a new role</h1>
-            </div>
-          </div>
-        </div>
-
-        <div className="p-6 sm:p-8">
-          <div className="mb-6 flex items-center gap-2 text-sm font-bold uppercase tracking-[0.18em] text-[#FF6B00]">
-            <Sparkles className="h-4 w-4" />
-            Role details
-          </div>
-
-          <JobForm values={form} saving={saving} error={error} onChange={update} onSubmit={submit} />
-
-          <div className="mt-6 flex justify-end">
-            <Button type="button" variant="outline" onClick={() => navigate('/jobs')}>
-              Cancel
-            </Button>
-          </div>
-        </div>
-      </div>
+      <PageHeader eyebrow="Employer workspace" title="Post a new role" description="Share the details applicants need to find and apply for this opportunity." icon={<Briefcase className="h-5 w-5" />} />
+      <Modal isOpen onClose={() => navigate('/jobs')} title="Post a new role" subtitle="Create a role for verified hospitality talent." maxWidth="2xl">
+        <JobForm values={form} saving={saving} error={error} onChange={update} onSubmit={submit} />
+      </Modal>
     </section>
   )
 }

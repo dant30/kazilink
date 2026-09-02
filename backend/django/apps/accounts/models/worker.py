@@ -30,6 +30,9 @@ class WorkerProfile(models.Model):
 	is_reference_checked = models.BooleanField(default=False)
 	consent_history_sharing = models.BooleanField(default=False)
 	national_id_masked = models.CharField(max_length=20, blank=True)
+	last_employer = models.CharField(max_length=255, blank=True, null=True)
+	background_check_verified = models.BooleanField(default=False)
+	open_to_work = models.BooleanField(default=True)
 
 	def __str__(self):
 		return f'{self.user.full_name} - {self.primary_role}'

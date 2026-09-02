@@ -18,6 +18,8 @@ import {
 
 import { authStore, useAuthStore } from '../../features/auth/store'
 import { Sidebar } from './Sidebar'
+import { useNotifications } from '../../features/notifications/hooks/useNotifications'
+import { ACCESS_TOKEN_KEY } from '../../core/api'
 
 export function Header() {
 	const navigate = useNavigate()
@@ -52,14 +54,16 @@ export function Header() {
 		}
 	}
 
-	const signedIn = Boolean(localStorage.getItem('kazilink.access_token') || storedUser)
+	const signedIn = Boolean(localStorage.getItem(ACCESS_TOKEN_KEY))
 	const isAdmin = Boolean(storedUser?.is_staff || storedUser?.is_superuser)
 	const isWorker = Boolean(storedUser?.is_worker)
 	const isEmployer = Boolean(storedUser?.is_employer && !storedUser?.is_worker)
 	const primaryMarketPath = isWorker ? '/jobs' : isEmployer ? '/workers' : '/jobs'
 	const primaryMarketLabel = isWorker ? 'Find Shifts' : isEmployer ? 'Browse Talent' : 'Find Shifts'
 	const dashboardPath = isAdmin ? '/admin' : isEmployer ? '/dashboard/employer' : '/dashboard/worker'
-	const profilePath = isAdmin ? '/admin' : '/profile'
+	const profilePath = isAdmin ? '/admin/profile' : isWorker ? '/profile/worker' : isEmployer ? '/profile/employer' : '/profile'
+	const settingsPath = '/profile/settings'
+	const profileMenuLabel = isAdmin ? 'Admin profile' : isWorker ? 'Worker profile' : isEmployer ? 'Employer profile' : 'Profile'
 	const messagePath = isAdmin ? '/admin' : '/messages'
 
 	const fullName = storedUser?.full_name?.trim() || 'User'
@@ -71,6 +75,8 @@ export function Header() {
 			.map((part) => part[0]?.toUpperCase() ?? '')
 			.join('') || 'U'
 	const profileImage = storedUser?.avatar || null
+	const { notifications, markRead } = useNotifications({ enabled: signedIn })
+	const unreadNotifications = notifications.filter((notification) => !notification.is_read)
 
 	return (
 		<header className="sticky top-0 z-40 bg-white border-b border-slate-200 shadow-xs">
@@ -97,9 +103,7 @@ export function Header() {
 					{/* Logo */}
 					<div className="flex items-center gap-6">
 						<Link to="/" className="flex items-center gap-2">
-							<span className="h-8 w-8 rounded-xl bg-[#0A2540] flex items-center justify-center text-[#FF6B00] font-black text-lg">
-								K
-							</span>
+								<img src="/icons/logo-192.png" alt="KaziLink" className="h-8 w-8 rounded-xl object-cover" />
 							<span className="text-2xl font-black text-[#0A2540] tracking-tight hover:text-[#FF6B00] transition">
 								Kazi<span className="text-[#FF6B00]">Link</span>
 							</span>
@@ -108,12 +112,31 @@ export function Header() {
 						{/* Desktop Public Navigation */}
 						<nav className="hidden md:flex items-center gap-1">
 							{!isAdmin && (
-								<Link
-									to={primaryMarketPath}
-									className="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition"
-								>
-									{primaryMarketLabel}
-								</Link>
+								<>
+									{signedIn ? (
+										<Link
+											to={primaryMarketPath}
+											className="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition"
+										>
+											{primaryMarketLabel}
+										</Link>
+									) : (
+										<>
+											<Link
+												to="/jobs"
+												className="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition"
+											>
+												Find Shifts
+											</Link>
+											<Link
+												to="/workers"
+												className="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition"
+											>
+												Browse Talent
+											</Link>
+										</>
+									)}
+								</>
 							)}
 							{signedIn && (
 								<Link
@@ -148,15 +171,15 @@ export function Header() {
 										title="Notifications"
 									>
 										<Bell className="w-5 h-5" />
+										{unreadNotifications.length > 0 && <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#FF6B00] px-1 text-[9px] font-bold text-white">{unreadNotifications.length > 9 ? '9+' : unreadNotifications.length}</span>}
 									</button>
 									{notifDropdownOpen && (
 										<div className="absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-xl border border-slate-200 py-2 z-50">
 											<div className="px-4 py-2.5 bg-slate-50 text-xs font-bold text-slate-900 uppercase">
 												Notifications
 											</div>
-											<div className="p-4 text-center text-xs text-slate-400">
-												No new notifications
-											</div>
+											{unreadNotifications.length ? unreadNotifications.slice(0, 3).map((notification) => <button key={notification.id} type="button" onClick={() => markRead(notification.id).catch(() => undefined)} className="block w-full border-b border-slate-100 px-4 py-3 text-left hover:bg-slate-50"><p className="truncate text-xs font-bold text-slate-800">{notification.title}</p><p className="mt-1 line-clamp-2 text-xs text-slate-500">{notification.message}</p></button>) : <div className="p-4 text-center text-xs text-slate-400">No new notifications</div>}
+											<Link to="/notifications" onClick={() => setNotifDropdownOpen(false)} className="block px-4 py-3 text-center text-xs font-bold text-[#FF6B00] hover:bg-orange-50">View all notifications</Link>
 										</div>
 									)}
 								</div>
@@ -205,7 +228,15 @@ export function Header() {
 													className="flex items-center gap-2.5 px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50"
 												>
 													<UserCircle className="h-4 w-4 text-slate-400" />
-													Profile & Passports
+													{profileMenuLabel}
+												</Link>
+												<Link
+													to={settingsPath}
+													onClick={() => setUserMenuOpen(false)}
+													className="flex items-center gap-2.5 px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50"
+												>
+													<ShieldCheck className="h-4 w-4 text-slate-400" />
+													Account settings
 												</Link>
 												<Link
 													to={messagePath}
@@ -292,9 +323,7 @@ export function Header() {
 								</div>
 							) : (
 								<div className="flex items-center gap-2">
-									<span className="h-8 w-8 rounded-xl bg-[#FF6B00] flex items-center justify-center text-white font-black text-base">
-										K
-									</span>
+									<img src="/icons/logo-192.png" alt="KaziLink" className="h-8 w-8 rounded-xl object-cover" />
 									<span className="text-lg font-black text-white">KaziLink Kenya</span>
 								</div>
 							)}

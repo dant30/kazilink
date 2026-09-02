@@ -1,1 +1,1 @@
-// Hooks
+export { useDashboard } from './useDashboard'

@@ -1,1 +1,1 @@
-// Pages
+export { SubscriptionsPage } from './SubscriptionsPage'

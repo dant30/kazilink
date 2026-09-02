@@ -54,6 +54,19 @@
   animation: impulse 1.8s infinite cubic-bezier(0.4, 0, 0.6, 1);
 }
 
+.skeleton-shimmer {
+  background: linear-gradient(110deg, #e2e8f0 8%, #f8fafc 18%, #e2e8f0 33%);
+  background-size: 200% 100%;
+  animation: shimmer 1.8s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-shimmer {
+    animation: none;
+    background: #e2e8f0;
+  }
+}
+
 @keyframes floatSlow {
   0%, 100% {
     transform: translateY(0);

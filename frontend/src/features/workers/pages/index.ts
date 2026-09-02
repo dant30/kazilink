@@ -1,1 +1,2 @@
-// Pages
+export { WorkerProfilePage } from './WorkerProfilePage'
+

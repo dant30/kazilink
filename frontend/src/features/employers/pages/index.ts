@@ -1,1 +1,2 @@
-// Pages
+export { EmployerProfilePage } from './EmployerProfilePage'
+

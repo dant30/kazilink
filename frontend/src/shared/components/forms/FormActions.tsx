@@ -11,6 +11,7 @@ export interface FormActionsProps {
   className?: string
   extraActions?: React.ReactNode
   fullWidth?: boolean
+  formId?: string
 }
 
 export const FormActions: React.FC<FormActionsProps> = ({
@@ -23,6 +24,7 @@ export const FormActions: React.FC<FormActionsProps> = ({
   className = '',
   extraActions,
   fullWidth = false,
+  formId,
 }) => {
   const alignmentClasses = {
     left: 'justify-start',
@@ -50,6 +52,7 @@ export const FormActions: React.FC<FormActionsProps> = ({
 
       <button
         type="submit"
+        form={formId}
         disabled={loading || disabled}
         className={`inline-flex items-center justify-center gap-2 rounded-xl bg-[#FF6B00] px-5 py-2.5 text-xs font-bold text-white shadow-sm transition-colors hover:bg-[#E55F00] disabled:opacity-50 ${fullWidth ? 'w-full' : ''}`}
       >

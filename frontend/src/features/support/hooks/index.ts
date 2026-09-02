@@ -1,1 +1,1 @@
-// Hooks
+export { useSupport } from './useSupport'

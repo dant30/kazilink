@@ -11,7 +11,7 @@ from apps.payments.services.mpesa import MpesaConfigurationError, initiate_stk_p
 from ..models import Subscription
 from ..permissions import IsEmployer, IsSubscriptionOwner
 from ..serializers import SubscriptionCheckoutSerializer, SubscriptionSerializer
-from ..services import cancel_subscription, subscription_for_employer
+from ..services import cancel_subscription, subscription_for_employer, subscription_plan, subscription_plans
 
 
 class SubscriptionListView(generics.ListAPIView):
@@ -22,6 +22,13 @@ class SubscriptionListView(generics.ListAPIView):
 		return subscription_for_employer(self.request.user.employer_profile)
 
 
+class SubscriptionPlansView(APIView):
+	permission_classes = [IsEmployer]
+
+	def get(self, request):
+		return Response(subscription_plans())
+
+
 class SubscriptionCheckoutView(APIView):
 	permission_classes = [IsEmployer]
 
@@ -29,11 +36,14 @@ class SubscriptionCheckoutView(APIView):
 		serializer = SubscriptionCheckoutSerializer(data=request.data)
 		serializer.is_valid(raise_exception=True)
 		data = serializer.validated_data
+		plan = subscription_plan(data['plan'])
+		if not plan or plan['amount_ksh'] < 1:
+			return Response({'detail': 'Choose a paid subscription plan.'}, status=status.HTTP_400_BAD_REQUEST)
 		payment = create_pending_payment(
 			employer=request.user.employer_profile,
 			transaction_type='subscription',
-			amount_ksh=data['amount_ksh'],
-			metadata={'subscription_plan': data['plan'], 'duration_days': data['duration_days']},
+			amount_ksh=plan['amount_ksh'],
+			metadata={'subscription_plan': data['plan'], 'duration_days': plan['duration_days']},
 		)
 		try:
 			provider_response = initiate_stk_push(transaction=payment, phone_number=data['phone_number'])

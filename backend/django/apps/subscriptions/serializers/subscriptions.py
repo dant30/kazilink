@@ -14,8 +14,6 @@ class SubscriptionSerializer(serializers.ModelSerializer):
 
 class SubscriptionCheckoutSerializer(serializers.Serializer):
 	plan = serializers.CharField(max_length=20)
-	amount_ksh = serializers.IntegerField(min_value=1)
-	duration_days = serializers.IntegerField(min_value=1, max_value=366)
 	phone_number = serializers.CharField(max_length=20)
 
 	def validate_plan(self, value):

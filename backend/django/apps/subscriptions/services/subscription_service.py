@@ -6,6 +6,24 @@ from django.utils import timezone
 from ..models import Subscription
 
 
+SUBSCRIPTION_PLANS = {
+	'free': {'name': 'Free', 'amount_ksh': 0, 'duration_days': 30, 'description': 'Start hiring with the essentials.'},
+	'growth': {'name': 'Growth', 'amount_ksh': 2500, 'duration_days': 30, 'description': 'More hiring capacity for growing teams.'},
+	'pro_enterprise': {'name': 'Pro Enterprise', 'amount_ksh': 7500, 'duration_days': 30, 'description': 'Priority tooling for high-volume hiring.'},
+}
+
+
+def subscription_plans():
+	return [
+		{'code': code, **details}
+		for code, details in SUBSCRIPTION_PLANS.items()
+	]
+
+
+def subscription_plan(code):
+	return SUBSCRIPTION_PLANS.get(code)
+
+
 def subscription_for_employer(employer):
 	return Subscription.objects.filter(employer=employer).order_by('-started_at')
 
@@ -44,6 +62,10 @@ def cancel_subscription(*, subscription):
 	subscription.status = Subscription.Status.CANCELLED
 	subscription.auto_renew = False
 	subscription.save(update_fields=('status', 'auto_renew'))
+	if subscription.employer.subscription_expires_at == subscription.expires_at:
+		subscription.employer.subscription_plan = 'free'
+		subscription.employer.subscription_expires_at = None
+		subscription.employer.save(update_fields=('subscription_plan', 'subscription_expires_at'))
 	return subscription
 
 

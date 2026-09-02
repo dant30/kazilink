@@ -1,1 +1,1 @@
-// Hooks
+export { useNotifications } from './useNotifications'

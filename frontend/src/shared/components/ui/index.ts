@@ -25,11 +25,18 @@ export type { FileUploadProps } from './FileUpload'
 export { Input } from './Input'
 export { Logo } from './Logo'
 export { Modal } from './Modal'
+export { Pagination } from './Pagination'
+export type { PaginationProps } from './Pagination'
+export { PageHeader } from './PageHeader'
+export type { PageHeaderProps } from './PageHeader'
 export { ProgressBar } from './ProgressBar'
 export { Select } from './Select'
 
 export { Spinner } from './Spinner'
 export type { SpinnerProps } from './Spinner'
+
+export { Skeleton, SkeletonText } from './Skeleton'
+export type { SkeletonProps, SkeletonTextProps } from './Skeleton'
 
 export { Switch } from './Switch'
 export type { SwitchProps } from './Switch'

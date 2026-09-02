@@ -1,1 +1,1 @@
-// Hooks
+export { usePayments } from './usePayments'

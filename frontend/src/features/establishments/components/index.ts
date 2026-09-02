@@ -1,2 +1,1 @@
-export { EstablishmentCard } from './EstablishmentCard'
-export { VerificationBadge } from './VerificationBadge'
+export { EstablishmentCard, VerificationBadge } from './EstablishmentCard'

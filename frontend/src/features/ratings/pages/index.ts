@@ -1,1 +1,1 @@
-// Pages
+export { RatingsPage } from './RatingsPage'

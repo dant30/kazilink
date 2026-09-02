@@ -1,1 +1,1 @@
-// Hooks
+export { useRatings } from './useRatings'

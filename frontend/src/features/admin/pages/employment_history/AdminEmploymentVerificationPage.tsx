@@ -3,6 +3,8 @@ import { useMemo } from 'react'
 
 import { useVerificationQueue } from '../../../employment_history/hooks'
 import type { EmploymentRecord } from '../../../employment_history/types'
+import { StatCard } from '../../../../shared/components/cards/StatCard'
+import { PageHeader } from '../../../../shared/components/ui/PageHeader'
 
 export function AdminEmploymentVerificationPage() {
   const { records, loading, error } = useVerificationQueue()
@@ -16,24 +18,22 @@ export function AdminEmploymentVerificationPage() {
 
   return (
     <section className="mx-auto max-w-7xl space-y-6 px-4 py-8 sm:px-6 lg:px-8">
-      <header className="rounded-[28px] bg-gradient-to-r from-[#0A2540] via-[#123860] to-[#0E2E4E] p-6 text-white sm:p-8">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-          <div>
-            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-200">Trust & verification</p>
-            <h1 className="mt-3 text-3xl font-black text-white sm:text-4xl">Employment history verification</h1>
-          </div>
+      <PageHeader
+        eyebrow="Trust & verification"
+        title="Employment history verification"
+        actions={
           <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-2 text-xs text-slate-200">
             <ShieldCheck className="h-4 w-4 text-[#FF6B00]" />
             {summary.total} records under review
           </div>
-        </div>
-      </header>
+        }
+      />
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <StatCard label="Total" value={summary.total} icon={<FileText className="h-5 w-5" />} />
-        <StatCard label="Verified" value={summary.verified} icon={<CheckCircle2 className="h-5 w-5" />} />
-        <StatCard label="Pending" value={summary.pending} icon={<Clock3 className="h-5 w-5" />} />
-        <StatCard label="Rejected" value={summary.rejected} icon={<XCircle className="h-5 w-5" />} />
+        <StatCard title="Total" value={summary.total} subtitle="Records in the queue" icon={<FileText className="h-5 w-5" />} />
+        <StatCard title="Verified" value={summary.verified} subtitle="Approved records" icon={<CheckCircle2 className="h-5 w-5" />} iconBg="bg-emerald-50 text-emerald-600" />
+        <StatCard title="Pending" value={summary.pending} subtitle="Awaiting review" icon={<Clock3 className="h-5 w-5" />} iconBg="bg-amber-50 text-amber-600" />
+        <StatCard title="Rejected" value={summary.rejected} subtitle="Require attention" icon={<XCircle className="h-5 w-5" />} iconBg="bg-rose-50 text-rose-600" />
       </div>
 
       <div className="card-kazilink p-5 sm:p-6">
@@ -108,14 +108,3 @@ function StatusBadge({ status }: { status: 'pending' | 'verified' | 'rejected' |
   )
 }
 
-function StatCard({ label, value, icon }: { label: string; value: number; icon: React.ReactNode }) {
-  return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-      <div className="flex items-center justify-between gap-3">
-        <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500">{label}</p>
-        <span className="inline-flex items-center justify-center rounded-lg bg-slate-100 p-2 text-[#0A2540]">{icon}</span>
-      </div>
-      <div className="mt-4 text-2xl font-black text-slate-900">{value}</div>
-    </div>
-  )
-}

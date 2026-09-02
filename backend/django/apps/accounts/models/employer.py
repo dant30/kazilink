@@ -8,6 +8,9 @@ class EmployerProfile(models.Model):
 		PRO_ENTERPRISE = 'pro_enterprise', 'Pro Enterprise'
 
 	user = models.OneToOneField('accounts.User', on_delete=models.CASCADE, related_name='employer_profile')
+	business_name = models.CharField(max_length=255, blank=True)
+	location = models.CharField(max_length=100, blank=True)
+	business_type = models.CharField(max_length=100, blank=True)
 	establishment = models.ForeignKey(
 		'establishments.Establishment', on_delete=models.SET_NULL, null=True, blank=True, related_name='employer_profiles'
 	)
@@ -17,6 +20,9 @@ class EmployerProfile(models.Model):
 	contact_person = models.CharField(max_length=255)
 	active_jobs_count = models.PositiveIntegerField(default=0)
 	total_hires = models.PositiveIntegerField(default=0)
+	average_response_time_minutes = models.PositiveIntegerField(default=0)
+	auto_shortlist = models.BooleanField(default=True)
+	verified_only = models.BooleanField(default=True)
 	history_unlock_credits = models.PositiveIntegerField(default=0)
 	unlocked_workers = models.ManyToManyField(
 		'accounts.WorkerProfile', through='employment_history.HistoryAccessLog', blank=True

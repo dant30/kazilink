@@ -1,1 +1,1 @@
-// Pages
+export { SupportPage } from './SupportPage'

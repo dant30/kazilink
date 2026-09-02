@@ -1,1 +1,1 @@
-// Hooks
+export { useSubscriptions } from './useSubscriptions'

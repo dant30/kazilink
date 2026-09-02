@@ -7,7 +7,13 @@ class KPISnapshotSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = KPISnapshot
 		fields = '__all__'
-		read_only_fields = fields
+		read_only_fields = (
+			'id', 'period_start', 'period_end', 'registered_workers',
+			'active_employers', 'jobs_posted', 'applications', 'successful_hires',
+			'paid_unlocks', 'premium_purchase_rate',
+			'average_revenue_per_paying_employer_ksh', 'repeat_employer_rate',
+			'customer_acquisition_cost_ksh', 'created_at',
+		)
 
 
 class ReportRangeSerializer(serializers.Serializer):

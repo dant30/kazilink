@@ -21,7 +21,7 @@ export function useJobs(filters: JobFilters = {}) {
       setError(state.error)
     })
 
-    return unsubscribe
+    return () => { unsubscribe() }
   }, [])
 
   useEffect(() => {

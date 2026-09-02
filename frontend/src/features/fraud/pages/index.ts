@@ -1,1 +1,1 @@
-// Pages
+export { FraudAlertsPage } from './FraudAlertsPage'

@@ -5,6 +5,9 @@ import { useAuthStore } from '../../auth/store/authStore'
 import { ApplicationCard, ApplicationStatusBadge } from '../components'
 import { useApplications } from '../hooks'
 import type { ApplicationFilters, JobApplicationStatus } from '../types'
+import { StatCard } from '../../../shared/components/cards/StatCard'
+import { PageHeader } from '../../../shared/components/ui/PageHeader'
+import { Pagination } from '../../../shared/components/ui/Pagination'
 
 const statusOptions: Array<{ value: JobApplicationStatus | ''; label: string }> = [
   { value: '', label: 'All statuses' },
@@ -18,6 +21,7 @@ const statusOptions: Array<{ value: JobApplicationStatus | ''; label: string }> 
 export function ApplicationsPage() {
   const { user } = useAuthStore()
   const [statusFilter, setStatusFilter] = useState<JobApplicationStatus | ''>('')
+  const [page, setPage] = useState(1)
   const isEmployer = Boolean(user?.is_employer && !user?.is_worker)
   const isWorker = Boolean(user?.is_worker)
   const isAdmin = Boolean(user?.is_staff || user?.is_superuser)
@@ -25,6 +29,8 @@ export function ApplicationsPage() {
   const scope = isAdmin ? 'admin' : isEmployer ? 'employer' : isWorker ? 'mine' : 'mine'
   const filters: ApplicationFilters = statusFilter ? { status: statusFilter } : {}
   const { applications, loading, error } = useApplications(scope, filters)
+  const pageSize = 8
+  const visibleApplications = applications.slice((page - 1) * pageSize, page * pageSize)
 
   const counts = useMemo(() => ({
     total: applications.length,
@@ -35,26 +41,22 @@ export function ApplicationsPage() {
 
   return (
     <section className="mx-auto max-w-7xl space-y-6 px-4 py-8 sm:px-6 lg:px-8">
-      <header className="rounded-[28px] bg-gradient-to-r from-[#0A2540] via-[#123860] to-[#0E2E4E] p-6 text-white sm:p-8">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-          <div>
-            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-200">Applications</p>
-            <h1 className="mt-3 text-3xl font-black text-white sm:text-4xl">
-              {isEmployer ? 'Applicant pipeline' : isAdmin ? 'Marketplace applications' : 'My applications'}
-            </h1>
-          </div>
+      <PageHeader
+        eyebrow="Applications"
+        title={isEmployer ? 'Applicant pipeline' : isAdmin ? 'Marketplace applications' : 'My applications'}
+        actions={
           <div className="flex items-center gap-2 rounded-full bg-white/10 px-3 py-2 text-xs text-slate-200">
             <Briefcase className="h-4 w-4 text-[#FF6B00]" />
             {counts.total} total records
           </div>
-        </div>
-      </header>
+        }
+      />
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <StatCard label="Total" value={counts.total} icon={<FileText className="h-5 w-5" />} />
-        <StatCard label="Shortlisted" value={counts.shortlisted} icon={<ApplicationStatusBadge status="shortlisted" />} />
-        <StatCard label="Interviews" value={counts.interview} icon={<ApplicationStatusBadge status="interview_scheduled" />} />
-        <StatCard label="Hired" value={counts.hired} icon={<ApplicationStatusBadge status="hired" />} />
+        <StatCard title="Total" value={counts.total} subtitle="Applications received" icon={<FileText className="h-5 w-5" />} />
+        <StatCard title="Shortlisted" value={counts.shortlisted} subtitle="Candidates to review" icon={<ApplicationStatusBadge status="shortlisted" />} iconBg="bg-orange-50 text-[#FF6B00]" />
+        <StatCard title="Interviews" value={counts.interview} subtitle="Scheduled conversations" icon={<ApplicationStatusBadge status="interview_scheduled" />} iconBg="bg-sky-50 text-sky-600" />
+        <StatCard title="Hired" value={counts.hired} subtitle="Successful applications" icon={<ApplicationStatusBadge status="hired" />} iconBg="bg-emerald-50 text-emerald-600" />
       </div>
 
       <div className="card-kazilink p-5 sm:p-6">
@@ -68,7 +70,7 @@ export function ApplicationsPage() {
             <Filter className="h-4 w-4 text-slate-400" />
             <select
               value={statusFilter}
-              onChange={(event) => setStatusFilter(event.target.value as JobApplicationStatus | '')}
+              onChange={(event) => { setStatusFilter(event.target.value as JobApplicationStatus | ''); setPage(1) }}
               className="bg-transparent text-sm font-medium text-slate-700 outline-none"
               aria-label="Filter applications by status"
             >
@@ -92,27 +94,14 @@ export function ApplicationsPage() {
 
         {!loading && !error && applications.length > 0 && (
           <div className="mt-6 grid gap-4 lg:grid-cols-2">
-            {applications.map((application) => (
+            {visibleApplications.map((application) => (
               <ApplicationCard key={application.id} application={application} />
             ))}
           </div>
         )}
+        {!loading && !error && applications.length > 0 && <Pagination page={page} pageSize={pageSize} total={applications.length} onPageChange={setPage} className="mt-6" />}
       </div>
     </section>
   )
 }
 
-function StatCard({ label, value, icon }: { label: string; value: number; icon: React.ReactNode }) {
-  return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-      <div className="flex items-center justify-between gap-3">
-        <p className="text-xs font-bold uppercase tracking-[0.18em] text-slate-500">{label}</p>
-        <span className="inline-flex items-center justify-center rounded-lg bg-slate-100 p-2 text-[#0A2540]">{icon}</span>
-      </div>
-      <div className="mt-4 flex items-end justify-between gap-3">
-        <span className="text-2xl font-black text-slate-900">{value}</span>
-        <ArrowRight className="h-4 w-4 text-[#FF6B00]" />
-      </div>
-    </div>
-  )
-}

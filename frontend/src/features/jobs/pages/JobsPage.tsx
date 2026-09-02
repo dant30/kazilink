@@ -1,7 +1,9 @@
 import { ArrowRight, Briefcase, MapPin, Search, Sparkles } from 'lucide-react'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 
+import { PageHeader } from '../../../shared/components/ui/PageHeader'
+import { Pagination } from '../../../shared/components/ui/Pagination'
 import { useAuthStore } from '../../auth/store/authStore'
 import { JobCard, JobFilters } from '../components'
 import { useJobs } from '../hooks'
@@ -12,7 +14,15 @@ export function JobsPage() {
   const isEmployer = Boolean(user?.is_employer)
   const isWorker = Boolean(user?.is_worker)
   const [filters, setFilters] = useState<JobFilterValues>({ q: '', location: '', category: '', job_type: '' })
+  const [page, setPage] = useState(1)
   const { jobs, loading, error } = useJobs(filters)
+  const pageSize = 9
+  const visibleJobs = useMemo(() => jobs.slice((page - 1) * pageSize, page * pageSize), [jobs, page])
+
+  const updateFilters = (nextFilters: JobFilterValues) => {
+    setFilters(nextFilters)
+    setPage(1)
+  }
 
   const heroTitle = isEmployer
     ? 'Hire trusted hospitality talent faster.'
@@ -28,18 +38,13 @@ export function JobsPage() {
 
   return (
     <section className="mx-auto max-w-7xl space-y-8 px-4 py-8 sm:px-6 lg:px-8">
-      <header className="overflow-hidden rounded-[28px] bg-gradient-to-r from-[#0A2540] via-[#123860] to-[#0E2E4E] p-6 text-white shadow-sm sm:p-8">
-        <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-          <div className="max-w-2xl">
-            <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-slate-200">
-              <Sparkles className="h-3.5 w-3.5 text-[#FF6B00]" />
-              {isEmployer ? 'Employer marketplace' : isWorker ? 'Worker marketplace' : 'KaziLink marketplace'}
-            </div>
-            <h1 className="font-display text-3xl font-black text-white sm:text-4xl">{heroTitle}</h1>
-            <p className="mt-3 max-w-xl text-sm leading-relaxed text-slate-300 sm:text-base">{heroDescription}</p>
-          </div>
-
-          {isEmployer ? (
+      <PageHeader
+        eyebrow={isEmployer ? 'Employer marketplace' : isWorker ? 'Worker marketplace' : 'KaziLink marketplace'}
+        title={heroTitle}
+        description={heroDescription}
+        icon={<Sparkles className="h-4 w-4" />}
+        actions={
+          isEmployer ? (
             <div className="flex flex-col gap-3 sm:flex-row">
               <Link
                 to="/jobs/new"
@@ -47,12 +52,6 @@ export function JobsPage() {
               >
                 <Briefcase className="h-4 w-4" />
                 Post a job
-              </Link>
-              <Link
-                to="/dashboard/employer"
-                className="inline-flex items-center justify-center rounded-xl border border-white/20 bg-white/5 px-4 py-3 text-sm font-bold text-white transition hover:bg-white/10"
-              >
-                Employer dashboard
               </Link>
             </div>
           ) : (
@@ -63,9 +62,9 @@ export function JobsPage() {
               <Briefcase className="h-4 w-4" />
               {user ? 'My applications' : 'Sign in to apply'}
             </Link>
-          )}
-        </div>
-      </header>
+          )
+        }
+      />
 
       <div className="grid gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm md:grid-cols-3">
         <div className="rounded-xl bg-slate-50 p-4">
@@ -87,7 +86,7 @@ export function JobsPage() {
           <Search className="h-4 w-4" />
           {isEmployer ? 'Manage hiring needs' : 'Search roles'}
         </div>
-        <JobFilters filters={filters} onChange={setFilters} />
+        <JobFilters filters={filters} onChange={updateFilters} />
       </div>
 
       {loading && (
@@ -117,7 +116,7 @@ export function JobsPage() {
 
           {jobs.length ? (
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-              {jobs.map((job) => (
+              {visibleJobs.map((job) => (
                 <JobCard key={job.id} job={job} />
               ))}
             </div>
@@ -126,6 +125,7 @@ export function JobsPage() {
               No open jobs match these filters. Try adjusting the search criteria.
             </div>
           )}
+          <Pagination page={page} pageSize={pageSize} total={jobs.length} onPageChange={setPage} />
         </div>
       )}
     </section>

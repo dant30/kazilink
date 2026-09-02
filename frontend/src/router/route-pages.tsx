@@ -2,9 +2,7 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
 import type { ReactNode } from 'react'
 
-import { Header } from '../shared/layouts/Header'
 import { MainLayout } from '../shared/layouts/MainLayout'
-import { Sidebar } from '../shared/layouts/Sidebar'
 
 function hasSession() {
   return Boolean(localStorage.getItem('kazilink.access_token'))
@@ -20,25 +18,7 @@ function isAdmin() {
 }
 
 export function PublicLayout() {
-  const signedIn = Boolean(localStorage.getItem('kazilink.access_token'))
-
-  return (
-    <>
-      <Header />
-      {signedIn ? (
-        <div className="flex w-full flex-1 items-start">
-          <Sidebar />
-          <main className="min-w-0 flex-1">
-            <Outlet />
-          </main>
-        </div>
-      ) : (
-        <main>
-          <Outlet />
-        </main>
-      )}
-    </>
-  )
+  return <MainLayout><Outlet /></MainLayout>
 }
 
 export function PrivateLayout() {

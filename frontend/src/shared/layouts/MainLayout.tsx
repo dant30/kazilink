@@ -6,6 +6,7 @@ import { Footer } from './Footer'
 import { Header } from './Header'
 import { Sidebar } from './Sidebar'
 import { useAuthStore } from '../../features/auth/store'
+import { ToastContainer } from '../components/feedback'
 
 interface MainLayoutProps {
 	children: React.ReactNode
@@ -44,6 +45,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children, admin = false 
 			<Footer />
 			<FloatingButton />
 			<BackToTop />
+			<ToastContainer />
 		</div>
 	)
 }

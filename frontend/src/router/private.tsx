@@ -2,12 +2,20 @@
 import type { RouteObject } from 'react-router-dom'
 
 import { PrivateLayout, RequireAuth, Screen } from './route-pages'
-import { ProfilePage } from '../features/accounts/pages'
+import { AccountSettingsPage, ProfilePage } from '../features/accounts/pages'
 import { ApplicationDetailPage, ApplicationsPage } from '../features/job_applications/pages'
 import { JobDetailPage, JobsPage, PostJobPage } from '../features/jobs/pages'
 import { DashboardPage, EmployerDashboardPage, WorkerDashboardPage } from '../features/dashboard'
 import { EstablishmentDetailPage, EstablishmentsPage } from '../features/establishments/pages'
 import { EmploymentHistoryPage } from '../features/employment_history/pages'
+import { EmployerProfilePage } from '../features/employers/pages'
+import { WorkerProfilePage } from '../features/workers/pages'
+import { MessagingPage } from '../features/messaging/pages'
+import { SubscriptionsPage } from '../features/subscriptions/pages'
+import { NotificationsPage } from '../features/notifications/pages'
+import { SupportPage } from '../features/support/pages'
+import { RatingsPage } from '../features/ratings/pages'
+import { PaymentsPage } from '../features/payments/pages'
 
 const protectedScreen = (title: string) => <RequireAuth><Screen title={title} /></RequireAuth>
 
@@ -28,13 +36,16 @@ export const privateRoutes: RouteObject[] = [
 			{ path: 'applications/:applicationId', element: <RequireAuth><ApplicationDetailPage /></RequireAuth> },
 			{ path: 'employment-history', element: <RequireAuth><EmploymentHistoryPage /></RequireAuth> },
 			{ path: 'employment-history/:workerId', element: <RequireAuth><EmploymentHistoryPage /></RequireAuth> },
-			{ path: 'messages', element: protectedScreen('Messages') },
-			{ path: 'notifications', element: protectedScreen('Notifications') },
-			{ path: 'payments', element: protectedScreen('Payments') },
-			{ path: 'subscriptions', element: protectedScreen('Subscriptions') },
-			{ path: 'ratings', element: protectedScreen('Reviews') },
-			{ path: 'support', element: protectedScreen('Support') },
+			{ path: 'messages', element: <RequireAuth><MessagingPage /></RequireAuth> },
+			{ path: 'notifications', element: <RequireAuth><NotificationsPage /></RequireAuth> },
+			{ path: 'payments', element: <RequireAuth><PaymentsPage /></RequireAuth> },
+			{ path: 'subscriptions', element: <RequireAuth><SubscriptionsPage /></RequireAuth> },
+			{ path: 'ratings', element: <RequireAuth><RatingsPage /></RequireAuth> },
+			{ path: 'support', element: <RequireAuth><SupportPage /></RequireAuth> },
 			{ path: 'profile', element: <RequireAuth><ProfilePage /></RequireAuth> },
+			{ path: 'profile/settings', element: <RequireAuth><AccountSettingsPage /></RequireAuth> },
+			{ path: 'profile/worker', element: <RequireAuth><WorkerProfilePage /></RequireAuth> },
+			{ path: 'profile/employer', element: <RequireAuth><EmployerProfilePage /></RequireAuth> },
 		],
 	},
 ]

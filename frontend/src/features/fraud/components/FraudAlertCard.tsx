@@ -1,0 +1,12 @@
+import { AlertTriangle, CheckCircle2, Clock3, ShieldAlert, XCircle } from 'lucide-react'
+import { Button } from '../../../shared/components/ui/Button'
+import { Badge } from '../../../shared/components/ui/Badge'
+import type { FraudAlert } from '../types'
+
+const severity: Record<string, 'warning' | 'orange' | 'neutral'> = { high: 'orange', medium: 'warning', low: 'neutral' }
+const status: Record<string, 'warning' | 'success' | 'neutral'> = { pending: 'warning', resolved: 'success', dismissed: 'neutral' }
+
+export function FraudAlertCard({ alert, onResolve, actionId }: { alert: FraudAlert; onResolve: (id: number, status: 'resolved' | 'dismissed') => Promise<unknown>; actionId: number | null }) {
+  const StatusIcon = alert.status === 'pending' ? Clock3 : alert.status === 'resolved' ? CheckCircle2 : XCircle
+  return <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between"><div className="flex gap-3"><span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${alert.severity === 'high' ? 'bg-rose-100 text-rose-700' : 'bg-amber-100 text-amber-700'}`}><AlertTriangle className="h-5 w-5" /></span><div><p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">{alert.target_type} · {alert.target_id}</p><h2 className="mt-1 text-base font-black text-slate-900">{alert.target_name}</h2><p className="mt-1 text-sm font-semibold text-slate-700">{alert.reason}</p></div></div><div className="flex shrink-0 gap-2"><Badge variant={severity[alert.severity] || 'neutral'}>{alert.severity}</Badge><Badge variant={status[alert.status] || 'neutral'} icon={<StatusIcon className="h-3 w-3" />}>{alert.status}</Badge></div></div><p className="mt-4 whitespace-pre-wrap rounded-xl bg-slate-50 p-3 text-sm leading-6 text-slate-600">{alert.details}</p><div className="mt-4 flex flex-col gap-3 border-t border-slate-100 pt-4 sm:flex-row sm:items-center sm:justify-between"><span className="text-xs text-slate-500"><ShieldAlert className="mr-1 inline h-3.5 w-3.5" />Detected {new Date(alert.detected_at).toLocaleString()}</span>{alert.status === 'pending' && <div className="flex gap-2"><Button size="sm" variant="outline" disabled={actionId === alert.id} onClick={() => onResolve(alert.id, 'dismissed')}>Dismiss</Button><Button size="sm" disabled={actionId === alert.id} onClick={() => onResolve(alert.id, 'resolved')}>{actionId === alert.id ? 'Updating...' : 'Resolve'}</Button></div>}</div></article>
+}

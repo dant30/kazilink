@@ -12,6 +12,7 @@ import {
 	Settings,
 	ShieldCheck,
 	Star,
+	Users,
 	UserCheck,
 } from 'lucide-react'
 
@@ -24,11 +25,9 @@ const workerNavItems = [
 	{ path: '/employment-history', label: 'Work Passport / History', icon: Award },
 	{ path: '/messages', label: 'Messages', icon: MessageSquare },
 	{ path: '/notifications', label: 'Notifications', icon: Bell },
-	{ path: '/payments', label: 'My Payments', icon: CreditCard },
-	{ path: '/subscriptions', label: 'Subscriptions', icon: CreditCard },
 	{ path: '/ratings', label: 'Reviews & Ratings', icon: Star },
 	{ path: '/support', label: 'Support', icon: Settings },
-	{ path: '/profile', label: 'Worker Profile', icon: UserCheck },
+	{ path: '/profile/worker', label: 'Worker Profile', icon: UserCheck },
 ]
 
 const employerNavItems = [
@@ -43,12 +42,14 @@ const employerNavItems = [
 	{ path: '/subscriptions', label: 'Subscriptions', icon: CreditCard },
 	{ path: '/ratings', label: 'Reviews & Ratings', icon: Star },
 	{ path: '/support', label: 'Support', icon: Settings },
-	{ path: '/profile', label: 'Employer Profile', icon: UserCheck },
+	{ path: '/profile/employer', label: 'Employer Profile', icon: UserCheck },
 ]
 
 const adminNavItems = [
 	{ path: '/admin', label: 'Operations Dashboard', icon: ShieldCheck },
 	{ path: '/admin/users', label: 'User Directory', icon: Home },
+	{ path: '/admin/workers', label: 'Worker Accounts', icon: UserCheck },
+	{ path: '/admin/employers', label: 'Employer Accounts', icon: Users },
 	{ path: '/admin/jobs', label: 'Job Oversight', icon: Briefcase },
 	{ path: '/admin/establishments', label: 'Establishments', icon: Award },
 	{ path: '/admin/employment-history', label: 'Verification Queue', icon: Award },

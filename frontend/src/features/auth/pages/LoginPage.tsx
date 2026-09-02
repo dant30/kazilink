@@ -46,7 +46,7 @@ export function LoginPage() {
     >
       <FormSection title="Welcome back" description="Use your registered phone number and password to continue.">
         <div className="pb-24 sm:pb-0">
-          <form className="space-y-5" onSubmit={submit}>
+          <form id="login-form" className="space-y-5" onSubmit={submit}>
             <AuthField
               label="Phone number"
               required
@@ -82,6 +82,7 @@ export function LoginPage() {
                 align="center"
                 className="border-t-0 pt-0"
                 fullWidth
+                formId="login-form"
               />
 
               <div className="flex items-center justify-between gap-3 text-sm">

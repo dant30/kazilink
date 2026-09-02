@@ -62,7 +62,10 @@ class WorkerProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = WorkerProfile
         fields = '__all__'
-        read_only_fields = ('rating', 'reviews_count', 'jobs_completed')
+        read_only_fields = (
+            'rating', 'reviews_count', 'jobs_completed',
+            'background_check_verified',
+        )
 
 
 class EmployerProfileSerializer(serializers.ModelSerializer):
@@ -71,4 +74,7 @@ class EmployerProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = EmployerProfile
         fields = '__all__'
-        read_only_fields = ('active_jobs_count', 'total_hires', 'history_unlock_credits', 'verified_business')
+        read_only_fields = (
+            'active_jobs_count', 'total_hires', 'history_unlock_credits',
+            'average_response_time_minutes', 'verified_business',
+        )

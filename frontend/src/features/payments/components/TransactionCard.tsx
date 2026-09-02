@@ -1,0 +1,12 @@
+import { ArrowDownLeft, ArrowUpRight, CalendarDays, CheckCircle2, Clock3, RotateCcw, XCircle } from 'lucide-react'
+import { Button } from '../../../shared/components/ui/Button'
+import { Badge } from '../../../shared/components/ui/Badge'
+import type { Transaction } from '../types'
+
+const status = (value: string): 'success' | 'warning' | 'info' | 'neutral' => value === 'completed' ? 'success' : value === 'pending' ? 'warning' : value === 'failed' ? 'info' : 'neutral'
+const labels: Record<string, string> = { history_unlock: 'History unlock', bundle: 'Profile unlock bundle', featured_job: 'Featured job', subscription: 'Subscription' }
+
+export function TransactionCard({ transaction, onRefund, refunding }: { transaction: Transaction; onRefund?: (id: number) => Promise<unknown>; refunding?: boolean }) {
+  const StatusIcon = transaction.status === 'completed' ? CheckCircle2 : transaction.status === 'pending' ? Clock3 : transaction.status === 'refunded' ? RotateCcw : XCircle
+  return <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><div className="flex items-start justify-between gap-4"><div className="flex items-center gap-3"><span className={`flex h-10 w-10 items-center justify-center rounded-full ${transaction.amount_ksh > 0 ? 'bg-orange-100 text-[#FF6B00]' : 'bg-slate-100 text-slate-500'}`}>{transaction.amount_ksh > 0 ? <ArrowUpRight className="h-5 w-5" /> : <ArrowDownLeft className="h-5 w-5" />}</span><div><h3 className="font-black text-slate-900">{labels[transaction.transaction_type] || transaction.transaction_type.replace(/_/g, ' ')}</h3><p className="mt-1 flex items-center gap-1 text-xs text-slate-500"><CalendarDays className="h-3.5 w-3.5" />{new Date(transaction.created_at).toLocaleString()}</p></div></div><div className="text-right"><p className="text-lg font-black text-[#0A2540]">KSh {transaction.amount_ksh.toLocaleString()}</p><Badge variant={status(transaction.status)} icon={<StatusIcon className="h-3 w-3" />}>{transaction.status}</Badge></div></div>{transaction.provider_reference && <p className="mt-4 truncate text-xs text-slate-400">Reference: {transaction.provider_reference}</p>}{transaction.status === 'completed' && onRefund && <div className="mt-3 flex justify-end"><Button variant="outline" size="sm" disabled={refunding} onClick={() => onRefund(transaction.id)}>{refunding ? 'Processing...' : 'Request refund'}</Button></div>}</article>
+}

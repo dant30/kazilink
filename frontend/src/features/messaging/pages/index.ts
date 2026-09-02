@@ -1,1 +1,1 @@
-// Pages
+export { MessagingPage } from './MessagingPage'

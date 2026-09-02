@@ -10,11 +10,13 @@ import type { Job } from '../../features/jobs/types'
 import type { JobApplication } from '../../features/job_applications/types'
 import type { Conversation, Message } from '../../features/messaging/types'
 import type { Notification } from '../../features/notifications/types'
-import type { Transaction } from '../../features/payments/types'
-import type { Review } from '../../features/ratings/types'
-import type { Subscription } from '../../features/subscriptions/types'
+import type { PaymentInitiateInput, PaymentInitiateResponse, Transaction } from '../../features/payments/types'
+import type { Review, ReviewUpdateInput } from '../../features/ratings/types'
+import type { Subscription, SubscriptionCheckout, SubscriptionCheckoutResponse, SubscriptionPlan } from '../../features/subscriptions/types'
 import type { SupportTicket } from '../../features/support/types'
 import type { KPISnapshot } from '../../features/analytics/types'
+import type { WorkerProfile, UpdateWorkerProfilePayload } from '../../features/workers/types'
+import type { EmployerProfile, UpdateEmployerProfilePayload } from '../../features/employers/types'
 
 export const endpoints = {
   auth: {
@@ -26,6 +28,8 @@ export const endpoints = {
     updateMe: (data: Record<string, unknown>) => patch<User>('/accounts/me/', data),
     profile: () => get('/accounts/profile/'),
     updateProfile: (data: Record<string, unknown>) => patch('/accounts/profile/', data),
+    employerProfile: () => get<EmployerProfile>('/accounts/employer-profile/'),
+    updateEmployerProfile: (data: UpdateEmployerProfilePayload) => patch<EmployerProfile>('/accounts/employer-profile/', data),
     adminUsers: () => get<Paginated<User> | User[]>('/accounts/admin/users/'),
   },
   jobs: {
@@ -38,12 +42,13 @@ export const endpoints = {
     adminList: () => get<Paginated<Job> | Job[]>('/jobs/admin/list/'),
   },
   establishments: {
-    list: () => get<Paginated<Establishment> | Establishment[]>('/establishments/'),
+    list: (query = '') => get<Paginated<Establishment> | Establishment[]>(`/establishments/${query ? `?${query}` : ''}`),
     detail: (id: number) => get<Establishment>(`/establishments/${id}/`),
     create: (data: Record<string, unknown>) => post<Establishment>('/establishments/', data),
     update: (id: number, data: Record<string, unknown>) => patch<Establishment>(`/establishments/${id}/`, data),
     verify: (id: number) => post<Establishment>(`/establishments/${id}/verify/`, {}),
     adminList: () => get<Paginated<Establishment> | Establishment[]>('/establishments/admin/list/'),
+    mine: () => get<Paginated<Establishment> | Establishment[]>('/establishments/mine/'),
   },
   employmentHistory: {
     mine: () => get<Paginated<EmploymentRecord> | EmploymentRecord[]>('/employment-history/mine/'),
@@ -80,7 +85,9 @@ export const endpoints = {
     list: (query = '') => get<Paginated<Review> | Review[]>(`/ratings/${query ? `?${query}` : ''}`),
     create: (data: Record<string, unknown>) => post<Review>('/ratings/', data),
     detail: (id: number) => get<Review>(`/ratings/${id}/`),
-    adminList: () => get('/ratings/admin/list/'),
+    adminList: () => get<Paginated<Review> | Review[]>('/ratings/admin/list/'),
+    update: (id: number, data: ReviewUpdateInput) => patch<Review>(`/ratings/${id}/`, data),
+    remove: (id: number) => del<void>(`/ratings/${id}/`),
   },
   notifications: {
     list: (unread = false) => get<Paginated<Notification> | Notification[]>(`/notifications/${unread ? '?unread=true' : ''}`),
@@ -93,13 +100,14 @@ export const endpoints = {
   payments: {
     list: () => get<Paginated<Transaction> | Transaction[]>('/payments/'),
     detail: (id: number) => get<Transaction>(`/payments/${id}/`),
-    create: (data: Record<string, unknown>) => post('/payments/', data),
+    create: (data: PaymentInitiateInput) => post<PaymentInitiateResponse>('/payments/', data),
     refund: (id: number) => post<Transaction>(`/payments/${id}/refund/`, {}),
     adminList: () => get<Paginated<Transaction> | Transaction[]>('/payments/admin/list/'),
   },
   subscriptions: {
     list: () => get<Paginated<Subscription> | Subscription[]>('/subscriptions/'),
-    checkout: (data: Record<string, unknown>) => post('/subscriptions/checkout/', data),
+    plans: () => get<SubscriptionPlan[]>('/subscriptions/plans/'),
+    checkout: (data: SubscriptionCheckout) => post<SubscriptionCheckoutResponse>('/subscriptions/checkout/', data),
     cancel: (id: number) => post<Subscription>(`/subscriptions/${id}/cancel/`, {}),
     adminList: () => get<Paginated<Subscription> | Subscription[]>('/subscriptions/admin/list/'),
   },
@@ -113,6 +121,7 @@ export const endpoints = {
   },
   analytics: {
     list: (query = '') => get<Paginated<KPISnapshot> | KPISnapshot[]>(`/analytics/${query ? `?${query}` : ''}`),
+    adminList: () => get<Paginated<KPISnapshot> | KPISnapshot[]>('/analytics/admin/list/'),
     latest: () => get<KPISnapshot>('/analytics/latest/'),
     generate: (data: { period_start: string; period_end: string }) => post<KPISnapshot>('/analytics/generate/', data),
     detail: (id: number) => get<KPISnapshot>(`/analytics/${id}/`),
@@ -120,4 +129,10 @@ export const endpoints = {
   },
   audit: { list: (query = '') => get<Paginated<AuditLog> | AuditLog[]>(`/audit/${query ? `?${query}` : ''}`), detail: (id: number) => get<AuditLog>(`/audit/${id}/`), adminList: () => get<Paginated<AuditLog> | AuditLog[]>('/audit/admin/list/') },
   fraud: { list: (query = '') => get<Paginated<FraudAlert> | FraudAlert[]>(`/fraud/${query ? `?${query}` : ''}`), detail: (id: number) => get<FraudAlert>(`/fraud/${id}/`), updateStatus: (id: number, status: 'resolved' | 'dismissed') => post<FraudAlert>(`/fraud/${id}/status/`, { status }) },
+  workers: {
+    me: () => get<WorkerProfile>('/workers/me/'),
+    update: (data: UpdateWorkerProfilePayload) => patch<WorkerProfile>('/workers/me/', data),
+    detail: (id: number) => get<WorkerProfile>(`/workers/${id}/`),
+    list: (query = '') => get<Paginated<WorkerProfile> | WorkerProfile[]>(`/workers/${query ? `?${query}` : ''}`),
+  },
 }

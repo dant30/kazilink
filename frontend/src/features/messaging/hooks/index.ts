@@ -1,1 +1,1 @@
-// Hooks
+export { useMessaging } from './useMessaging'

@@ -6,6 +6,12 @@ import { useAuthStore } from '../../auth/store/authStore'
 import { useEstablishments } from '../hooks'
 import { createEstablishment } from '../services'
 import type { EstablishmentFilters, EstablishmentInput } from '../types'
+import { StatCard } from '../../../shared/components/cards/StatCard'
+import { FormActions, FormField, FormSection, ValidationErrors } from '../../../shared/components/forms'
+import { Button } from '../../../shared/components/ui/Button'
+import { Modal } from '../../../shared/components/ui/Modal'
+import { PageHeader } from '../../../shared/components/ui/PageHeader'
+import { Pagination } from '../../../shared/components/ui/Pagination'
 
 const blankForm: EstablishmentInput = {
   name: '',
@@ -23,7 +29,13 @@ export function EstablishmentsPage() {
   const [form, setForm] = useState<EstablishmentInput>(blankForm)
   const [saving, setSaving] = useState(false)
   const [formError, setFormError] = useState('')
+  const [page, setPage] = useState(1)
   const { establishments, loading, error, refetch } = useEstablishments(filters)
+  const pageSize = 8
+  const visibleEstablishments = useMemo(
+    () => establishments.slice((page - 1) * pageSize, page * pageSize),
+    [establishments, page],
+  )
 
   const spotlight = useMemo(
     () => establishments.filter((item) => item.is_verified).slice(0, 3),
@@ -57,23 +69,12 @@ export function EstablishmentsPage() {
 
   return (
     <section className="mx-auto max-w-7xl space-y-6 px-4 py-8 sm:px-6 lg:px-8">
-      <header className="rounded-[28px] bg-gradient-to-r from-[#0A2540] via-[#123860] to-[#0E2E4E] p-6 text-white sm:p-8">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-          <div>
-            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-200">Establishments</p>
-            <h1 className="mt-3 text-3xl font-black text-white sm:text-4xl">Verified hospitality venues</h1>
-          </div>
-          <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-2 text-xs text-slate-200">
-            <Sparkles className="h-4 w-4 text-[#FF6B00]" />
-            {establishments.length} listings
-          </div>
-        </div>
-      </header>
+      <PageHeader eyebrow="Establishments" title="Verified hospitality venues" actions={<div className="flex items-center gap-3"><div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-2 text-xs text-slate-200"><Sparkles className="h-4 w-4 text-[#FF6B00]" />{establishments.length} listings</div>{isEmployer && <Button type="button" onClick={() => setShowCreateForm(true)}><Building2 className="h-4 w-4" />New establishment</Button>}</div>} />
 
       <div className="grid gap-4 md:grid-cols-3">
-        <OverviewCard label="Verified" value={establishments.filter((item) => item.is_verified).length} icon={<ShieldCheck className="h-5 w-5" />} />
-        <OverviewCard label="Locations" value={new Set(establishments.map((item) => item.location)).size} icon={<MapPin className="h-5 w-5" />} />
-        <OverviewCard label="Profiles" value={establishments.reduce((sum, item) => sum + (item.verified_employers_count ?? 0), 0)} icon={<Building2 className="h-5 w-5" />} />
+        <StatCard title="Verified" value={establishments.filter((item) => item.is_verified).length} subtitle="Approved venues" icon={<ShieldCheck className="h-5 w-5" />} iconBg="bg-emerald-50 text-emerald-600" />
+        <StatCard title="Locations" value={new Set(establishments.map((item) => item.location)).size} subtitle="Distinct operating areas" icon={<MapPin className="h-5 w-5" />} iconBg="bg-orange-50 text-[#FF6B00]" />
+        <StatCard title="Profiles" value={establishments.reduce((sum, item) => sum + (item.verified_employers_count ?? 0), 0)} subtitle="Verified employer links" icon={<Building2 className="h-5 w-5" />} />
       </div>
 
       {isEmployer && (
@@ -83,31 +84,22 @@ export function EstablishmentsPage() {
               <h2 className="text-lg font-black text-slate-900">Add your establishment</h2>
               <p className="text-xs text-slate-500">Create an employer-owned venue profile for hiring and verification.</p>
             </div>
-            {!showCreateForm && (
-              <button
-                type="button"
-                onClick={() => setShowCreateForm(true)}
-                className="inline-flex items-center justify-center rounded-xl bg-[#FF6B00] px-4 py-2.5 text-sm font-bold text-white transition hover:bg-[#E55F00]"
-              >
-                + New establishment
-              </button>
-            )}
           </div>
 
-          {showCreateForm && (
-            <form onSubmit={handleSubmit} className="mt-6 grid gap-5 md:grid-cols-2">
-              <label className="space-y-2 text-sm font-semibold text-slate-700">
-                <span>Establishment name</span>
+          <Modal isOpen={showCreateForm} onClose={() => { setShowCreateForm(false); setForm(blankForm); setFormError('') }} title="Add your establishment" subtitle="Create an employer-owned venue profile for hiring and verification." maxWidth="lg">
+            <form id="establishment-form" onSubmit={handleSubmit} className="space-y-5">
+              <FormSection title="Venue details" description="Add the information workers and the verification team will use." icon={<Building2 className="h-4 w-4" />} divider={false}>
+                <div className="grid gap-5 md:grid-cols-2">
+              <FormField label="Establishment name" required>
                 <input
                   required
                   value={form.name}
                   onChange={(event) => updateForm('name', event.target.value)}
                   className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-700 placeholder:text-slate-400 focus:border-[#FF6B00] focus:bg-white focus:outline-none"
                 />
-              </label>
+              </FormField>
 
-              <label className="space-y-2 text-sm font-semibold text-slate-700">
-                <span>Type</span>
+              <FormField label="Type" required>
                 <input
                   required
                   value={form.establishment_type}
@@ -115,10 +107,9 @@ export function EstablishmentsPage() {
                   placeholder="Restaurant, Hotel, Cafe"
                   className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-700 placeholder:text-slate-400 focus:border-[#FF6B00] focus:bg-white focus:outline-none"
                 />
-              </label>
+              </FormField>
 
-              <label className="space-y-2 text-sm font-semibold text-slate-700">
-                <span>Location</span>
+              <FormField label="Location" required>
                 <input
                   required
                   value={form.location}
@@ -126,20 +117,19 @@ export function EstablishmentsPage() {
                   placeholder="Nairobi"
                   className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-700 placeholder:text-slate-400 focus:border-[#FF6B00] focus:bg-white focus:outline-none"
                 />
-              </label>
+              </FormField>
 
-              <label className="space-y-2 text-sm font-semibold text-slate-700">
-                <span>Logo URL</span>
+              <FormField label="Logo URL" helperText="Optional. Use a publicly accessible image URL.">
                 <input
                   value={form.logo ?? ''}
                   onChange={(event) => updateForm('logo', event.target.value)}
                   placeholder="https://example.com/logo.png"
                   className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-700 placeholder:text-slate-400 focus:border-[#FF6B00] focus:bg-white focus:outline-none"
                 />
-              </label>
+              </FormField>
+                </div>
 
-              <label className="space-y-2 text-sm font-semibold text-slate-700 md:col-span-2">
-                <span>Address</span>
+              <FormField label="Address" required>
                 <textarea
                   required
                   value={form.address}
@@ -147,20 +137,13 @@ export function EstablishmentsPage() {
                   rows={3}
                   className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-700 placeholder:text-slate-400 focus:border-[#FF6B00] focus:bg-white focus:outline-none"
                 />
-              </label>
+              </FormField>
+              </FormSection>
 
-              {formError && <p className="md:col-span-2 rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">{formError}</p>}
-
-              <div className="md:col-span-2 flex justify-end gap-3">
-                <button type="button" onClick={() => { setShowCreateForm(false); setForm(blankForm); setFormError('') }} className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-700 transition hover:bg-slate-50">
-                  Cancel
-                </button>
-                <button type="submit" disabled={saving} className="rounded-xl bg-[#FF6B00] px-5 py-2.5 text-sm font-bold text-white transition hover:bg-[#E55F00] disabled:cursor-not-allowed disabled:opacity-70">
-                  {saving ? 'Saving...' : 'Create establishment'}
-                </button>
-              </div>
+              <ValidationErrors errors={formError ? [formError] : null} />
+              <FormActions submitLabel="Create establishment" loading={saving} onCancel={() => { setShowCreateForm(false); setForm(blankForm); setFormError('') }} />
             </form>
-          )}
+          </Modal>
         </div>
       )}
 
@@ -176,14 +159,14 @@ export function EstablishmentsPage() {
               <Search className="h-4 w-4 text-slate-400" />
               <input
                 value={filters.q ?? ''}
-                onChange={(event) => setFilters((current) => ({ ...current, q: event.target.value }))}
+                  onChange={(event) => { setFilters((current) => ({ ...current, q: event.target.value })); setPage(1) }}
                 placeholder="Search by name or address"
                 className="w-44 bg-transparent outline-none placeholder:text-slate-400"
               />
             </label>
             <select
               value={filters.type ?? ''}
-              onChange={(event) => setFilters((current) => ({ ...current, type: event.target.value }))}
+              onChange={(event) => { setFilters((current) => ({ ...current, type: event.target.value })); setPage(1) }}
               className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none"
             >
               <option value="">All types</option>
@@ -214,7 +197,7 @@ export function EstablishmentsPage() {
               </div>
             ) : (
               <div className="grid gap-4 xl:grid-cols-2">
-                {establishments.map((establishment) => (
+                {visibleEstablishments.map((establishment) => (
                   <Link key={establishment.id} to={`/establishments/${establishment.id}`} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-orange-200 hover:shadow-md">
                     <div className="flex items-start justify-between gap-3">
                       <div>
@@ -241,22 +224,11 @@ export function EstablishmentsPage() {
                 ))}
               </div>
             )}
+            <Pagination page={page} pageSize={pageSize} total={establishments.length} onPageChange={setPage} />
           </div>
         )}
       </div>
     </section>
-  )
-}
-
-function OverviewCard({ label, value, icon }: { label: string; value: number; icon: React.ReactNode }) {
-  return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-      <div className="flex items-center justify-between gap-3">
-        <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500">{label}</p>
-        <span className="inline-flex items-center justify-center rounded-lg bg-slate-100 p-2 text-[#0A2540]">{icon}</span>
-      </div>
-      <div className="mt-4 text-2xl font-black text-slate-900">{value}</div>
-    </div>
   )
 }
 

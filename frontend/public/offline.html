@@ -1,1 +1,27 @@
-<!-- Offline fallback -->
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta name="theme-color" content="#0A2540" />
+		<link rel="icon" href="/icons/favicon.ico" sizes="any" />
+		<title>KaziLink | Offline</title>
+		<style>
+			:root { color-scheme: light; font-family: Georgia, 'Times New Roman', serif; background: #f8fafc; color: #0a2540; }
+			body { min-height: 100vh; margin: 0; display: grid; place-items: center; padding: 24px; }
+			main { width: min(100%, 520px); padding: 40px 32px; border: 1px solid #dbe3ea; border-radius: 24px; background: white; box-shadow: 0 20px 50px rgb(10 37 64 / 12%); text-align: center; }
+			img { width: 72px; height: 72px; margin-bottom: 20px; }
+			h1 { margin: 0 0 12px; font-size: 34px; }
+			p { margin: 0; color: #526476; font: 16px/1.6 Arial, sans-serif; }
+			button { margin-top: 24px; border: 0; border-radius: 12px; padding: 12px 18px; background: #ff6b00; color: white; font: 700 14px Arial, sans-serif; cursor: pointer; }
+		</style>
+	</head>
+	<body>
+		<main>
+			<img src="/icons/logo-192.png" alt="KaziLink" />
+			<h1>You are offline</h1>
+			<p>KaziLink could not reach the network. Reconnect and try again to continue.</p>
+			<button type="button" onclick="window.location.reload()">Try again</button>
+		</main>
+	</body>
+</html>

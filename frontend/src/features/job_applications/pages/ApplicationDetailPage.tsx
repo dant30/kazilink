@@ -4,6 +4,7 @@ import { Link, useParams } from 'react-router-dom'
 
 import { useAuthStore } from '../../auth/store/authStore'
 import { Button } from '../../../shared/components/ui/Button'
+import { DatePicker } from '../../../shared/components/ui/DatePicker'
 import { ApplicationStatusBadge } from '../components'
 import { useApplication } from '../hooks'
 import { updateApplicationStatus } from '../services'
@@ -18,6 +19,7 @@ export function ApplicationDetailPage() {
   const app = application as NonNullable<typeof application>
   const [draftStatus, setDraftStatus] = useState<JobApplicationStatus>('applied')
   const [interviewDate, setInterviewDate] = useState('')
+  const [interviewTime, setInterviewTime] = useState('09:00')
   const [interviewNote, setInterviewNote] = useState('')
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState('')
@@ -25,7 +27,8 @@ export function ApplicationDetailPage() {
   useEffect(() => {
     if (app) {
       setDraftStatus(app.status)
-      setInterviewDate(app.interview_date ?? '')
+      setInterviewDate(app.interview_date ? app.interview_date.slice(0, 10) : '')
+      setInterviewTime(app.interview_date?.slice(11, 16) || '09:00')
       setInterviewNote(app.interview_note ?? '')
     }
   }, [app])
@@ -59,7 +62,7 @@ export function ApplicationDetailPage() {
   async function handleStatusUpdate() {
     const payload: ApplicationStatusInput = {
       status: draftStatus,
-      interview_date: draftStatus === 'interview_scheduled' ? interviewDate || null : null,
+      interview_date: draftStatus === 'interview_scheduled' && interviewDate ? `${interviewDate}T${interviewTime}` : null,
       interview_note: interviewNote || '',
     }
 
@@ -169,15 +172,10 @@ export function ApplicationDetailPage() {
                   </label>
 
                   {draftStatus === 'interview_scheduled' && (
-                    <label className="block text-sm font-medium text-slate-700">
-                      Interview date
-                      <input
-                        type="datetime-local"
-                        value={interviewDate}
-                        onChange={(event) => setInterviewDate(event.target.value)}
-                        className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-800 outline-none transition focus:border-[#FF6B00]"
-                      />
-                    </label>
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <DatePicker label="Interview date" required value={interviewDate} onChange={setInterviewDate} minDate={new Date().toISOString().slice(0, 10)} />
+                      <label className="block text-sm font-medium text-slate-700">Interview time<input type="time" required value={interviewTime} onChange={(event) => setInterviewTime(event.target.value)} className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-800 outline-none transition focus:border-[#FF6B00]" /></label>
+                    </div>
                   )}
 
                   <label className="block text-sm font-medium text-slate-700">

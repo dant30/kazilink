@@ -1,1 +1,1 @@
-// Hooks
+export { useFraudAlerts } from './useFraudAlerts'

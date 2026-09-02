@@ -34,7 +34,8 @@ export function updateEstablishment(id: number, data: Partial<EstablishmentInput
 }
 
 export function verifyEstablishment(id: number, verified = true) {
-  return endpoints.establishments.verify(id, verified)
+  void verified
+  return endpoints.establishments.verify(id)
 }
 
 export function getAdminEstablishments() {

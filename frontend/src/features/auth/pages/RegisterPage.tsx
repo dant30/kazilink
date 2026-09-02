@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 
 import { FormActions } from '../../../shared/components/forms/FormActions'
 import { FormSection } from '../../../shared/components/forms/FormSection'
+import { Checkbox } from '../../../shared/components/ui/Checkbox'
 import { AuthField, AuthPanel } from '../components'
 import { register } from '../services'
 
@@ -24,6 +25,7 @@ export function RegisterPage() {
   })
   const [error, setError] = useState('')
   const [saving, setSaving] = useState(false)
+  const [termsAccepted, setTermsAccepted] = useState(false)
 
   const update = (key: keyof typeof form, value: string) =>
     setForm((current) => ({ ...current, [key]: value }))
@@ -41,6 +43,12 @@ export function RegisterPage() {
 
     if (form.password !== form.confirm_password) {
       setError('Passwords do not match.')
+      setSaving(false)
+      return
+    }
+
+    if (!termsAccepted) {
+      setError('Please accept the terms and conditions to continue.')
       setSaving(false)
       return
     }
@@ -112,7 +120,7 @@ export function RegisterPage() {
     >
       <FormSection title="Your profile" description="Set up your worker or employer account and verify the details that matter most.">
         <div className="pb-24 sm:pb-0">
-          <form className="space-y-5" onSubmit={submit}>
+          <form id="register-form" className="space-y-5" onSubmit={submit}>
             <div className="rounded-2xl border border-slate-200 bg-slate-50 p-1">
               <div className="grid grid-cols-2 gap-1" role="group" aria-label="Account type">
                 <button
@@ -238,6 +246,20 @@ export function RegisterPage() {
                 {error}
               </div>
             )}
+
+            <Checkbox
+              checked={termsAccepted}
+              onChange={setTermsAccepted}
+              label={
+                <span>
+                  I agree to the{' '}
+                  <Link className="text-[#0A2540] underline decoration-[#FF6B00] underline-offset-2" to="/terms">
+                    terms and conditions
+                  </Link>
+                </span>
+              }
+              description="You agree to KaziLink's platform rules and privacy practices."
+            />
           </form>
         </div>
 
@@ -250,6 +272,8 @@ export function RegisterPage() {
                 align="center"
                 className="border-t-0 pt-0"
                 fullWidth
+                disabled={!termsAccepted}
+                formId="register-form"
               />
 
               <div className="text-center text-sm text-slate-600">

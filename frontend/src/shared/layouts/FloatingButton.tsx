@@ -172,7 +172,7 @@ export const FloatingButton: React.FC = () => {
             <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-emerald-400 animate-impulse ring-2 ring-white"></span>
           )}
         </div>
-        <span className="font-black tracking-wide text-xs">
+        <span className="hidden font-black tracking-wide text-xs sm:inline">
           {isOpen ? 'Close Support' : 'Support & Contacts'}
         </span>
       </button>
