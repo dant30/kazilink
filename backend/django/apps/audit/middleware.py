@@ -18,6 +18,7 @@ class AuditRequestMiddleware:
 						'method': request.method,
 						'status_code': response.status_code,
 						'ip_address': request.META.get('REMOTE_ADDR', ''),
+						'correlation_id': getattr(request, 'correlation_id', getattr(request, 'request_id', '')),
 						'request_id': getattr(request, 'request_id', ''),
 					},
 				)

@@ -52,7 +52,7 @@ export function AdminApplicationsPage() {
           { header: 'Role', render: (application) => <div><p className="font-semibold text-slate-800">{application.job_title || `Job #${application.job}`}</p><p className="text-xs text-slate-500">{application.employer_name || 'Employer'}</p></div> },
           { header: 'Applied', render: (application) => new Date(application.applied_date).toLocaleDateString() },
           { header: 'Status', render: (application) => <ApplicationStatusBadge status={application.status} /> },
-          { header: 'Decision', render: (application) => application.status === 'hired' || application.status === 'rejected' ? <span className="text-xs text-slate-400">Final</span> : <select aria-label={`Update application ${application.id} status`} value={application.status} onChange={(event) => update(application.id, event.target.value as JobApplicationStatus)} className="rounded-lg border border-slate-200 px-2 py-1.5 text-xs"><option value="applied">Applied</option><option value="shortlisted">Shortlisted</option><option value="interview_scheduled">Interview scheduled</option><option value="hired">Hired</option><option value="rejected">Rejected</option></select> },
+          { header: 'Decision', render: (application) => application.status === 'hired' || application.status === 'rejected' ? <span className="text-xs text-slate-400">Final</span> : <Select aria-label={`Update application ${application.id} status`} value={application.status} onChange={(value) => void update(application.id, value as JobApplicationStatus)} options={statuses.filter((option) => option.value)} className="min-w-36" /> },
         ]} />}
       </section>
     </section>

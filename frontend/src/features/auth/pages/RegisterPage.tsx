@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { FormActions } from '../../../shared/components/forms/FormActions'
 import { FormSection } from '../../../shared/components/forms/FormSection'
 import { Checkbox } from '../../../shared/components/ui/Checkbox'
+import { Select } from '../../../shared/components/ui/Select'
 import { AuthField, AuthPanel } from '../components'
 import { register } from '../services'
 
@@ -202,19 +203,7 @@ export function RegisterPage() {
                   value={form.location}
                   onChange={(event) => update('location', event.target.value)}
                 />
-                <div className="space-y-1.5 text-left">
-                  <label className="block text-[11px] font-bold uppercase tracking-[0.2em] text-slate-700">Availability</label>
-                  <select
-                    className="w-full rounded-2xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 shadow-sm transition-all duration-150 focus:border-[#0A2540] focus:outline-none focus:ring-4 focus:ring-[#0A2540]/10"
-                    value={form.availability}
-                    onChange={(event) => update('availability', event.target.value)}
-                  >
-                    <option value="immediate">Immediate</option>
-                    <option value="night_shifts">Night shifts</option>
-                    <option value="full_time">Full time</option>
-                    <option value="part_time">Part time</option>
-                  </select>
-                </div>
+                <Select label="Availability" value={form.availability} onChange={(value) => update('availability', value)} options={[{ value: 'immediate', label: 'Immediate' }, { value: 'night_shifts', label: 'Night shifts' }, { value: 'full_time', label: 'Full time' }, { value: 'part_time', label: 'Part time' }]} />
                 <AuthField
                   label="Expected daily rate (KSh)"
                   required

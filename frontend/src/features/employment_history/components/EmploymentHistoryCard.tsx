@@ -1,6 +1,7 @@
 import { CheckCircle2, Clock3, FileText, UserRound } from 'lucide-react'
 
 import type { EmploymentRecord } from '../types'
+import { Badge } from '../../../shared/components/ui/Badge'
 
 export function EmploymentHistoryCard({ record }: { record: EmploymentRecord }) {
   return (
@@ -25,15 +26,6 @@ export function EmploymentHistoryCard({ record }: { record: EmploymentRecord }) 
 }
 
 export function StatusBadge({ status }: { status: 'pending' | 'verified' | 'rejected' | string }) {
-  const palette = {
-    pending: 'bg-amber-100 text-amber-700',
-    verified: 'bg-emerald-100 text-emerald-700',
-    rejected: 'bg-rose-100 text-rose-700',
-  }
-
-  return (
-    <span className={`inline-flex rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.15em] ${palette[status as keyof typeof palette] ?? 'bg-slate-100 text-slate-700'}`}>
-      {status}
-    </span>
-  )
+  const variant = status === 'verified' ? 'success' : status === 'pending' ? 'warning' : status === 'rejected' ? 'danger' : 'neutral'
+  return <Badge variant={variant} size="sm" className="capitalize">{status.replace(/_/g, ' ')}</Badge>
 }

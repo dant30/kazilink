@@ -5,6 +5,7 @@ import { Link, useParams } from 'react-router-dom'
 import { useAuthStore } from '../../auth/store/authStore'
 import { Button } from '../../../shared/components/ui/Button'
 import { Skeleton } from '../../../shared/components/ui/Skeleton'
+import { Badge } from '../../../shared/components/ui/Badge'
 import { useJob } from '../hooks'
 import { applyForJob } from '../services'
 
@@ -54,9 +55,7 @@ export function JobDetailPage() {
         <div className="bg-gradient-to-r from-[#0A2540] via-[#123860] to-[#0E2E4E] p-6 text-white sm:p-8">
           <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
             <div>
-              <span className="inline-flex items-center rounded-full bg-white/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-slate-200">
-                {job.category || 'Hospitality'}
-              </span>
+              <Badge variant="neutral" size="sm" className="border-white/15 bg-white/10 text-slate-200">{job.category || 'Hospitality'}</Badge>
               <h1 className="mt-4 text-3xl font-black text-white sm:text-4xl">{job.title}</h1>
               <div className="mt-4 flex flex-wrap items-center gap-4 text-sm text-slate-200">
                 <span className="inline-flex items-center gap-2">

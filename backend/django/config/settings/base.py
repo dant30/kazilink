@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 
 from dotenv import load_dotenv
+from core.logging.config import LOGGING
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 load_dotenv(BASE_DIR.parent / '.env')
@@ -117,6 +118,20 @@ REST_FRAMEWORK = {
 }
 
 CORS_ALLOWED_ORIGINS = [origin.strip() for origin in os.getenv('CORS_ALLOWED_ORIGINS', '').split(',') if origin.strip()]
+CORS_ALLOW_ALL_ORIGINS = os.getenv('CORS_ALLOW_ALL_ORIGINS', 'false').lower() == 'true'
+CORS_ALLOW_CREDENTIALS = os.getenv('CORS_ALLOW_CREDENTIALS', 'false').lower() == 'true'
+CSRF_TRUSTED_ORIGINS = [origin.strip() for origin in os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',') if origin.strip()]
+CORS_ALLOW_HEADERS = [
+	'accept',
+	'authorization',
+	'content-type',
+	'user-agent',
+	'x-csrftoken',
+	'x-requested-with',
+	'x-correlation-id',
+	'x-request-id',
+]
+CORS_EXPOSE_HEADERS = ['X-Correlation-ID', 'X-Request-ID']
 MPESA_SHORTCODE = os.getenv('MPESA_SHORTCODE', '')
 MPESA_CONSUMER_KEY = os.getenv('MPESA_CONSUMER_KEY', '')
 MPESA_CONSUMER_SECRET = os.getenv('MPESA_CONSUMER_SECRET', '')

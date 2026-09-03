@@ -1,6 +1,7 @@
 import type { FormEvent } from 'react'
 
 import { FormActions, FormField, FormSection, ValidationErrors } from '../../../shared/components/forms'
+import { Select } from '../../../shared/components/ui/Select'
 
 export type JobFormValues = {
   title: string
@@ -84,19 +85,7 @@ export function JobForm({
             />
           </FormField>
 
-          <FormField label="Job type" required>
-            <select
-              value={values.job_type}
-              onChange={(event) => onChange('job_type', event.target.value)}
-              className={fieldClass}
-            >
-              <option value="full_time">Full time</option>
-              <option value="part_time">Part time</option>
-              <option value="weekend_gig">Weekend gig</option>
-              <option value="daily_shift">Daily shift</option>
-              <option value="shift_24hr">24-hour shift</option>
-            </select>
-          </FormField>
+          <Select label="Job type" required value={values.job_type} onChange={(value) => onChange('job_type', value)} options={[{ value: 'full_time', label: 'Full time' }, { value: 'part_time', label: 'Part time' }, { value: 'weekend_gig', label: 'Weekend gig' }, { value: 'daily_shift', label: 'Daily shift' }, { value: 'shift_24hr', label: '24-hour shift' }]} />
         </div>
 
         <FormField label="Description" required>

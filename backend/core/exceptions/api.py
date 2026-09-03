@@ -10,6 +10,17 @@ class APIError(APIException):
 
 def api_exception_handler(exc, context):
     response = exception_handler(exc, context)
-    if response is not None and isinstance(response.data, dict) and 'detail' in response.data:
-        response.data = {'error': {'code': getattr(exc, 'default_code', 'error'), 'detail': response.data['detail']}}
+    if response is not None:
+        detail = response.data.get('detail') if isinstance(response.data, dict) and 'detail' in response.data else response.data
+        request = context.get('request')
+        correlation = getattr(request, 'correlation_id', '')
+        response.data = {
+            'error': {
+                'code': getattr(exc, 'default_code', 'error'),
+                'detail': detail,
+                'correlation_id': correlation,
+            }
+        }
+        if correlation:
+            response['X-Correlation-ID'] = correlation
     return response

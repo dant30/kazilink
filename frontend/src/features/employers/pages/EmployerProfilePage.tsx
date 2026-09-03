@@ -8,6 +8,7 @@ import { useEmployerProfile } from '../hooks/useEmployerProfile'
 import { useUpdateEmployerProfile } from '../hooks/useUpdateEmployerProfile'
 import { EmployerEstablishmentsCard, EmployerInfoCard, EmployerSettingsCard, EmployerStatsCard } from '../components'
 import type { UpdateEmployerProfilePayload } from '../types'
+import { ErrorBoundary } from '../../../shared/components/ui/ErrorBoundary'
 
 export function EmployerProfilePage() {
   const { profile, establishments, loading, error, refresh } = useEmployerProfile()
@@ -27,7 +28,7 @@ export function EmployerProfilePage() {
   if (!profile) return null
 
   const strength = Math.round(([profile.business_name, profile.location, profile.business_type, profile.contact_person, establishments.length > 0].filter(Boolean).length / 5) * 100)
-  return <section className="mx-auto max-w-6xl space-y-6 px-4 py-8 sm:px-6 lg:px-8">
+  return <ErrorBoundary><section className="mx-auto max-w-6xl space-y-6 px-4 py-8 sm:px-6 lg:px-8">
     <PageHeader
       eyebrow="Employer profile"
       title={profile.business_name || profile.user.full_name}
@@ -43,14 +44,17 @@ export function EmployerProfilePage() {
         </div>
       }
     >
-      <div className="mt-3 flex flex-wrap gap-2">
+      <div className="mt-3 flex items-center gap-3">
+        <Avatar name={profile.user.full_name} size="lg" isVerified={profile.verified_business} />
+        <div className="flex flex-wrap gap-2">
         <Badge variant={profile.verified_business ? 'verified' : 'warning'}>{profile.verified_business ? 'Verified business' : 'Verification pending'}</Badge>
         <Badge variant="info">{profile.active_jobs_count > 0 ? 'Hiring actively' : 'No open roles'}</Badge>
+        </div>
       </div>
     </PageHeader>
     {success && <div className="rounded-2xl border border-green-200 bg-green-50 p-4 font-semibold text-green-700">Profile updated successfully.</div>}
     {updateError && <div className="rounded-2xl border border-red-200 bg-red-50 p-4 font-semibold text-red-700">{updateError}</div>}
     <div className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]"><div className="space-y-6"><EmployerInfoCard values={form} onChange={change} /><EmployerEstablishmentsCard establishments={establishments} /></div><aside className="space-y-6"><EmployerSettingsCard profile={profile} onChange={changeSetting} /><EmployerStatsCard profile={profile} /></aside></div>
     <div className="flex justify-end rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"><Button onClick={save} disabled={updating}>{updating ? 'Saving...' : 'Save profile'}</Button></div>
-  </section>
+  </section></ErrorBoundary>
 }

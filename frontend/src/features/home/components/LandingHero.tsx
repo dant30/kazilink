@@ -3,6 +3,7 @@ import type { Dispatch, SetStateAction } from 'react'
 import { ArrowRight, MapPin, Search, ShieldCheck } from 'lucide-react'
 
 import { HeroParticles } from './HeroParticles'
+import { Select } from '../../../shared/components/ui/Select'
 
 export interface LandingHeroProps {
   searchRole: string
@@ -34,26 +35,12 @@ export function LandingHero({ searchRole, setSearchRole, searchLocation, setSear
             <label className="flex w-full items-center gap-2.5 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 sm:w-1/2">
               <Search className="h-4 w-4 shrink-0 text-[#0A2540]" />
               <span className="sr-only">Hospitality role</span>
-              <select value={searchRole} onChange={(event) => setSearchRole(event.target.value)} className="w-full bg-transparent text-xs font-medium text-slate-700 outline-none sm:text-sm">
-                <option value="">All Hospitality Roles</option>
-                <option value="Waiter">Waiters & Waitresses</option>
-                <option value="Bartender">Mixologists & Bartenders</option>
-                <option value="Barmaid">Barmaids</option>
-                <option value="Cleaner">Cleaners & Stewards</option>
-                <option value="Chef">Kitchen Chefs & Cooks</option>
-                <option value="Barista">Baristas</option>
-              </select>
+              <Select aria-label="Hospitality role" value={searchRole} onChange={setSearchRole} options={[{ value: '', label: 'All Hospitality Roles' }, { value: 'Waiter', label: 'Waiters & Waitresses' }, { value: 'Bartender', label: 'Mixologists & Bartenders' }, { value: 'Barmaid', label: 'Barmaids' }, { value: 'Cleaner', label: 'Cleaners & Stewards' }, { value: 'Chef', label: 'Kitchen Chefs & Cooks' }, { value: 'Barista', label: 'Baristas' }]} className="flex-1" />
             </label>
             <label className="flex w-full items-center gap-2.5 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 sm:w-1/2">
               <MapPin className="h-4 w-4 shrink-0 text-[#0A2540]" />
               <span className="sr-only">Location</span>
-              <select value={searchLocation} onChange={(event) => setSearchLocation(event.target.value)} className="w-full bg-transparent text-xs font-medium text-slate-700 outline-none sm:text-sm">
-                <option value="">All Kenya Locations</option>
-                <option value="Nairobi">Nairobi</option>
-                <option value="Mombasa">Mombasa & Coast</option>
-                <option value="Nakuru">Nakuru & Rift Valley</option>
-                <option value="Kisumu">Kisumu & Western</option>
-              </select>
+              <Select aria-label="Location" value={searchLocation} onChange={setSearchLocation} options={[{ value: '', label: 'All Kenya Locations' }, { value: 'Nairobi', label: 'Nairobi' }, { value: 'Mombasa', label: 'Mombasa & Coast' }, { value: 'Nakuru', label: 'Nakuru & Rift Valley' }, { value: 'Kisumu', label: 'Kisumu & Western' }]} className="flex-1" />
             </label>
             <button type="button" onClick={onSearch} className="btn-primary-orange w-full shrink-0 text-sm sm:w-auto">
               <span>Search Candidates</span><ArrowRight className="h-4 w-4" />

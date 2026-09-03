@@ -6,6 +6,7 @@ import { PageHeader } from '../../../../shared/components/ui/PageHeader'
 import { Pagination } from '../../../../shared/components/ui/Pagination'
 import { Skeleton } from '../../../../shared/components/ui/Skeleton'
 import { EmptyState } from '../../../../shared/components/feedback'
+import { Badge } from '../../../../shared/components/ui/Badge'
 
 export function AdminUsersPage() {
   const [query, setQuery] = useState('')
@@ -57,10 +58,9 @@ export function AdminUsersPage() {
                     <p className="text-lg font-black text-slate-900">{user.full_name}</p>
                     <p className="text-sm text-slate-600">{user.phone}</p>
                   </div>
-                  <span className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-slate-700">
-                    <Users className="h-3.5 w-3.5" />
+                  <Badge variant={user.is_staff || user.is_superuser ? 'verified' : 'neutral'} size="sm" icon={<Users className="h-3.5 w-3.5" />}>
                     {user.is_staff || user.is_superuser ? 'Admin' : user.is_worker && user.is_employer ? 'Worker + Employer' : user.is_worker ? 'Worker' : user.is_employer ? 'Employer' : 'User'}
-                  </span>
+                  </Badge>
                 </div>
                 <div className="mt-3 flex flex-wrap gap-2 text-xs text-slate-500">
                   <span className="rounded-full bg-slate-100 px-2 py-1">{user.email || 'No email'}</span>

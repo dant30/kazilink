@@ -2,6 +2,7 @@ import { ArrowRight, Briefcase, MapPin, Sparkles, TimerReset } from 'lucide-reac
 import { Link } from 'react-router-dom'
 
 import type { Job } from '../types'
+import { Badge } from '../../../shared/components/ui/Badge'
 
 export function JobCard({ job }: { job: Job }) {
   const categoryLabel = job.category || 'Hospitality'
@@ -11,15 +12,11 @@ export function JobCard({ job }: { job: Job }) {
     <article className="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-[#FFB380] hover:shadow-md">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <span className="inline-flex items-center rounded-full bg-[#FFF4EB] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-[#FF6B00]">
-            {categoryLabel}
-          </span>
+          <Badge variant="orange" size="sm">{categoryLabel}</Badge>
           <h2 className="mt-3 text-lg font-black text-slate-900">{job.title}</h2>
         </div>
         {job.is_urgent && (
-          <span className="inline-flex items-center rounded-full border border-[#FECACA] bg-[#FFF1F2] px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-[#BE123C]">
-            Urgent
-          </span>
+          <Badge variant="danger" size="sm">Urgent</Badge>
         )}
       </div>
 

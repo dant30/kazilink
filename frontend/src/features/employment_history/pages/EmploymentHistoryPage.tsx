@@ -12,6 +12,7 @@ import { PageHeader } from '../../../shared/components/ui/PageHeader'
 import { StatCard } from '../../../shared/components/cards/StatCard'
 import { Skeleton } from '../../../shared/components/ui/Skeleton'
 import { EmptyState } from '../../../shared/components/feedback'
+import { Select } from '../../../shared/components/ui/Select'
 
 const defaultForm: EmploymentRecordInput = {
   worker_id: undefined,
@@ -144,36 +145,9 @@ export function EmploymentHistoryPage() {
 
           <form onSubmit={handleSubmit} className="mt-6 space-y-5">
             <div className="grid gap-5 md:grid-cols-2">
-              <label className="space-y-2 text-sm font-semibold text-slate-700">
-                <span>Worker</span>
-                <select
-                  required
-                  value={form.worker_id ?? ''}
-                  onChange={(event) => handleChange('worker_id', Number(event.target.value))}
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-700 outline-none focus:border-[#FF6B00] focus:bg-white"
-                >
-                  <option value="">Select worker</option>
-                  {workers.map((worker) => (
-                    <option key={worker.id} value={worker.id}>{worker.full_name} · {worker.phone}</option>
-                  ))}
-                </select>
-              </label>
+              <Select label="Worker" required value={String(form.worker_id ?? '')} onChange={(value) => handleChange('worker_id', Number(value))} options={[{ value: '', label: 'Select worker' }, ...workers.map((worker) => ({ value: String(worker.id), label: worker.full_name, sublabel: worker.phone }))]} />
 
-              <label className="space-y-2 text-sm font-semibold text-slate-700">
-                <span>Establishment</span>
-                <select
-                  required
-                  value={form.establishment_id ?? ''}
-                  onChange={(event) => handleChange('establishment_id', Number(event.target.value))}
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-700 outline-none focus:border-[#FF6B00] focus:bg-white"
-                  disabled={establishmentsLoading}
-                >
-                  <option value="">Select establishment</option>
-                  {establishments.map((establishment) => (
-                    <option key={establishment.id} value={establishment.id}>{establishment.name}</option>
-                  ))}
-                </select>
-              </label>
+              <Select label="Establishment" required value={String(form.establishment_id ?? '')} onChange={(value) => handleChange('establishment_id', Number(value))} options={[{ value: '', label: 'Select establishment' }, ...establishments.map((establishment) => ({ value: String(establishment.id), label: establishment.name }))]} disabled={establishmentsLoading} />
 
               <label className="space-y-2 text-sm font-semibold text-slate-700">
                 <span>Position</span>

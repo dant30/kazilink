@@ -1,4 +1,5 @@
 import type { JobFilters as JobFilterValues } from '../services'
+import { Select } from '../../../shared/components/ui/Select'
 
 const categoryOptions = [
   'Waiter',
@@ -25,52 +26,11 @@ export function JobFilters({ filters, onChange }: { filters: JobFilterValues; on
           />
         </label>
 
-        <label className="space-y-2 text-xs font-bold uppercase tracking-[0.1em] text-slate-500">
-          <span>Location</span>
-          <select
-            value={filters.location ?? ''}
-            onChange={(event) => onChange({ ...filters, location: event.target.value })}
-            className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-800 focus:border-[#FF6B00] focus:outline-none"
-          >
-            <option value="">All locations</option>
-            <option value="Nairobi">Nairobi</option>
-            <option value="Mombasa">Mombasa</option>
-            <option value="Kisumu">Kisumu</option>
-            <option value="Nakuru">Nakuru</option>
-          </select>
-        </label>
+        <Select label="Location" value={filters.location ?? ''} onChange={(value) => onChange({ ...filters, location: value })} options={[{ value: '', label: 'All locations' }, 'Nairobi', 'Mombasa', 'Kisumu', 'Nakuru']} />
 
-        <label className="space-y-2 text-xs font-bold uppercase tracking-[0.1em] text-slate-500">
-          <span>Category</span>
-          <select
-            value={filters.category ?? ''}
-            onChange={(event) => onChange({ ...filters, category: event.target.value })}
-            className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-800 focus:border-[#FF6B00] focus:outline-none"
-          >
-            <option value="">All categories</option>
-            {categoryOptions.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-          </select>
-        </label>
+        <Select label="Category" value={filters.category ?? ''} onChange={(value) => onChange({ ...filters, category: value })} options={[{ value: '', label: 'All categories' }, ...categoryOptions]} />
 
-        <label className="space-y-2 text-xs font-bold uppercase tracking-[0.1em] text-slate-500">
-          <span>Job type</span>
-          <select
-            value={filters.job_type ?? ''}
-            onChange={(event) => onChange({ ...filters, job_type: event.target.value })}
-            className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-800 focus:border-[#FF6B00] focus:outline-none"
-          >
-            <option value="">All types</option>
-            <option value="full_time">Full time</option>
-            <option value="part_time">Part time</option>
-            <option value="weekend_gig">Weekend gig</option>
-            <option value="daily_shift">Daily shift</option>
-            <option value="shift_24hr">24-hour shift</option>
-          </select>
-        </label>
+        <Select label="Job type" value={filters.job_type ?? ''} onChange={(value) => onChange({ ...filters, job_type: value })} options={[{ value: '', label: 'All types' }, { value: 'full_time', label: 'Full time' }, { value: 'part_time', label: 'Part time' }, { value: 'weekend_gig', label: 'Weekend gig' }, { value: 'daily_shift', label: 'Daily shift' }, { value: 'shift_24hr', label: '24-hour shift' }]} />
       </div>
     </form>
   )

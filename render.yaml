@@ -1,0 +1,92 @@
+services:
+	- type: web
+		name: kazilink-backend
+		env: python
+		plan: free
+		region: ohio
+		rootDir: backend
+		autoDeploy: true
+		healthCheckPath: /admin/login/
+		buildCommand: pip install -r django/requirements/production.txt
+		startCommand: python django/manage.py migrate --noinput && gunicorn --chdir django config.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 60
+		envVars:
+			- key: PYTHON_VERSION
+				value: 3.11.11
+			- key: DJANGO_SETTINGS_MODULE
+				value: config.settings.production
+			- key: DEBUG
+				value: "false"
+			- key: SECRET_KEY
+				generateValue: true
+			- key: ALLOWED_HOSTS
+				value: .onrender.com
+			- key: POSTGRES_DB
+				fromDatabase:
+					name: kazilink-db
+					property: database
+			- key: POSTGRES_USER
+				fromDatabase:
+					name: kazilink-db
+					property: user
+			- key: POSTGRES_PASSWORD
+				fromDatabase:
+					name: kazilink-db
+					property: password
+			- key: POSTGRES_HOST
+				fromDatabase:
+					name: kazilink-db
+					property: host
+			- key: POSTGRES_PORT
+				fromDatabase:
+					name: kazilink-db
+					property: port
+			- key: REDIS_URL
+				fromService:
+					type: redis
+					name: kazilink-redis
+					property: connectionString
+			- key: CORS_ALLOWED_ORIGINS
+				value: https://kazilink-frontend.onrender.com
+			- key: CSRF_TRUSTED_ORIGINS
+				value: https://kazilink-frontend.onrender.com
+			- key: CORS_ALLOW_ALL_ORIGINS
+				value: "false"
+			- key: CORS_ALLOW_CREDENTIALS
+				value: "true"
+			- key: ADMIN_EMAIL
+				sync: false
+			- key: ADMIN_PHONE
+				sync: false
+			- key: ADMIN_PASSWORD
+				sync: false
+
+	- type: web
+		name: kazilink-frontend
+		env: static
+		rootDir: frontend
+		autoDeploy: true
+		buildCommand: npm ci && npm run build
+		staticPublishPath: dist
+		routes:
+			- type: rewrite
+				source: /*
+				destination: /index.html
+		envVars:
+			- key: VITE_API_URL
+				value: https://kazilink-backend.onrender.com/api
+			- key: VITE_APP_ENVIRONMENT
+				value: production
+
+	- type: redis
+		name: kazilink-redis
+		plan: free
+		region: ohio
+		ipAllowList:
+			- source: 0.0.0.0/0
+
+databases:
+	- name: kazilink-db
+		databaseName: kazilink
+		user: kazilink
+		plan: free
+		region: ohio

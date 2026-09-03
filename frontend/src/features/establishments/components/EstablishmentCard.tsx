@@ -2,6 +2,7 @@ import { ArrowRight, Building2, MapPin, ShieldCheck } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
 import type { Establishment } from '../types'
+import { Badge } from '../../../shared/components/ui/Badge'
 
 export function EstablishmentCard({ establishment }: { establishment: Establishment }) {
   return (
@@ -33,9 +34,5 @@ export function EstablishmentCard({ establishment }: { establishment: Establishm
 }
 
 export function VerificationBadge({ verified }: { verified: boolean }) {
-  return (
-    <span className={`rounded-full px-2.5 py-1 text-[10px] font-bold ${verified ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
-      {verified ? 'Verified' : 'Pending'}
-    </span>
-  )
+  return <Badge variant={verified ? 'success' : 'warning'} size="sm">{verified ? 'Verified' : 'Pending'}</Badge>
 }

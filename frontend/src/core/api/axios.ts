@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { localStorageStore } from '../storage'
+import { CORRELATION_HEADER, createCorrelationId } from './correlation'
 
 export const ACCESS_TOKEN_KEY = 'kazilink.access_token'
 export const REFRESH_TOKEN_KEY = 'kazilink.refresh_token'
@@ -11,6 +12,8 @@ export const http = axios.create({
 })
 
 http.interceptors.request.use((config) => {
+  const existingCorrelationId = config.headers.get(CORRELATION_HEADER)
+  config.headers.set(CORRELATION_HEADER, existingCorrelationId || createCorrelationId())
   const token = localStorageStore.getString(ACCESS_TOKEN_KEY)
   if (token) config.headers.Authorization = `Bearer ${token}`
   return config
@@ -24,8 +27,9 @@ http.interceptors.response.use(
     const original = error.config as typeof error.config & { _retry?: boolean }
     if (error.response?.status !== 401 || original?._retry || !localStorageStore.getString(REFRESH_TOKEN_KEY)) return Promise.reject(error)
     original._retry = true
+    const correlationId = original.headers?.get?.(CORRELATION_HEADER) || original.headers?.[CORRELATION_HEADER] || createCorrelationId()
     refreshRequest ??= axios
-      .post<{ access: string }>(`${http.defaults.baseURL}/accounts/token/refresh/`, { refresh: localStorageStore.getString(REFRESH_TOKEN_KEY) })
+      .post<{ access: string }>(`${http.defaults.baseURL}/accounts/token/refresh/`, { refresh: localStorageStore.getString(REFRESH_TOKEN_KEY) }, { headers: { [CORRELATION_HEADER]: correlationId } })
       .then(({ data }) => {
         localStorageStore.setString(ACCESS_TOKEN_KEY, data.access)
         return data.access
