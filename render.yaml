@@ -59,6 +59,34 @@ services:
 				sync: false
 			- key: ADMIN_PASSWORD
 				sync: false
+			- key: MPESA_ENABLED
+				value: "false"
+			- key: MPESA_BASE_URL
+				value: https://sandbox.safaricom.co.ke
+			- key: MPESA_CONSUMER_KEY
+				sync: false
+			- key: MPESA_CONSUMER_SECRET
+				sync: false
+			- key: MPESA_SHORTCODE
+				sync: false
+			- key: MPESA_PASSKEY
+				sync: false
+			- key: MPESA_CALLBACK_URL
+				sync: false
+			- key: MPESA_API_TIMEOUT_SECONDS
+				value: "15"
+			- key: MPESA_WEBHOOK_SECRET
+				sync: false
+			- key: SMS_ENABLED
+				value: "true"
+			- key: SMS_API_BASE_URL
+				value: https://sms.ots.co.ke/api/v3/
+			- key: SMS_API_SEND_PATH
+				value: sms/send
+			- key: SMS_API_TOKEN
+				sync: false
+			- key: SMS_SENDER_ID
+				sync: false
 
 	- type: web
 		name: kazilink-frontend

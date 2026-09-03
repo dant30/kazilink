@@ -18,7 +18,7 @@ def _request_json(url, *, method='GET', headers=None, payload=None):
 		headers={**(headers or {}), **({'Content-Type': 'application/json'} if payload is not None else {})},
 		method=method,
 	)
-	with build_opener().open(request, timeout=10) as response:
+	with build_opener().open(request, timeout=getattr(settings, 'MPESA_API_TIMEOUT_SECONDS', 15)) as response:
 		return loads(response.read().decode())
 
 
@@ -30,8 +30,12 @@ def initiate_stk_push(*, transaction, phone_number):
 	passkey = getattr(settings, 'MPESA_PASSKEY', '')
 	shortcode = getattr(settings, 'MPESA_SHORTCODE', '')
 	callback_url = getattr(settings, 'MPESA_CALLBACK_URL', '')
+	if not getattr(settings, 'MPESA_ENABLED', False):
+		raise MpesaConfigurationError('M-Pesa sandbox payments are disabled.')
 	if not all((consumer_key, consumer_secret, passkey, shortcode, callback_url)):
 		raise MpesaConfigurationError('M-Pesa is not configured.')
+	if not shortcode.isdigit():
+		raise MpesaConfigurationError('M-Pesa shortcode must contain only digits.')
 	base_url = getattr(settings, 'MPESA_BASE_URL', 'https://sandbox.safaricom.co.ke').rstrip('/')
 	timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
 	password = b64encode(f'{shortcode}{passkey}{timestamp}'.encode()).decode()

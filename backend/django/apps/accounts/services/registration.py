@@ -4,6 +4,7 @@ from django.db import transaction
 from django.utils import timezone
 
 from core.authentication.otp import generate_otp, hash_otp
+from core.services.sms import send_sms
 
 from ..models import EmployerProfile, PhoneVerification, User, UserRole, WorkerProfile
 
@@ -43,5 +44,9 @@ def register_user(*, phone, full_name, password, role, email='', primary_role=''
 		user=user,
 		code_hash=hash_otp(code),
 		expires_at=timezone.now() + timedelta(minutes=10),
+	)
+	send_sms(
+		recipient=phone,
+		message=f'Your KaziLink verification code is {code}. It expires in 10 minutes.',
 	)
 	return user, code

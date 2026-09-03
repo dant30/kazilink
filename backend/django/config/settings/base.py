@@ -138,9 +138,17 @@ MPESA_CONSUMER_SECRET = os.getenv('MPESA_CONSUMER_SECRET', '')
 MPESA_PASSKEY = os.getenv('MPESA_PASSKEY', '')
 MPESA_BASE_URL = os.getenv('MPESA_BASE_URL', 'https://sandbox.safaricom.co.ke')
 MPESA_CALLBACK_URL = os.getenv('MPESA_CALLBACK_URL', '')
+MPESA_ENABLED = os.getenv('MPESA_ENABLED', 'false').lower() == 'true'
+MPESA_API_TIMEOUT_SECONDS = int(os.getenv('MPESA_API_TIMEOUT_SECONDS', '15'))
 MPESA_WEBHOOK_SECRET = os.getenv('MPESA_WEBHOOK_SECRET', '')
 FRAUD_PAYMENT_THRESHOLD_KSH = int(os.getenv('FRAUD_PAYMENT_THRESHOLD_KSH', '100000'))
 AUDIT_LOG_RETENTION_DAYS = int(os.getenv('AUDIT_LOG_RETENTION_DAYS', '365'))
+SMS_ENABLED = os.getenv('SMS_ENABLED', 'false').lower() == 'true'
+SMS_API_BASE_URL = os.getenv('SMS_API_BASE_URL', 'https://sms.ots.co.ke/api/v3/')
+SMS_API_SEND_PATH = os.getenv('SMS_API_SEND_PATH', 'sms/send')
+SMS_API_TOKEN = os.getenv('SMS_API_TOKEN', '')
+SMS_SENDER_ID = os.getenv('SMS_SENDER_ID', '')
+SMS_API_TIMEOUT_SECONDS = int(os.getenv('SMS_API_TIMEOUT_SECONDS', '10'))
 CHANNEL_LAYERS = {
 	'default': {
 		'BACKEND': 'channels_redis.core.RedisChannelLayer',

@@ -27,9 +27,9 @@ class RegisterView(APIView):
 		serializer.is_valid(raise_exception=True)
 		try:
 			user, otp = register_user(**serializer.validated_data)
-		except ValueError as exc:
+		except (ValueError, RuntimeError) as exc:
 			return Response({'detail': str(exc)}, status=status.HTTP_400_BAD_REQUEST)
-		data = {'user': UserSerializer(user).data, 'message': 'Verification code generated.'}
+		data = {'user': UserSerializer(user).data, 'message': 'Verification code sent by SMS.'}
 		if settings.DEBUG:
 			data['verification_code'] = otp
 		return Response(data, status=status.HTTP_201_CREATED)
