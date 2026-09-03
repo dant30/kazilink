@@ -52,7 +52,7 @@ export function WorkerProfilePage() {
 		}
 	}
 
-	const updateForm = (field: keyof UpdateWorkerProfilePayload, value: string | number | string[]) => {
+	const updateForm = (field: keyof UpdateWorkerProfilePayload, value: string | number | string[] | File) => {
 		setForm((current) => ({ ...current, [field]: value }))
 		clearError()
 	}
@@ -98,11 +98,15 @@ export function WorkerProfilePage() {
 				}
 			>
 				<div className="mt-3 flex items-center gap-3">
-					<Avatar src={profile?.avatar || profile?.user.avatar} name={user?.full_name || 'Worker'} size="lg" isVerified={Boolean(profile?.is_reference_checked)} />
+					<Avatar src={form.avatar instanceof File ? URL.createObjectURL(form.avatar) : profile?.avatar || profile?.user.avatar} name={user?.full_name || 'Worker'} size="lg" isVerified={Boolean(profile?.is_reference_checked)} />
 					<div className="flex flex-wrap gap-2">
 					<Badge variant="verified">Verified</Badge>
 					{profile?.open_to_work && <Badge variant="success">Available for work</Badge>}
 					</div>
+					<label className="cursor-pointer text-xs font-bold text-white underline decoration-white/40 underline-offset-4 hover:text-orange-200">
+						Change photo
+						<input type="file" accept="image/png,image/jpeg,image/webp" className="sr-only" onChange={(event) => { const file = event.target.files?.[0]; if (file) updateForm('avatar', file) }} />
+					</label>
 				</div>
 			</PageHeader>
 

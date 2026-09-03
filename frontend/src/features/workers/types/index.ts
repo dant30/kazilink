@@ -55,7 +55,7 @@ export interface UpdateWorkerProfilePayload {
 	bio?: string
 	skills?: string[]
 	languages?: string[]
-	avatar?: string | null
+	avatar?: File | string | null
 	last_employer?: string | null
 	background_check_verified?: boolean
 	open_to_work?: boolean

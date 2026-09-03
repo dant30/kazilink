@@ -18,6 +18,7 @@ class EmployerProfile(models.Model):
 		'establishments.Establishment', related_name='employers', blank=True
 	)
 	contact_person = models.CharField(max_length=255)
+	avatar = models.FileField(upload_to='avatars/employers/', blank=True, null=True)
 	active_jobs_count = models.PositiveIntegerField(default=0)
 	total_hires = models.PositiveIntegerField(default=0)
 	average_response_time_minutes = models.PositiveIntegerField(default=0)

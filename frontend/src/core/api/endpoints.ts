@@ -29,7 +29,7 @@ export const endpoints = {
     profile: () => get('/accounts/profile/'),
     updateProfile: (data: Record<string, unknown>) => patch('/accounts/profile/', data),
     employerProfile: () => get<EmployerProfile>('/accounts/employer-profile/'),
-    updateEmployerProfile: (data: UpdateEmployerProfilePayload) => patch<EmployerProfile>('/accounts/employer-profile/', data),
+    updateEmployerProfile: (data: UpdateEmployerProfilePayload | FormData) => patch<EmployerProfile>('/accounts/employer-profile/', data),
     adminUsers: () => get<Paginated<User> | User[]>('/accounts/admin/users/'),
   },
   jobs: {
@@ -131,7 +131,7 @@ export const endpoints = {
   fraud: { list: (query = '') => get<Paginated<FraudAlert> | FraudAlert[]>(`/fraud/${query ? `?${query}` : ''}`), detail: (id: number) => get<FraudAlert>(`/fraud/${id}/`), updateStatus: (id: number, status: 'resolved' | 'dismissed') => post<FraudAlert>(`/fraud/${id}/status/`, { status }) },
   workers: {
     me: () => get<WorkerProfile>('/workers/me/'),
-    update: (data: UpdateWorkerProfilePayload) => patch<WorkerProfile>('/workers/me/', data),
+    update: (data: UpdateWorkerProfilePayload | FormData) => patch<WorkerProfile>('/workers/me/', data),
     detail: (id: number) => get<WorkerProfile>(`/workers/${id}/`),
     list: (query = '') => get<Paginated<WorkerProfile> | WorkerProfile[]>(`/workers/${query ? `?${query}` : ''}`),
   },

@@ -14,7 +14,7 @@ export const workerServices = {
 	 * Update the current authenticated worker's profile
 	 */
 	async updateMyProfile(data: UpdateWorkerProfilePayload): Promise<WorkerProfile> {
-		return endpoints.workers.update(data)
+		return endpoints.workers.update(serializeProfileUpdate(data))
 	},
 
 	/**
@@ -31,5 +31,16 @@ export const workerServices = {
 		const result = await endpoints.workers.list(query)
 		return Array.isArray(result) ? result : result.results
 	},
+}
+
+function serializeProfileUpdate(data: UpdateWorkerProfilePayload): UpdateWorkerProfilePayload | FormData {
+	if (!(data.avatar instanceof File)) return data
+	const formData = new FormData()
+	Object.entries(data).forEach(([key, value]) => {
+		if (value === undefined || value === null) return
+		if (Array.isArray(value)) value.forEach((item) => formData.append(key, String(item)))
+		else formData.append(key, value instanceof File ? value : String(value))
+	})
+	return formData
 }
 

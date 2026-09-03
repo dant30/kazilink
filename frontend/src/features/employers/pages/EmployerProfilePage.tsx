@@ -16,10 +16,10 @@ export function EmployerProfilePage() {
   const [form, setForm] = useState<UpdateEmployerProfilePayload>({})
 
   useEffect(() => {
-    if (profile) setForm({ business_name: profile.business_name, location: profile.location, business_type: profile.business_type, contact_person: profile.contact_person })
+    if (profile) setForm({ business_name: profile.business_name, location: profile.location, business_type: profile.business_type, contact_person: profile.contact_person, avatar: profile.avatar })
   }, [profile])
 
-  const change = (field: keyof UpdateEmployerProfilePayload, value: string) => setForm((current) => ({ ...current, [field]: value }))
+  const change = (field: keyof UpdateEmployerProfilePayload, value: string | File) => setForm((current) => ({ ...current, [field]: value }))
   const changeSetting = async (field: 'auto_shortlist' | 'verified_only', value: boolean) => { await updateProfile({ [field]: value }) }
   const save = async () => { await updateProfile(form) }
 
@@ -45,11 +45,15 @@ export function EmployerProfilePage() {
       }
     >
       <div className="mt-3 flex items-center gap-3">
-        <Avatar name={profile.user.full_name} size="lg" isVerified={profile.verified_business} />
+        <Avatar src={form.avatar && typeof form.avatar !== 'string' ? URL.createObjectURL(form.avatar as File) : profile.avatar} name={profile.user.full_name} size="lg" isVerified={profile.verified_business} />
         <div className="flex flex-wrap gap-2">
         <Badge variant={profile.verified_business ? 'verified' : 'warning'}>{profile.verified_business ? 'Verified business' : 'Verification pending'}</Badge>
         <Badge variant="info">{profile.active_jobs_count > 0 ? 'Hiring actively' : 'No open roles'}</Badge>
         </div>
+        <label className="cursor-pointer text-xs font-bold text-white underline decoration-white/40 underline-offset-4 hover:text-orange-200">
+          Change photo
+          <input type="file" accept="image/png,image/jpeg,image/webp" className="sr-only" onChange={(event) => { const file = event.target.files?.[0]; if (file) change('avatar', file) }} />
+        </label>
       </div>
     </PageHeader>
     {success && <div className="rounded-2xl border border-green-200 bg-green-50 p-4 font-semibold text-green-700">Profile updated successfully.</div>}

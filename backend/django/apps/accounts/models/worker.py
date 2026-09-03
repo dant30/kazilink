@@ -21,7 +21,7 @@ class WorkerProfile(models.Model):
 	bio = models.TextField()
 	skills = ArrayField(models.CharField(max_length=100), blank=True, default=list)
 	languages = ArrayField(models.CharField(max_length=50), blank=True, default=list)
-	avatar = models.URLField(blank=True, null=True)
+	avatar = models.FileField(upload_to='avatars/workers/', blank=True, null=True)
 	rating = models.DecimalField(max_digits=3, decimal_places=2, default=0)
 	reviews_count = models.PositiveIntegerField(default=0)
 	jobs_completed = models.PositiveIntegerField(default=0)
