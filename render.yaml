@@ -7,8 +7,8 @@ services:
     rootDir: backend
     autoDeploy: true
     healthCheckPath: /admin/login/
-    buildCommand: pip install -r django/requirements/production.txt
-    startCommand: python django/manage.py migrate --noinput && gunicorn --chdir django config.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 60
+    buildCommand: bash ./build.sh
+    startCommand: cd django && python manage.py migrate --noinput && gunicorn config.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 60
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.11
