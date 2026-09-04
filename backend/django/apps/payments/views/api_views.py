@@ -36,9 +36,15 @@ class TransactionListCreateView(generics.ListCreateAPIView):
 		except (MpesaConfigurationError, ValueError) as exc:
 			fail_payment(transaction_id=payment.id, metadata={'provider_error': str(exc)})
 			return Response({'detail': str(exc)}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
-		except (HTTPError, URLError, KeyError) as exc:
+		except HTTPError as exc:
 			fail_payment(transaction_id=payment.id, metadata={'provider_error': str(exc)})
-			return Response({'detail': 'The payment provider could not be reached.'}, status=status.HTTP_502_BAD_GATEWAY)
+			return Response(
+				{'detail': 'M-Pesa is temporarily unavailable. Please try again later.'},
+				status=status.HTTP_503_SERVICE_UNAVAILABLE,
+			)
+		except (URLError, KeyError) as exc:
+			fail_payment(transaction_id=payment.id, metadata={'provider_error': str(exc)})
+			return Response({'detail': 'The payment provider could not be reached.'}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
 		payment.provider_reference = provider_response.get('CheckoutRequestID', '')
 		payment.save(update_fields=('provider_reference',))
 		return Response(
