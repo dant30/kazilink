@@ -68,11 +68,11 @@ services:
       - key: MPESA_CONSUMER_SECRET
         sync: false
       - key: MPESA_SHORTCODE
-        sync: false
+        value: "174379"
       - key: MPESA_PASSKEY
         sync: false
       - key: MPESA_CALLBACK_URL
-        sync: false
+        value: https://kazilink-backend.onrender.com/api/payments/webhooks/mpesa/
       - key: MPESA_API_TIMEOUT_SECONDS
         value: "15"
       - key: MPESA_WEBHOOK_SECRET
