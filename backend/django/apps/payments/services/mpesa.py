@@ -1,10 +1,14 @@
 from base64 import b64encode
 from datetime import datetime
+import logging
 from json import dumps, loads
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, build_opener
 
 from django.conf import settings
+
+
+logger = logging.getLogger(__name__)
 
 
 class MpesaConfigurationError(RuntimeError):
@@ -18,8 +22,16 @@ def _request_json(url, *, method='GET', headers=None, payload=None):
 		headers={**(headers or {}), **({'Content-Type': 'application/json'} if payload is not None else {})},
 		method=method,
 	)
-	with build_opener().open(request, timeout=getattr(settings, 'MPESA_API_TIMEOUT_SECONDS', 15)) as response:
-		return loads(response.read().decode())
+	try:
+		with build_opener().open(request, timeout=getattr(settings, 'MPESA_API_TIMEOUT_SECONDS', 15)) as response:
+			return loads(response.read().decode())
+	except HTTPError as exc:
+		body = exc.read().decode(errors='replace')[:1000]
+		logger.error('M-Pesa request failed: status=%s url=%s response=%s', exc.code, url, body)
+		raise
+	except URLError as exc:
+		logger.error('M-Pesa request could not reach provider: url=%s reason=%s', url, exc.reason)
+		raise
 
 
 def initiate_stk_push(*, transaction, phone_number):
