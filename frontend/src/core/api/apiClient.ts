@@ -17,9 +17,21 @@ export class ApiClientError extends Error {
   }
 }
 
-function errorMessage(data: unknown) {
-  if (typeof data === 'object' && data !== null && 'detail' in data && typeof data.detail === 'string') return data.detail
-  if (typeof data === 'object' && data !== null && 'error' in data && typeof data.error === 'object' && data.error !== null && 'detail' in data.error && typeof data.error.detail === 'string') return data.error.detail
+function errorMessage(data: unknown): string {
+  if (typeof data === 'string') return data
+  if (!data || typeof data !== 'object') return 'The request could not be completed.'
+
+  const payload = 'error' in data && data.error && typeof data.error === 'object' ? data.error : data
+  if ('detail' in payload) {
+    if (typeof payload.detail === 'string') return payload.detail
+    if (Array.isArray(payload.detail)) return payload.detail.map(String).join(' ')
+  }
+  if ('non_field_errors' in payload && Array.isArray(payload.non_field_errors)) return payload.non_field_errors.map(String).join(' ')
+
+  const fieldErrors = Object.entries(payload)
+    .filter(([, value]) => Array.isArray(value))
+    .flatMap(([field, messages]) => (messages as unknown[]).map((message) => `${field}: ${String(message)}`))
+  if (fieldErrors.length) return fieldErrors.join(' ')
   return 'The request could not be completed.'
 }
 
