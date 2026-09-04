@@ -12,10 +12,14 @@ from ..serializers import (
 	ProfileSerializer,
 	RegistrationSerializer,
 	UserSerializer,
+	PasswordResetConfirmSerializer,
+	PasswordResetRequestSerializer,
+	PasswordResetVerifySerializer,
 )
 from ..services.authentication import issue_tokens
 from ..services.registration import register_user
 from ..services.verification import verify_phone
+from ..services.password_reset import request_password_reset, reset_password, verify_password_reset
 
 
 class RegisterView(APIView):
@@ -57,6 +61,52 @@ class VerifyPhoneView(APIView):
 		except ValueError as exc:
 			return Response({'detail': str(exc)}, status=status.HTTP_400_BAD_REQUEST)
 		return Response({'user': UserSerializer(user).data, 'tokens': issue_tokens(user)})
+
+
+class PasswordResetRequestView(APIView):
+	permission_classes = [AllowAny]
+	throttle_classes = [OTPRateThrottle]
+
+	def post(self, request):
+		serializer = PasswordResetRequestSerializer(data=request.data)
+		serializer.is_valid(raise_exception=True)
+		code = request_password_reset(phone=serializer.validated_data['phone'])
+		data = {'message': 'If an account exists for that phone number, a reset code has been sent.'}
+		if settings.DEBUG and code:
+			data['verification_code'] = code
+		return Response(data)
+
+
+class PasswordResetVerifyView(APIView):
+	permission_classes = [AllowAny]
+	throttle_classes = [OTPRateThrottle]
+
+	def post(self, request):
+		serializer = PasswordResetVerifySerializer(data=request.data)
+		serializer.is_valid(raise_exception=True)
+		try:
+			token = verify_password_reset(**serializer.validated_data)
+		except ValueError as exc:
+			return Response({'detail': str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+		return Response({'reset_token': token, 'message': 'Code verified. Set your new password.'})
+
+
+class PasswordResetConfirmView(APIView):
+	permission_classes = [AllowAny]
+	throttle_classes = [OTPRateThrottle]
+
+	def post(self, request):
+		serializer = PasswordResetConfirmSerializer(data=request.data)
+		serializer.is_valid(raise_exception=True)
+		try:
+			reset_password(
+				phone=serializer.validated_data['phone'],
+				reset_token=serializer.validated_data['reset_token'],
+				new_password=serializer.validated_data['new_password'],
+			)
+		except ValueError as exc:
+			return Response({'detail': str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+		return Response({'message': 'Password reset successful. You can now sign in.'})
 
 
 class MeView(APIView):

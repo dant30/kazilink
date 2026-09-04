@@ -2,7 +2,7 @@ from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView
 
 from ..views.admin_views import UserListView
-from ..views.api_views import LoginView, MeView, ProfileView, RegisterView, VerifyPhoneView
+from ..views.api_views import LoginView, MeView, PasswordResetConfirmView, PasswordResetRequestView, PasswordResetVerifyView, ProfileView, RegisterView, VerifyPhoneView
 from ..views.employer_views import MyEmployerProfileView
 
 app_name = 'accounts'
@@ -12,6 +12,9 @@ urlpatterns = [
 	path('login/', LoginView.as_view(), name='login'),
 	path('token/refresh/', TokenRefreshView.as_view(), name='token-refresh'),
 	path('verify-phone/', VerifyPhoneView.as_view(), name='verify-phone'),
+	path('password-reset/request/', PasswordResetRequestView.as_view(), name='password-reset-request'),
+	path('password-reset/verify/', PasswordResetVerifyView.as_view(), name='password-reset-verify'),
+	path('password-reset/confirm/', PasswordResetConfirmView.as_view(), name='password-reset-confirm'),
 	path('me/', MeView.as_view(), name='me'),
 	path('profile/', ProfileView.as_view(), name='profile'),
 	path('employer-profile/', MyEmployerProfileView.as_view(), name='employer-profile'),

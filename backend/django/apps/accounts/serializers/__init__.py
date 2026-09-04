@@ -7,4 +7,5 @@ from .user import (
 	WorkerProfileSerializer,
 )
 from .verification import PhoneVerificationSerializer
+from .password_reset import PasswordResetConfirmSerializer, PasswordResetRequestSerializer, PasswordResetVerifySerializer
 
