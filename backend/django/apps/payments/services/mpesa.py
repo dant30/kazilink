@@ -2,6 +2,7 @@ from base64 import b64encode
 from datetime import datetime
 import logging
 from json import dumps, loads
+from time import sleep
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, build_opener
 
@@ -34,6 +35,23 @@ def _request_json(url, *, method='GET', headers=None, payload=None):
 		raise
 
 
+def _request_stk_push(url, *, headers, payload):
+	max_retries = max(0, int(getattr(settings, 'MPESA_STK_MAX_RETRIES', 2)))
+	backoff_seconds = max(0, float(getattr(settings, 'MPESA_STK_RETRY_BACKOFF_SECONDS', 3)))
+	for attempt in range(max_retries + 1):
+		try:
+			return _request_json(url, headers=headers, payload=payload)
+		except HTTPError as exc:
+			if exc.code not in (500, 502, 503, 504) or attempt == max_retries:
+				raise
+		except (TimeoutError, URLError):
+			if attempt == max_retries:
+				raise
+		wait_seconds = backoff_seconds * (2 ** attempt)
+		logger.warning('Retrying M-Pesa STK request in %ss: attempt=%s/%s', wait_seconds, attempt + 1, max_retries)
+		sleep(wait_seconds)
+
+
 def initiate_stk_push(*, transaction, phone_number):
 	if not phone_number:
 		raise ValueError('A phone number is required for an M-Pesa payment.')
@@ -57,7 +75,7 @@ def initiate_stk_push(*, transaction, phone_number):
 		headers={'Authorization': f'Basic {credentials}'},
 	)
 	access_token = token_response['access_token']
-	return _request_json(
+	return _request_stk_push(
 		f'{base_url}/mpesa/stkpush/v1/processrequest',
 		headers={'Authorization': f'Bearer {access_token}'},
 		payload={

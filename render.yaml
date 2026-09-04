@@ -75,6 +75,10 @@ services:
         value: https://kazilink-backend.onrender.com/api/payments/webhooks/mpesa/
       - key: MPESA_API_TIMEOUT_SECONDS
         value: "15"
+      - key: MPESA_STK_MAX_RETRIES
+        value: "2"
+      - key: MPESA_STK_RETRY_BACKOFF_SECONDS
+        value: "3"
       - key: MPESA_WEBHOOK_SECRET
         sync: false
       - key: SMS_ENABLED
