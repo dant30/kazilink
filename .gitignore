@@ -30,8 +30,7 @@ backend/django/.env
 backend/django/*.sqlite3
 backend/django/media/
 backend/django/staticfiles/
-backend/django/**/migrations/*.py
-!backend/django/**/migrations/__init__.py
+# Django migration source files are required for deployment.
 
 # Node / frontend
 node_modules/
