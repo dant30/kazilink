@@ -24,10 +24,15 @@ def send_sms(*, recipient: str, message: str) -> None:
 	if not getattr(settings, 'SMS_ENABLED', False):
 		return
 
-	token = getattr(settings, 'SMS_API_TOKEN', '')
-	sender_id = getattr(settings, 'SMS_SENDER_ID', '')
-	if not token or not sender_id:
-		raise SMSDeliveryError('SMS delivery is enabled but its token or sender ID is not configured.')
+	token = str(getattr(settings, 'SMS_API_TOKEN', '') or '').strip()
+	sender_id = str(getattr(settings, 'SMS_SENDER_ID', '') or '').strip()
+	missing = []
+	if not token:
+		missing.append('SMS_API_TOKEN')
+	if not sender_id:
+		missing.append('SMS_SENDER_ID')
+	if missing:
+		raise SMSDeliveryError(f"SMS delivery is enabled but {', '.join(missing)} is not configured.")
 
 	base_url = getattr(settings, 'SMS_API_BASE_URL', 'https://sms.ots.co.ke/api/v3/').rstrip('/')
 	send_path = getattr(settings, 'SMS_API_SEND_PATH', 'sms/send').strip('/')
