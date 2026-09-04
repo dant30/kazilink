@@ -2,14 +2,13 @@
 import type { RouteObject } from 'react-router-dom'
 
 import { PrivateLayout, RequireAuth, Screen } from './route-pages'
-import { AccountSettingsPage, ProfilePage } from '../features/accounts/pages'
 import { ApplicationDetailPage, ApplicationsPage } from '../features/job_applications/pages'
 import { JobDetailPage, JobsPage, PostJobPage } from '../features/jobs/pages'
 import { DashboardPage, EmployerDashboardPage, WorkerDashboardPage } from '../features/dashboard'
 import { EstablishmentDetailPage, EstablishmentsPage } from '../features/establishments/pages'
 import { EmploymentHistoryPage } from '../features/employment_history/pages'
-import { EmployerProfilePage } from '../features/employers/pages'
-import { WorkerProfilePage, WorkersPage } from '../features/workers/pages'
+import { EmployerProfilePage, EmployerSettingsPage } from '../features/employers/pages'
+import { WorkerProfilePage, WorkerSettingsPage, WorkersPage } from '../features/workers/pages'
 import { MessagingPage } from '../features/messaging/pages'
 import { SubscriptionsPage } from '../features/subscriptions/pages'
 import { NotificationsPage } from '../features/notifications/pages'
@@ -43,10 +42,10 @@ export const privateRoutes: RouteObject[] = [
 			{ path: 'subscriptions', element: <RequireAuth><SubscriptionsPage /></RequireAuth> },
 			{ path: 'ratings', element: <RequireAuth><RatingsPage /></RequireAuth> },
 			{ path: 'support', element: <RequireAuth><SupportPage /></RequireAuth> },
-			{ path: 'profile', element: <RequireAuth><ProfilePage /></RequireAuth> },
-			{ path: 'profile/settings', element: <RequireAuth><AccountSettingsPage /></RequireAuth> },
 			{ path: 'profile/worker', element: <RequireAuth><WorkerProfilePage /></RequireAuth> },
+			{ path: 'profile/worker/settings', element: <RequireAuth><WorkerSettingsPage /></RequireAuth> },
 			{ path: 'profile/employer', element: <RequireAuth><EmployerProfilePage /></RequireAuth> },
+			{ path: 'profile/employer/settings', element: <RequireAuth><EmployerSettingsPage /></RequireAuth> },
 		],
 	},
 ]

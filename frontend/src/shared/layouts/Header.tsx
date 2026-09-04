@@ -63,7 +63,7 @@ export function Header() {
 	const primaryMarketLabel = isWorker ? 'Find Shifts' : isEmployer ? 'Browse Talent' : 'Find Shifts'
 	const dashboardPath = isAdmin ? '/admin' : isEmployer ? '/dashboard/employer' : '/dashboard/worker'
 	const profilePath = isAdmin ? '/admin/profile' : isWorker ? '/profile/worker' : isEmployer ? '/profile/employer' : '/profile'
-	const settingsPath = '/profile/settings'
+	const settingsPath = isAdmin ? '/admin/profile' : isWorker ? '/profile/worker/settings' : isEmployer ? '/profile/employer/settings' : '/profile'
 	const profileMenuLabel = isAdmin ? 'Admin profile' : isWorker ? 'Worker profile' : isEmployer ? 'Employer profile' : 'Profile'
 	const messagePath = isAdmin ? '/admin' : '/messages'
 
