@@ -1,5 +1,5 @@
 // frontend/src/shared/layouts/FloatingButton.tsx
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import {
   Headphones,
   Phone,
@@ -15,11 +15,21 @@ import {
 export const FloatingButton: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false)
   const [copiedType, setCopiedType] = useState<string | null>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
 
   const supportPhone = '+254728102107'
   const supportPhoneDisplay = '+254 728 102 107'
   const supportEmail = 'munene@mambonami.com'
   const whatsappUrl = `https://wa.me/254728102107?text=${encodeURIComponent('Hello KaziLink Support Team, I need assistance with the platform.')}`
+
+  useEffect(() => {
+    if (!isOpen) return
+    const closeOnOutsideClick = (event: MouseEvent) => {
+      if (!containerRef.current?.contains(event.target as Node)) setIsOpen(false)
+    }
+    document.addEventListener('mousedown', closeOnOutsideClick)
+    return () => document.removeEventListener('mousedown', closeOnOutsideClick)
+  }, [isOpen])
 
   const copyToClipboard = (text: string, type: string) => {
     navigator.clipboard?.writeText(text)
@@ -28,7 +38,7 @@ export const FloatingButton: React.FC = () => {
   }
 
   return (
-    <div className="fixed bottom-6 right-6 z-40 flex flex-col items-end">
+    <div ref={containerRef} className="fixed bottom-6 right-6 z-40 flex flex-col items-end">
       {/* Expanded Support Card Modal */}
       {isOpen && (
         <div className="mb-3 w-80 sm:w-96 bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden animate-fade-in divide-y divide-slate-100">

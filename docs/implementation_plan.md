@@ -1,6 +1,6 @@
 # KaziLink Implementation Plan
 
-This roadmap tracks the current repository state as of 2026-08-29. It separates verified implementation from work that is still incomplete or not yet validated.
+This roadmap tracks the current repository state as of 2026-09-05. It separates verified implementation from work that is still incomplete or not yet validated.
 
 ## Status Legend
 
@@ -46,7 +46,7 @@ This roadmap tracks the current repository state as of 2026-08-29. It separates 
 | Establishment model and employer/job links | ✅✅ | Establishment is normalized and referenced by employers and jobs. |
 | Job CRUD and status actions | ✅✅ | Job list/create/detail/close APIs and services exist. |
 | Job type and status choices | ✅✅ | Current migrations enforce documented job types and statuses. |
-| Application creation and duplicate protection | ✅✅ | Application API and unique job/worker constraint exist. |
+| Application creation and duplicate protection | ✅✅ | Application API and unique job/worker constraint exist; applications require an authenticated worker and consume one Kazi Credit atomically. |
 | Application status workflow | ✅✅ | Employer status update flow and notifications exist. |
 | Applicant and hire denormalized counters | ✅✅ | Signals maintain job, worker, and employer counters. |
 | PostgreSQL full-text search | ✅✅ | Jobs maintain a weighted PostgreSQL search vector and use ranked web-search queries. |
@@ -70,7 +70,7 @@ This roadmap tracks the current repository state as of 2026-08-29. It separates 
 | Native Daraja callback processing | ✅✅ | Native `Body.stkCallback` callbacks settle credit recharges and existing employer transactions idempotently. |
 | Signed M-Pesa callback | ❌❌ | Optional custom HMAC validation remains supported, but Daraja does not provide that signature header. |
 | Payment/history integration tests | ❌❌ | Credit wallet unit coverage exists; full recharge, callback, and history-unlock integration coverage is still needed. |
-| Frontend unlock and checkout UX | ❌❌ | Shared Kazi Credits wallet/recharge UI and employer payment modal exist; feature-specific worker unlock and boost controls remain incomplete. |
+| Frontend unlock and checkout UX | ❌❌ | Shared Kazi Credits wallet/recharge UI, employer payment modal, and worker application balance gate exist; feature-specific history unlock and boost controls remain incomplete. |
 
 ## Phase 4: Reputation And Communication
 

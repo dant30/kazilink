@@ -1,5 +1,5 @@
 // frontend/src/shared/layouts/Header.tsx
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import {
 	Bell,
@@ -30,6 +30,8 @@ export function Header() {
 	const [notifDropdownOpen, setNotifDropdownOpen] = useState(false)
 	const [userMenuOpen, setUserMenuOpen] = useState(false)
 	const [creditBalance, setCreditBalance] = useState<number | null>(null)
+	const notificationRef = useRef<HTMLDivElement>(null)
+	const userMenuRef = useRef<HTMLDivElement>(null)
 
 	function signOut() {
 		setUserMenuOpen(false)
@@ -65,6 +67,16 @@ export function Header() {
 		}
 		endpoints.credits.wallet().then((response) => setCreditBalance(response.wallet.balance)).catch(() => setCreditBalance(null))
 	}, [signedIn])
+	useEffect(() => {
+		if (!notifDropdownOpen && !userMenuOpen) return
+		const closeOnOutsideClick = (event: MouseEvent) => {
+			const target = event.target as Node
+			if (notifDropdownOpen && !notificationRef.current?.contains(target)) setNotifDropdownOpen(false)
+			if (userMenuOpen && !userMenuRef.current?.contains(target)) setUserMenuOpen(false)
+		}
+		document.addEventListener('mousedown', closeOnOutsideClick)
+		return () => document.removeEventListener('mousedown', closeOnOutsideClick)
+	}, [notifDropdownOpen, userMenuOpen])
 	const isAdmin = Boolean(storedUser?.is_staff || storedUser?.is_superuser)
 	const isWorker = Boolean(storedUser?.is_worker)
 	const isEmployer = Boolean(storedUser?.is_employer && !storedUser?.is_worker)
@@ -173,7 +185,7 @@ export function Header() {
 								</Link>
 
 								{/* Notifications */}
-								<div className="relative">
+								<div ref={notificationRef} className="relative">
 									<button
 										type="button"
 										onClick={() => setNotifDropdownOpen(!notifDropdownOpen)}
@@ -195,7 +207,7 @@ export function Header() {
 								</div>
 
 								{/* User avatar menu */}
-								<div className="relative">
+								<div ref={userMenuRef} className="relative">
 									<button
 										type="button"
 										onClick={() => setUserMenuOpen((value) => !value)}
