@@ -1,5 +1,6 @@
 from django.contrib.auth import authenticate
 from rest_framework import serializers
+from core.utils.validators import normalize_kenyan_phone, validate_password_strength
 
 from ..models import EmployerProfile, Profile, User, UserRole, WorkerProfile
 from ..services.occupations import WORKER_AVAILABILITIES
@@ -18,7 +19,7 @@ class UserSerializer(serializers.ModelSerializer):
 class RegistrationSerializer(serializers.Serializer):
     phone = serializers.CharField(max_length=15)
     full_name = serializers.CharField(max_length=255)
-    password = serializers.CharField(write_only=True, min_length=8, trim_whitespace=False)
+    password = serializers.CharField(write_only=True, trim_whitespace=False, validators=[validate_password_strength])
     email = serializers.EmailField(required=False, allow_blank=True)
     role = serializers.ChoiceField(choices=UserRole.Role.choices)
     primary_role = serializers.CharField(max_length=100, required=False)
@@ -32,6 +33,10 @@ class RegistrationSerializer(serializers.Serializer):
     privacy_policy_accepted = serializers.BooleanField(required=True)
 
     def validate(self, attrs):
+        try:
+            attrs['phone'] = normalize_kenyan_phone(attrs['phone'])
+        except Exception as exc:
+            raise serializers.ValidationError({'phone': str(exc)}) from exc
         if attrs['role'] == UserRole.Role.WORKER:
             required_fields = ('location', 'availability', 'expected_daily_rate_ksh', 'bio')
             missing = [field for field in required_fields if field not in attrs]
@@ -49,7 +54,22 @@ class LoginSerializer(serializers.Serializer):
     password = serializers.CharField(write_only=True, trim_whitespace=False)
 
     def validate(self, attrs):
-        user = authenticate(phone=attrs['phone'], password=attrs['password'])
+        try:
+            phone = normalize_kenyan_phone(attrs['phone'])
+        except Exception as exc:
+            raise serializers.ValidationError({'phone': str(exc)}) from exc
+        phone_candidates = {phone}
+        if phone.startswith('+2547'):
+            phone_candidates.update((phone[1:], f'0{phone[4:]}'))
+        elif phone.startswith('2547'):
+            phone_candidates.update((f'+{phone}', f'0{phone[3:]}'))
+        elif phone.startswith('07') and len(phone) == 10:
+            phone_candidates.update((f'+254{phone[1:]}', f'254{phone[1:]}'))
+        user = None
+        for candidate in phone_candidates:
+            user = authenticate(phone=candidate, password=attrs['password'])
+            if user is not None:
+                break
         if user is None:
             raise serializers.ValidationError('Invalid phone number or password.')
         if not user.is_phone_verified and not (user.is_staff or user.is_superuser):

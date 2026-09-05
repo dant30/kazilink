@@ -36,7 +36,9 @@ This roadmap tracks the current repository state as of 2026-09-05. It separates 
 | SMS provider integration | ❌❌ | OTP generation exists, but Africa's Talking/Twilio transport is not implemented. |
 | Employer business verification | ✅✅ | Model, document field, admin workflow surfaces, and verification-related code exist. |
 | S3/local storage production integration | ❌❌ | Storage abstractions exist, but production object-storage integration is not verified. |
-| Frontend auth pages | ✅✅ | Login, registration, phone verification, and recovery screens are implemented and routed. |
+| Frontend auth pages | ✅✅ | Login, registration, phone verification, and recovery screens include Kenyan phone normalization, password-strength feedback, role-aware routing, searchable catalogs, referral entry, and separate Terms/Privacy consent. |
+| Backend consent records | ✅✅ | Registration requires Terms and Privacy acceptance and stores consent timestamps plus policy versions on the user account. |
+| Public privacy policy | ✅✅ | Public `/privacy` page explains collection, use, sharing, retention, rights, cookies, and Kenya Data Protection Act alignment. |
 | Frontend worker/employer profile pages | ❌❌ | Feature folders exist, but complete interactive pages are not implemented. |
 
 ## Phase 2: Marketplace
@@ -52,7 +54,7 @@ This roadmap tracks the current repository state as of 2026-09-05. It separates 
 | PostgreSQL full-text search | ✅✅ | Jobs maintain a weighted PostgreSQL search vector and use ranked web-search queries. |
 | Location filtering for Nairobi/Mombasa/Kisumu | ✅✅ | Job search supports location filtering through the marketplace query API. |
 | Job matching service | ✅✅ | Worker recommendations use indexed skill matching, location scoring, and ranking. |
-| Frontend marketplace pages | ✅✅ | Job discovery, detail/application, and employer posting screens are connected to the API. |
+| Frontend marketplace pages | ✅✅ | Public job discovery/detail pages are available; applying requires an authenticated worker with sufficient Kazi Credits. |
 
 ## Phase 3: Employment History And Payments
 
@@ -70,7 +72,7 @@ This roadmap tracks the current repository state as of 2026-09-05. It separates 
 | Native Daraja callback processing | ✅✅ | Native `Body.stkCallback` callbacks settle credit recharges and existing employer transactions idempotently. |
 | Signed M-Pesa callback | ❌❌ | Optional custom HMAC validation remains supported, but Daraja does not provide that signature header. |
 | Payment/history integration tests | ❌❌ | Credit wallet unit coverage exists; full recharge, callback, and history-unlock integration coverage is still needed. |
-| Frontend unlock and checkout UX | ❌❌ | Shared Kazi Credits wallet/recharge UI, employer payment modal, and worker application balance gate exist; feature-specific history unlock and boost controls remain incomplete. |
+| Frontend unlock and checkout UX | ❌❌ | Shared Kazi Credits wallet/recharge UI, employer payment modal, worker application balance gate, and legal consent UX exist; feature-specific history unlock and boost controls remain incomplete. |
 
 ## Phase 4: Reputation And Communication
 
@@ -118,7 +120,7 @@ This roadmap tracks the current repository state as of 2026-09-05. It separates 
 
 | Deliverable | Status | Current state |
 | --- | --- | --- |
-| Public routes and auth navigation | ✅✅ | Public route definitions and auth redirects exist. |
+| Public routes and auth navigation | ✅✅ | Public routes include landing, jobs, job details, terms, privacy, and auth flows; protected actions redirect guests to login with their intended destination. |
 | Landing page | ✅✅ | Public landing experience includes backend-fed role search, live jobs, worker profile positioning, trust education, FAQ, calculator, and role-aware calls to action. |
 | Worker/employer onboarding funnels | ❌❌ | Registration APIs exist, but role-specific onboarding UI is incomplete. |
 | Testimonials and feature presentation | ❌❌ | Not implemented. |
@@ -135,7 +137,7 @@ This roadmap tracks the current repository state as of 2026-09-05. It separates 
 | HTTPS and public callback domain | ❌❌ | Requires deployment infrastructure and a public M-Pesa callback URL. |
 | Seed data management command | ❌❌ | `seed_data` has not been implemented. |
 | Migration consistency | ✅✅ | Migration conflicts were resolved and migrations apply in the working environment. |
-| Runtime validation | ❌❌ | `manage.py check`, full test runs, and frontend build still need to be executed in CI/local environments. |
+| Runtime validation | ❌❌ | Static diagnostics pass for recent changes, but `manage.py check`, migrations, full test runs, and frontend build still need to be executed in CI/local environments. |
 
 ## Current Priorities
 
