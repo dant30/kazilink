@@ -107,6 +107,61 @@ WORKER_AVAILABILITIES = (
 	('flexible', 'Flexible schedule'),
 )
 
+WORKER_SKILLS = (
+	('customer_service', 'Customer service'),
+	('food_preparation', 'Food preparation'),
+	('food_safety', 'Food safety and hygiene'),
+	('menu_planning', 'Menu planning'),
+	('table_service', 'Table service'),
+	('bar_service', 'Bar service'),
+	('coffee_preparation', 'Coffee preparation'),
+	('cash_handling', 'Cash handling'),
+	('point_of_sale', 'Point of sale systems'),
+	('stock_control', 'Stock control'),
+	('inventory_management', 'Inventory management'),
+	('housekeeping', 'Housekeeping'),
+	('deep_cleaning', 'Deep cleaning'),
+	('laundry', 'Laundry'),
+	('ironing', 'Ironing'),
+	('childcare', 'Childcare'),
+	('elderly_care', 'Elderly care'),
+	('first_aid', 'First aid'),
+	('patient_support', 'Patient support'),
+	('driving', 'Driving'),
+	('defensive_driving', 'Defensive driving'),
+	('route_planning', 'Route planning'),
+	('security_monitoring', 'Security monitoring'),
+	('access_control', 'Access control'),
+	('cctv_monitoring', 'CCTV monitoring'),
+	('event_setup', 'Event setup'),
+	('event_coordination', 'Event coordination'),
+	('sales', 'Sales'),
+	('merchandising', 'Merchandising'),
+	('cashier_operations', 'Cashier operations'),
+	('computer_literacy', 'Computer literacy'),
+	('microsoft_office', 'Microsoft Office'),
+	('communication', 'Written and verbal communication'),
+	('team_leadership', 'Team leadership'),
+	('time_management', 'Time management'),
+	('problem_solving', 'Problem solving'),
+	('plumbing', 'Plumbing'),
+	('electrical_repair', 'Electrical repair'),
+	('carpentry', 'Carpentry'),
+	('painting', 'Painting and decorating'),
+	('welding', 'Welding'),
+	('masonry', 'Masonry'),
+	('tile_work', 'Tile work'),
+	('motor_vehicle_repair', 'Motor vehicle repair'),
+	('beauty_services', 'Beauty services'),
+	('hair_styling', 'Hair styling'),
+	('makeup', 'Makeup application'),
+	('massage', 'Massage therapy'),
+	('tailoring', 'Tailoring'),
+	('photography', 'Photography'),
+	('video_production', 'Video production'),
+	('social_media', 'Social media management'),
+)
+
 WORK_LOCATIONS = (
 	('Nairobi', 'Nairobi'),
 	('Mombasa', 'Mombasa'),
@@ -167,3 +222,7 @@ def worker_availability_catalog():
 
 def worker_location_catalog():
 	return [{'value': value, 'label': label} for value, label in WORK_LOCATIONS]
+
+
+def worker_skill_catalog():
+	return [{'value': value, 'label': label} for value, label in WORKER_SKILLS]

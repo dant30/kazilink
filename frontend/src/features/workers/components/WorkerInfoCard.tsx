@@ -11,9 +11,10 @@ interface WorkerInfoCardProps {
 	loading?: boolean
 	values?: UpdateWorkerProfilePayload
 	onChange?: (field: keyof UpdateWorkerProfilePayload, value: string | number | string[]) => void
+	skillOptions?: Array<{ value: string; label: string }>
 }
 
-export function WorkerInfoCard({ profile, loading = false, values, onChange }: WorkerInfoCardProps) {
+export function WorkerInfoCard({ profile, loading = false, values, onChange, skillOptions = [] }: WorkerInfoCardProps) {
 	if (loading) {
 		return (
 			<FormSection title="Professional details" description="Share the information employers use to assess your fit for roles." icon={<BriefcaseBusiness className="h-4 w-4" />}>
@@ -63,7 +64,8 @@ export function WorkerInfoCard({ profile, loading = false, values, onChange }: W
 						<Input value={values?.secondary_roles?.join(', ') ?? profile?.secondary_roles.join(', ') ?? ''} onChange={(event) => onChange?.('secondary_roles', event.target.value.split(',').map((role) => role.trim()).filter(Boolean))} placeholder="Waiter, bartender" readOnly={!onChange} />
 					</FormField>
 					<FormField label="Skills" helperText="Separate skills with commas.">
-						<Input value={values?.skills?.join(', ') ?? profile?.skills.join(', ') ?? ''} onChange={(event) => onChange?.('skills', event.target.value.split(',').map((skill) => skill.trim()).filter(Boolean))} placeholder="Food service, barista" readOnly={!onChange} />
+						<Input list="worker-skill-suggestions" value={values?.skills?.join(', ') ?? profile?.skills.join(', ') ?? ''} onChange={(event) => onChange?.('skills', event.target.value.split(',').map((skill) => skill.trim()).filter(Boolean))} placeholder="Food service, barista" readOnly={!onChange} />
+						<datalist id="worker-skill-suggestions">{skillOptions.map((skill) => <option key={skill.value} value={skill.label} />)}</datalist>
 					</FormField>
 					<FormField label="Languages" helperText="Separate languages with commas.">
 						<Input value={values?.languages?.join(', ') ?? profile?.languages.join(', ') ?? ''} onChange={(event) => onChange?.('languages', event.target.value.split(',').map((language) => language.trim()).filter(Boolean))} placeholder="English, Kiswahili" readOnly={!onChange} />
