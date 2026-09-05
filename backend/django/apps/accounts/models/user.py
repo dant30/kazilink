@@ -29,6 +29,10 @@ class User(AbstractBaseUser, PermissionsMixin):
 	joined_date = models.DateTimeField(default=timezone.now)
 	is_active = models.BooleanField(default=True)
 	is_staff = models.BooleanField(default=False)
+	terms_accepted_at = models.DateTimeField(null=True, blank=True)
+	privacy_policy_accepted_at = models.DateTimeField(null=True, blank=True)
+	terms_version = models.CharField(max_length=20, blank=True)
+	privacy_policy_version = models.CharField(max_length=20, blank=True)
 
 	objects = UserManager()
 	USERNAME_FIELD = 'phone'

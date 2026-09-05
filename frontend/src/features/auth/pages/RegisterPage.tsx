@@ -36,9 +36,10 @@ export function RegisterPage() {
     if (form.password !== form.confirm_password) { setError('Passwords do not match.'); setSaving(false); return }
     if (!termsAccepted) { setError('Please accept the terms and conditions to continue.'); setSaving(false); return }
     if (!privacyAccepted) { setError('Please accept the privacy policy to continue.'); setSaving(false); return }
+    if (!privacyAccepted) { setError('Please accept the privacy policy to continue.'); setSaving(false); return }
 
     try {
-      const payload: Record<string, unknown> = { phone: normalizedPhone, full_name: form.full_name.trim(), password: form.password, role }
+      const payload: Record<string, unknown> = { phone: normalizedPhone, full_name: form.full_name.trim(), password: form.password, role, terms_accepted: termsAccepted, privacy_policy_accepted: privacyAccepted }
       if (form.email.trim()) payload.email = form.email.trim()
       if (form.referral_code.trim()) payload.referral_code = form.referral_code.trim().toUpperCase()
       if (role === 'worker') {

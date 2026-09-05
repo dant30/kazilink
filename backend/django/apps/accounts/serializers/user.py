@@ -28,6 +28,8 @@ class RegistrationSerializer(serializers.Serializer):
     bio = serializers.CharField(required=False, allow_blank=False)
     contact_person = serializers.CharField(max_length=255, required=False)
     referral_code = serializers.CharField(max_length=20, required=False, allow_blank=True)
+    terms_accepted = serializers.BooleanField(required=True)
+    privacy_policy_accepted = serializers.BooleanField(required=True)
 
     def validate(self, attrs):
         if attrs['role'] == UserRole.Role.WORKER:
@@ -35,6 +37,10 @@ class RegistrationSerializer(serializers.Serializer):
             missing = [field for field in required_fields if field not in attrs]
             if missing:
                 raise serializers.ValidationError({field: 'This field is required for worker registration.' for field in missing})
+        if not attrs['terms_accepted']:
+            raise serializers.ValidationError({'terms_accepted': 'You must accept the Terms of Service.'})
+        if not attrs['privacy_policy_accepted']:
+            raise serializers.ValidationError({'privacy_policy_accepted': 'You must accept the Privacy Policy.'})
         return attrs
 
 
