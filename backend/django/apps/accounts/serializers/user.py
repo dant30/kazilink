@@ -87,6 +87,11 @@ class ProfileSerializer(serializers.ModelSerializer):
 class WorkerProfileSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
 
+    def validate_bio(self, value):
+        if len(value) > 500:
+            raise serializers.ValidationError('Bio must be 500 characters or fewer.')
+        return value
+
     class Meta:
         model = WorkerProfile
         fields = '__all__'

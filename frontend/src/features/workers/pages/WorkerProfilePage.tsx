@@ -3,7 +3,8 @@ import { Avatar } from '../../../shared/components/ui/Avatar'
 import { Badge } from '../../../shared/components/ui/Badge'
 import { Button } from '../../../shared/components/ui/Button'
 import { PageHeader } from '../../../shared/components/ui/PageHeader'
-import { useEffect, useState } from 'react'
+import { ProgressBar } from '../../../shared/components/ui/ProgressBar'
+import { useEffect, useMemo, useState } from 'react'
 import { useAuthStore } from '../../auth/store'
 import { useWorkerProfile } from '../hooks/useWorkerProfile'
 import { useUpdateWorkerProfile } from '../hooks/useUpdateWorkerProfile'
@@ -12,20 +13,24 @@ import { FormSection } from '../../../shared/components/forms'
 import { ErrorBoundary } from '../../../shared/components/ui/ErrorBoundary'
 import { ConfirmDialog } from '../../../shared/components/ui/ConfirmDialog'
 import { endpoints } from '../../../core/api'
-import { toast } from '../../../shared/components/feedback'
 import { Link } from 'react-router-dom'
+import { Briefcase, Check, CheckCircle2, ChevronDown, ChevronUp, Clock, Edit3, Eye, Languages, Search, Share2, ShieldAlert, ShieldCheck, Star, UserCheck, Zap } from 'lucide-react'
 import type { UpdateWorkerProfilePayload } from '../types'
 import { ReferralCard } from '../../accounts/components/ReferralCard'
 
 export function WorkerProfilePage() {
 	const { user } = useAuthStore()
 	const { profile, loading, error, refresh } = useWorkerProfile()
-	const { updating, error: updateError, success, updateProfile, clearError } = useUpdateWorkerProfile()
+	const { updating, error: updateError, success, updateProfile, clearError, clearSuccess } = useUpdateWorkerProfile()
 	const [form, setForm] = useState<UpdateWorkerProfilePayload>({})
 	const [creditBalance, setCreditBalance] = useState<number | null>(null)
 	const [confirmBoost, setConfirmBoost] = useState(false)
 	const [boosting, setBoosting] = useState(false)
 	const [boostFeedback, setBoostFeedback] = useState('')
+	const [avatarPreview, setAvatarPreview] = useState<string | null>(null)
+	const [activeTab, setActiveTab] = useState<'edit' | 'preview'>('edit')
+	const [showChecklist, setShowChecklist] = useState(false)
+	const [copiedLink, setCopiedLink] = useState(false)
 
 	useEffect(() => {
 		if (!profile) return
@@ -44,17 +49,27 @@ export function WorkerProfilePage() {
 		})
 	}, [profile])
 
+	useEffect(() => () => { if (avatarPreview) URL.revokeObjectURL(avatarPreview) }, [avatarPreview])
+
 	useEffect(() => {
 		endpoints.credits.wallet().then((response) => setCreditBalance(response.wallet.balance)).catch(() => setCreditBalance(null))
 	}, [])
-	const profileStrength = profile
-		? Math.round(
-				([profile.primary_role, profile.location, profile.bio, profile.skills.length > 0, profile.languages.length > 0, profile.last_employer]
-					.filter(Boolean).length /
-					6) *
-				100
-			)
-		: 0
+	const workerCriteria = [
+		['photo', 'Professional profile photo', Boolean(profile?.avatar || profile?.user.avatar || form.avatar)],
+		['role_rate', 'Primary role and daily shift rate', Boolean((form.primary_role || profile?.primary_role)?.trim() && Number(form.expected_daily_rate_ksh ?? profile?.expected_daily_rate_ksh) > 0)],
+		['location', 'Operating Kenyan town or county', Boolean((form.location || profile?.location)?.trim())],
+		['bio', 'Experience summary and professional bio', Boolean((form.bio || profile?.bio)?.trim() && (form.bio || profile?.bio)!.length >= 20)],
+		['skills', 'Hospitality skills and languages', Boolean((form.skills || profile?.skills)?.length && (form.languages || profile?.languages)?.length)],
+		['experience', 'Track record and years of experience', Number(form.years_of_experience ?? profile?.years_of_experience) > 0],
+		['trust', 'Verified reference or identity', Boolean(profile?.is_reference_checked || profile?.user.is_id_verified || profile?.background_check_verified)],
+	] as const
+	const profileStrength = Math.round((workerCriteria.filter((item) => item[2]).length / workerCriteria.length) * 100)
+	const strengthColor: 'rose' | 'amber' | 'orange' | 'emerald' = profileStrength < 40 ? 'rose' : profileStrength < 70 ? 'amber' : profileStrength < 90 ? 'orange' : 'emerald'
+	const strengthTier = profileStrength < 40 ? 'Incomplete' : profileStrength < 70 ? 'Basic Candidate' : profileStrength < 90 ? 'High Demand' : 'All-Star Verified'
+	const isDirty = useMemo(() => Boolean(profile && ((form.primary_role ?? '') !== (profile.primary_role ?? '') || (form.location ?? '') !== (profile.location ?? '') || Number(form.years_of_experience ?? 0) !== Number(profile.years_of_experience ?? 0) || Number(form.expected_daily_rate_ksh ?? 0) !== Number(profile.expected_daily_rate_ksh ?? 0) || (form.availability ?? '') !== (profile.availability ?? '') || (form.bio ?? '') !== (profile.bio ?? '') || JSON.stringify(form.skills || []) !== JSON.stringify(profile.skills || []) || JSON.stringify(form.languages || []) !== JSON.stringify(profile.languages || []) || form.avatar instanceof File)), [form, profile])
+	const avatarSrc = avatarPreview || (form.avatar instanceof File ? URL.createObjectURL(form.avatar) : profile?.avatar || profile?.user.avatar)
+	const discardChanges = () => { if (!profile) return; setForm({ primary_role: profile.primary_role, location: profile.location, years_of_experience: profile.years_of_experience, expected_daily_rate_ksh: profile.expected_daily_rate_ksh, expected_monthly_salary_ksh: profile.expected_monthly_salary_ksh, availability: profile.availability, bio: profile.bio, skills: profile.skills, languages: profile.languages, secondary_roles: profile.secondary_roles, last_employer: profile.last_employer }); if (avatarPreview) { URL.revokeObjectURL(avatarPreview); setAvatarPreview(null) }; clearError() }
+	const copyProfileLink = async () => { try { await navigator.clipboard.writeText(window.location.href) } finally { setCopiedLink(true); window.setTimeout(() => setCopiedLink(false), 2000) } }
 
 	const handleStatusChange = async (field: 'open_to_work', value: boolean) => {
 		try {
@@ -66,6 +81,7 @@ export function WorkerProfilePage() {
 	}
 
 	const updateForm = (field: keyof UpdateWorkerProfilePayload, value: string | number | string[] | File) => {
+		if (field === 'avatar' && value instanceof File) { if (avatarPreview) URL.revokeObjectURL(avatarPreview); setAvatarPreview(URL.createObjectURL(value)) }
 		setForm((current) => ({ ...current, [field]: value }))
 		clearError()
 	}
@@ -114,39 +130,33 @@ export function WorkerProfilePage() {
 		<ErrorBoundary>
 		<section className="mx-auto max-w-6xl space-y-6 px-4 py-8 sm:px-6 lg:px-8">
 			<PageHeader
-				eyebrow="Worker profile"
-				title={user?.full_name || 'Your profile'}
-				actions={
-					<div className="rounded-2xl border border-white/15 bg-white/5 p-4 text-left backdrop-blur-sm">
-						<p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-200">Profile strength</p>
-						<div className="mt-2 flex items-center gap-3">
-							<span className="text-3xl font-black text-white">{profileStrength}%</span>
-							<div className="h-2.5 w-24 rounded-full bg-white/15">
-								<div className="h-2.5 rounded-full bg-[#FF6B00]" style={{ width: `${profileStrength}%` }} />
-							</div>
-						</div>
-					</div>
-				}
+				eyebrow="Worker Profile & Verified Resume"
+				title={user?.full_name || profile?.user.full_name || 'Worker Profile'}
+				description="Your verified hospitality credentials, availability, and rating across Kenyan venues."
+				actions={<div className="flex flex-wrap gap-2"><Button variant="outline" size="sm" onClick={() => void copyProfileLink()} leftIcon={copiedLink ? <Check className="h-4 w-4" /> : <Share2 className="h-4 w-4" />}>{copiedLink ? 'Link copied' : 'Share profile'}</Button><Link to="/jobs"><Button size="sm" leftIcon={<Search className="h-4 w-4" />}>Browse shifts</Button></Link></div>}
 			>
 				<div className="mt-3 flex items-center gap-3">
-					<Avatar src={form.avatar instanceof File ? URL.createObjectURL(form.avatar) : profile?.avatar || profile?.user.avatar} name={user?.full_name || 'Worker'} size="lg" isVerified={Boolean(profile?.is_reference_checked)} />
-					<div className="flex flex-wrap gap-2">
-					<Badge variant="verified">Verified</Badge>
-					{profile?.open_to_work && <Badge variant="success">Available for work</Badge>}
-					</div>
-					<label className="cursor-pointer text-xs font-bold text-white underline decoration-white/40 underline-offset-4 hover:text-orange-200">
-						Change photo
+					<label className="group relative cursor-pointer rounded-full" title="Change profile photo">
+						<Avatar src={avatarSrc} name={user?.full_name || 'Worker'} size="lg" isVerified={Boolean(profile?.is_reference_checked || profile?.user.is_id_verified)} />
+						<span className="absolute inset-0 flex items-center justify-center rounded-full bg-slate-950/65 text-[10px] font-bold text-white opacity-0 transition group-hover:opacity-100 group-focus-within:opacity-100">Change</span>
 						<input type="file" accept="image/png,image/jpeg,image/webp" className="sr-only" onChange={(event) => { const file = event.target.files?.[0]; if (file) updateForm('avatar', file) }} />
 					</label>
+					<div className="space-y-1">
+						<div className="flex flex-wrap gap-2">
+							<Badge variant={profile?.is_reference_checked || profile?.user.is_id_verified ? 'verified' : 'neutral'}>{profile?.is_reference_checked || profile?.user.is_id_verified ? 'Verified profile' : 'Verification in progress'}</Badge>
+							<Badge variant={profile?.open_to_work ? 'success' : 'neutral'}>{profile?.open_to_work ? 'Available for work' : 'Not seeking shifts'}</Badge>
+						</div>
+						<p className="text-xs text-slate-300"><strong className="text-white">{form.primary_role || profile?.primary_role || 'Hospitality specialist'}</strong> · {form.location || profile?.location || 'Kenya'}</p>
+						<p className="text-xs text-slate-300">Daily rate: <strong className="text-white">KSh {form.expected_daily_rate_ksh || profile?.expected_daily_rate_ksh || 0}</strong> · <span className="capitalize">{(form.availability || profile?.availability || 'immediate').replace(/_/g, ' ')}</span></p>
+					</div>
 				</div>
 			</PageHeader>
 
+			<div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><ProgressBar value={profileStrength} color={strengthColor} showPercentage={false} barHeightClassName="h-3" label={<span className="flex items-center gap-2 font-bold text-slate-900">{profileStrength >= 80 ? <ShieldCheck className="h-4 w-4 text-emerald-600" /> : <ShieldAlert className="h-4 w-4 text-amber-600" />}Candidate profile strength</span>} rightLabel={<span className="flex items-center gap-2"><Badge variant={profileStrength >= 90 ? 'success' : 'warning'} size="sm">{profileStrength}% · {strengthTier}</Badge><button type="button" className="text-xs font-bold text-[#FF6B00]" onClick={() => setShowChecklist((value) => !value)}>{showChecklist ? 'Hide details' : 'View checklist'} {showChecklist ? <ChevronUp className="inline h-3.5 w-3.5" /> : <ChevronDown className="inline h-3.5 w-3.5" />}</button></span>} />{showChecklist && <div className="mt-4 grid gap-2 border-t border-slate-100 pt-4 sm:grid-cols-2 lg:grid-cols-3">{workerCriteria.map(([id, label, met]) => <div key={id} className={`flex items-center gap-2 rounded-xl p-2.5 text-xs ${met ? 'bg-emerald-50 text-emerald-800' : 'bg-slate-50 text-slate-600'}`}>{met ? <CheckCircle2 className="h-4 w-4 text-emerald-600" /> : <span className="h-2 w-2 rounded-full bg-slate-300" />}{label}</div>)}</div>}</div>
+			<div className="flex rounded-2xl border border-slate-200 bg-slate-100 p-1"><button type="button" onClick={() => setActiveTab('edit')} className={`flex flex-1 items-center justify-center gap-2 rounded-xl py-2.5 text-xs font-bold ${activeTab === 'edit' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600'}`}><Edit3 className="h-3.5 w-3.5" />Edit profile and details</button><button type="button" onClick={() => setActiveTab('preview')} className={`flex flex-1 items-center justify-center gap-2 rounded-xl py-2.5 text-xs font-bold ${activeTab === 'preview' ? 'bg-[#0A2540] text-white shadow-sm' : 'text-slate-600'}`}><Eye className="h-3.5 w-3.5 text-[#FF6B00]" />Employer live view</button></div>
+
 			{/* Success Message */}
-			{success && (
-				<div className="rounded-2xl border border-green-200 bg-green-50 p-4">
-					<p className="text-green-700 font-semibold">Profile updated successfully!</p>
-				</div>
-			)}
+			{success && <div className="flex items-center justify-between rounded-2xl border border-green-200 bg-green-50 p-4"><span className="flex items-center gap-2 font-semibold text-green-700"><CheckCircle2 className="h-5 w-5" />Profile updated successfully.</span><button type="button" className="text-xs font-bold text-green-700" onClick={clearSuccess}>Dismiss</button></div>}
 
 			{/* Error Message */}
 			{updateError && (
@@ -155,7 +165,7 @@ export function WorkerProfilePage() {
 				</div>
 			)}
 
-			<div className="grid gap-6 xl:grid-cols-[1.3fr_0.7fr]">
+			{activeTab === 'edit' && <div className="grid gap-6 xl:grid-cols-[1.3fr_0.7fr]">
 				<div className="space-y-6">
 					{/* Professional Details */}
 					<WorkerInfoCard profile={profile} loading={loading} values={form} onChange={updateForm} />
@@ -226,14 +236,14 @@ export function WorkerProfilePage() {
 						{boostFeedback && <p className="mt-3 text-xs font-semibold text-emerald-700">{boostFeedback}</p>}
 					</div>
 				</aside>
-			</div>
+			</div>}
+
+			{activeTab === 'preview' && <div className="space-y-6"><div className="rounded-3xl bg-gradient-to-b from-[#0A2540] to-[#071D32] p-8 text-white shadow-md"><div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between"><div className="flex items-center gap-4"><Avatar src={avatarSrc} name={user?.full_name || 'Worker'} size="xl" isVerified={Boolean(profile?.is_reference_checked)} /><div><h2 className="text-2xl font-black text-white">{user?.full_name || profile?.user.full_name}</h2><p className="mt-1 text-sm text-slate-300">{form.primary_role || profile?.primary_role || 'Hospitality specialist'} · {form.location || profile?.location || 'Kenya'}</p><div className="mt-3 flex flex-wrap gap-4 text-xs text-slate-300"><span className="flex items-center gap-1"><Clock className="h-3.5 w-3.5 text-[#FF6B00]" />{form.years_of_experience || profile?.years_of_experience || 0} years experience</span><span className="flex items-center gap-1"><Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />{Number(profile?.rating ?? 0).toFixed(1)} ({profile?.reviews_count ?? 0} reviews)</span><span className="flex items-center gap-1"><Zap className="h-3.5 w-3.5 text-emerald-400" />{profile?.punctuality_score ?? 0}% punctuality</span></div></div></div><Button variant="outline" onClick={() => setActiveTab('edit')} className="border-white/30 text-white">Back to edit</Button></div></div><div className="grid gap-6 md:grid-cols-2"><div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"><h3 className="flex items-center gap-2 font-bold text-slate-900"><Briefcase className="h-5 w-5 text-[#FF6B00]" />Shift rates and availability</h3><div className="mt-4 grid grid-cols-2 gap-3 text-xs"><div className="rounded-xl border border-orange-100 bg-orange-50 p-3"><span className="text-slate-500">Daily shift rate</span><strong className="mt-1 block text-lg text-[#0A2540]">KSh {form.expected_daily_rate_ksh || profile?.expected_daily_rate_ksh || 0}</strong></div><div className="rounded-xl bg-slate-50 p-3"><span className="text-slate-500">Availability</span><strong className="mt-1 block capitalize text-slate-800">{(form.availability || profile?.availability || 'Immediate').replace('_', ' ')}</strong></div></div><p className="mt-4 rounded-xl bg-slate-50 p-4 text-sm leading-relaxed text-slate-700">{form.bio || profile?.bio || 'No bio summary provided yet.'}</p></div><div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"><h3 className="flex items-center gap-2 font-bold text-slate-900"><CheckCircle2 className="h-5 w-5 text-emerald-600" />Verified skills and languages</h3><div className="mt-4 flex flex-wrap gap-2">{(form.skills || profile?.skills || []).map((skill) => <span key={skill} className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-800"><Check className="mr-1 inline h-3 w-3" />{skill}</span>)}{(form.languages || profile?.languages || []).map((language) => <span key={language} className="rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700"><Languages className="mr-1 inline h-3 w-3" />{language}</span>)}</div><div className="mt-5 space-y-2 border-t border-slate-100 pt-4 text-xs text-slate-700"><p><UserCheck className="mr-2 inline h-4 w-4 text-emerald-600" />Kenyan phone verified</p><p><ShieldCheck className="mr-2 inline h-4 w-4 text-emerald-600" />Identity and reference checks shown privately</p></div></div></div></div>}
 
 			{/* Action Buttons */}
-			<div className="flex justify-end rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-				<Button type="button" disabled={updating || loading} onClick={() => void saveProfile()}>
-					{updating ? 'Saving...' : success ? 'Profile saved' : 'Save profile'}
-				</Button>
-			</div>
+			{activeTab === 'edit' && <div className="sticky bottom-4 z-20 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white/95 p-4 shadow-md backdrop-blur-sm">
+				<span className="text-xs font-semibold text-slate-500">{isDirty ? 'Unsaved changes to your profile' : 'All profile details saved'}</span><div className="flex gap-2">{isDirty && <Button variant="outline" size="sm" onClick={discardChanges} disabled={updating}>Discard</Button>}<Button type="button" disabled={updating || loading || !isDirty} onClick={() => void saveProfile()} isLoading={updating}>{updating ? 'Saving profile...' : 'Save profile'}</Button></div>
+			</div>}
 			<ConfirmDialog
 				isOpen={confirmBoost}
 				title="Boost your profile?"
