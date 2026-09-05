@@ -37,8 +37,14 @@ class CreditSpendSerializer(serializers.Serializer):
 	metadata = serializers.JSONField(required=False, default=dict)
 
 
+class CreditTransferSerializer(serializers.Serializer):
+	recipient_phone = serializers.CharField(max_length=20)
+	amount = serializers.IntegerField(min_value=1)
+	idempotency_key = serializers.CharField(max_length=100)
+
+
 class CreditRechargeCreateSerializer(serializers.Serializer):
-	amount_ksh = serializers.IntegerField(min_value=20)
+	amount_ksh = serializers.IntegerField(min_value=100)
 	phone_number = serializers.CharField(max_length=20, required=False, allow_blank=True)
 
 	def validate(self, attrs):

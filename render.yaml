@@ -82,7 +82,7 @@ services:
       - key: MPESA_WEBHOOK_SECRET
         sync: false
       - key: CREDIT_KSH_PER_CREDIT
-        value: "20"
+        value: "50"
       - key: REFERRAL_REFERRER_CREDITS
         value: "5"
       - key: REFERRAL_REFERRED_CREDITS

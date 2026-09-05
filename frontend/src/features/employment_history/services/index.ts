@@ -27,8 +27,8 @@ export function deleteEmploymentRecord(id: number) {
   return endpoints.employmentHistory.remove(id)
 }
 
-export function unlockEmploymentHistory(workerId: number, amountKsh = 100) {
-  return endpoints.employmentHistory.unlock({ worker_id: workerId, amount_ksh: amountKsh })
+export function unlockEmploymentHistory(workerId: number, idempotencyKey?: string) {
+  return endpoints.employmentHistory.unlock({ worker_id: workerId, idempotency_key: idempotencyKey })
 }
 
 export function getHistoryAccess() {

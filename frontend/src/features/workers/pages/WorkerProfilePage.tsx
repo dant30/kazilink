@@ -10,6 +10,10 @@ import { useUpdateWorkerProfile } from '../hooks/useUpdateWorkerProfile'
 import { WorkerInfoCard, WorkerStatusCard, WorkerStatsCard } from '../components'
 import { FormSection } from '../../../shared/components/forms'
 import { ErrorBoundary } from '../../../shared/components/ui/ErrorBoundary'
+import { ConfirmDialog } from '../../../shared/components/ui/ConfirmDialog'
+import { endpoints } from '../../../core/api'
+import { toast } from '../../../shared/components/feedback'
+import { Link } from 'react-router-dom'
 import type { UpdateWorkerProfilePayload } from '../types'
 import { ReferralCard } from '../../accounts/components/ReferralCard'
 
@@ -18,6 +22,10 @@ export function WorkerProfilePage() {
 	const { profile, loading, error, refresh } = useWorkerProfile()
 	const { updating, error: updateError, success, updateProfile, clearError } = useUpdateWorkerProfile()
 	const [form, setForm] = useState<UpdateWorkerProfilePayload>({})
+	const [creditBalance, setCreditBalance] = useState<number | null>(null)
+	const [confirmBoost, setConfirmBoost] = useState(false)
+	const [boosting, setBoosting] = useState(false)
+	const [boostFeedback, setBoostFeedback] = useState('')
 
 	useEffect(() => {
 		if (!profile) return
@@ -35,6 +43,10 @@ export function WorkerProfilePage() {
 			last_employer: profile.last_employer,
 		})
 	}, [profile])
+
+	useEffect(() => {
+		endpoints.credits.wallet().then((response) => setCreditBalance(response.wallet.balance)).catch(() => setCreditBalance(null))
+	}, [])
 	const profileStrength = profile
 		? Math.round(
 				([profile.primary_role, profile.location, profile.bio, profile.skills.length > 0, profile.languages.length > 0, profile.last_employer]
@@ -64,6 +76,24 @@ export function WorkerProfilePage() {
 			await updateProfile(form)
 		} catch {
 			// The update hook exposes the error state to the page.
+		}
+	}
+
+	const boostProfile = async () => {
+		setBoosting(true)
+		setBoostFeedback('')
+		try {
+			await endpoints.workers.boostProfileWithCredits(`profile-boost:${user?.id || 'me'}:${Date.now()}`)
+			const [walletResponse, profileResponse] = await Promise.all([endpoints.credits.wallet(), endpoints.workers.me()])
+			setCreditBalance(walletResponse.wallet.balance)
+			setForm((current) => ({ ...current, ...profileResponse }))
+			await refresh()
+			setConfirmBoost(false)
+			setBoostFeedback('Profile boosted for 7 days.')
+		} catch (error) {
+			setBoostFeedback(error instanceof Error ? error.message : 'The profile boost failed. Your credits were not charged.')
+		} finally {
+			setBoosting(false)
 		}
 	}
 
@@ -186,6 +216,15 @@ export function WorkerProfilePage() {
 							<div className="flex items-center justify-between gap-3"><span className="text-slate-500">National ID</span><span className="font-semibold text-slate-700">{profile?.national_id_masked || 'Not provided'}</span></div>
 						</div>
 					</div>
+
+					<div className="rounded-2xl border border-orange-200 bg-orange-50 p-5 shadow-sm">
+						<div className="flex items-center justify-between gap-3"><h3 className="text-sm font-black uppercase tracking-[0.18em] text-slate-700">Profile visibility</h3><span className="text-xs font-bold text-[#C2410C]">3 credits</span></div>
+						<p className="mt-2 text-sm text-slate-600">Boost your profile for 7 days so employers can spot you faster.</p>
+						<p className="mt-3 text-xs text-slate-600">Balance: <strong>{creditBalance ?? '...'}</strong> Kazi Credits</p>
+						{creditBalance === 0 && <p className="mt-2 text-xs font-medium text-amber-800">You need 3 credits. <Link to="/payments" className="font-bold underline">Buy Kazi Credits</Link></p>}
+						<Button className="mt-4 w-full" disabled={boosting || creditBalance === null || creditBalance < 3} onClick={() => setConfirmBoost(true)}>{profile?.profile_boost_until ? 'Boost again' : 'Boost profile for 7 days'}</Button>
+						{boostFeedback && <p className="mt-3 text-xs font-semibold text-emerald-700">{boostFeedback}</p>}
+					</div>
 				</aside>
 			</div>
 
@@ -195,6 +234,15 @@ export function WorkerProfilePage() {
 					{updating ? 'Saving...' : success ? 'Profile saved' : 'Save profile'}
 				</Button>
 			</div>
+			<ConfirmDialog
+				isOpen={confirmBoost}
+				title="Boost your profile?"
+				message={<span>This will use <strong>3 Kazi Credits</strong> and boost your profile for 7 days. Your balance is <strong>{creditBalance ?? '...'}</strong>.</span>}
+				confirmLabel="Use 3 Credits"
+				loading={boosting}
+				onCancel={() => setConfirmBoost(false)}
+				onConfirm={boostProfile}
+			/>
 		</section>
 		</ErrorBoundary>
 	)

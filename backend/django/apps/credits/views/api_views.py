@@ -7,10 +7,12 @@ from rest_framework.views import APIView
 
 from apps.payments.services.mpesa import MpesaConfigurationError, initiate_stk_push
 
-from ..models import CreditLedgerEntry, CreditRecharge
-from ..serializers import CreditCatalogSerializer, CreditLedgerEntrySerializer, CreditRechargeCreateSerializer, CreditRechargeSerializer, CreditSpendSerializer, CreditWalletSerializer
+from django.contrib.auth import get_user_model
+from ..models import CreditEconomyConfig, CreditLedgerEntry, CreditRecharge
+from ..serializers import CreditCatalogSerializer, CreditLedgerEntrySerializer, CreditRechargeCreateSerializer, CreditRechargeSerializer, CreditSpendSerializer, CreditTransferSerializer, CreditWalletSerializer
 from ..services.catalog import credit_catalog
 from ..services.wallet_service import get_or_create_wallet, record_ledger_entry, spend_credits
+from ..services.transfer_service import transfer_credits
 
 
 class CreditCatalogView(APIView):
@@ -18,7 +20,8 @@ class CreditCatalogView(APIView):
 
 	def get(self, request):
 		catalog = [dict(key=key, **value) for key, value in credit_catalog().items()]
-		return Response({'currency': 'Kazi Credits', 'ksh_per_credit': 20, 'actions': CreditCatalogSerializer(catalog, many=True).data})
+		config = CreditEconomyConfig.current()
+		return Response({'currency': 'Kazi Credits', 'ksh_per_credit': config.ksh_per_credit, 'minimum_recharge_ksh': config.minimum_recharge_ksh, 'actions': CreditCatalogSerializer(catalog, many=True).data})
 
 
 class CreditWalletView(APIView):
@@ -43,7 +46,7 @@ class CreditRechargeView(APIView):
 			amount_ksh=serializer.validated_data['amount_ksh'],
 			credits=serializer.validated_data['credits'],
 			phone_number=phone_number,
-			metadata={'credit_rate_ksh': 20},
+			metadata={'credit_rate_ksh': CreditEconomyConfig.current().ksh_per_credit},
 		)
 		try:
 			provider_response = initiate_stk_push(transaction=recharge, phone_number=phone_number)
@@ -72,6 +75,23 @@ class CreditSpendView(APIView):
 			entry = spend_credits(user=request.user, **serializer.validated_data)
 		except PermissionError as exc:
 			return Response({'detail': str(exc)}, status=status.HTTP_403_FORBIDDEN)
+		except ValueError as exc:
+			return Response({'detail': str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+		return Response(CreditLedgerEntrySerializer(entry).data, status=status.HTTP_201_CREATED)
+
+
+class CreditTransferView(APIView):
+	permission_classes = [IsAuthenticated]
+
+	def post(self, request):
+		serializer = CreditTransferSerializer(data=request.data)
+		serializer.is_valid(raise_exception=True)
+		User = get_user_model()
+		recipient = User.objects.filter(phone=serializer.validated_data['recipient_phone']).first()
+		if recipient is None:
+			return Response({'detail': 'Recipient account was not found.'}, status=status.HTTP_404_NOT_FOUND)
+		try:
+			entry = transfer_credits(sender=request.user, recipient=recipient, amount=serializer.validated_data['amount'], idempotency_key=serializer.validated_data['idempotency_key'])
 		except ValueError as exc:
 			return Response({'detail': str(exc)}, status=status.HTTP_400_BAD_REQUEST)
 		return Response(CreditLedgerEntrySerializer(entry).data, status=status.HTTP_201_CREATED)

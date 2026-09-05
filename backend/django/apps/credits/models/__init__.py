@@ -1,3 +1,4 @@
 from .wallets import CreditLedgerEntry, CreditRecharge, CreditWallet
+from .economy import CreditEconomyConfig
 
-__all__ = ['CreditLedgerEntry', 'CreditRecharge', 'CreditWallet']
+__all__ = ['CreditEconomyConfig', 'CreditLedgerEntry', 'CreditRecharge', 'CreditWallet']

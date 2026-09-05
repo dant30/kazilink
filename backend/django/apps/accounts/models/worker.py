@@ -37,6 +37,7 @@ class WorkerProfile(models.Model):
 	last_employer = models.CharField(max_length=255, blank=True, null=True)
 	background_check_verified = models.BooleanField(default=False)
 	open_to_work = models.BooleanField(default=True)
+	profile_boost_until = models.DateTimeField(null=True, blank=True)
 
 	def __str__(self):
 		return f'{self.user.full_name} - {self.primary_role}'

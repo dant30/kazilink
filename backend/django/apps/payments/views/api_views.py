@@ -24,6 +24,8 @@ class TransactionListCreateView(generics.ListCreateAPIView):
 		serializer = self.get_serializer(data=request.data)
 		serializer.is_valid(raise_exception=True)
 		data = serializer.validated_data
+		if data['transaction_type'] != Transaction.TransactionType.SUBSCRIPTION:
+			return Response({'detail': 'Platform actions must be paid with Kazi Credits. Only subscriptions use this payment endpoint.'}, status=status.HTTP_400_BAD_REQUEST)
 		metadata = {**data.get('metadata', {}), 'phone_number': data.get('phone_number', '')}
 		payment = create_pending_payment(
 			employer=request.user.employer_profile,
@@ -67,6 +69,8 @@ class TransactionRefundView(APIView):
 	def post(self, request, pk):
 		payment = get_object_or_404(Transaction.objects.select_related('employer__user'), pk=pk)
 		self.check_object_permissions(request, payment)
+		if payment.transaction_type != Transaction.TransactionType.SUBSCRIPTION:
+			return Response({'detail': 'Platform action payments are no longer refundable because actions use Kazi Credits.'}, status=status.HTTP_400_BAD_REQUEST)
 		try:
 			payment = refund_transaction(transaction_id=payment.id)
 		except ValueError as exc:

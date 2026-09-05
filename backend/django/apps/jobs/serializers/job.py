@@ -13,9 +13,9 @@ class JobSerializer(serializers.ModelSerializer):
             'id', 'employer', 'employer_name', 'establishment', 'establishment_name',
             'title', 'category', 'location', 'job_type', 'pay_amount_ksh',
             'pay_period', 'shift_times', 'description', 'requirements', 'benefits',
-            'is_urgent', 'is_featured', 'status', 'applicant_count', 'posted_date',
+            'is_urgent', 'is_featured', 'featured_until', 'boost_until', 'status', 'applicant_count', 'posted_date',
         )
-        read_only_fields = ('id', 'employer', 'employer_name', 'establishment_name', 'applicant_count', 'posted_date')
+        read_only_fields = ('id', 'employer', 'employer_name', 'establishment_name', 'featured_until', 'boost_until', 'applicant_count', 'posted_date')
 
 
 class JobWriteSerializer(serializers.ModelSerializer):
@@ -24,7 +24,7 @@ class JobWriteSerializer(serializers.ModelSerializer):
         fields = (
             'establishment', 'title', 'category', 'location', 'job_type',
             'pay_amount_ksh', 'pay_period', 'shift_times', 'description',
-            'requirements', 'benefits', 'is_urgent', 'is_featured', 'status',
+            'requirements', 'benefits', 'is_urgent', 'status',
         )
 
     def validate_title(self, value):

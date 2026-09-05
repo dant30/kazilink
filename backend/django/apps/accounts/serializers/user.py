@@ -92,7 +92,7 @@ class WorkerProfileSerializer(serializers.ModelSerializer):
         fields = '__all__'
         read_only_fields = (
             'rating', 'reviews_count', 'jobs_completed',
-            'background_check_verified',
+            'background_check_verified', 'profile_boost_until',
         )
 
 

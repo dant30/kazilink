@@ -17,6 +17,8 @@ export type Job = {
   status: JobStatus
   is_urgent: boolean
   is_featured: boolean
+  featured_until?: string | null
+  boost_until?: string | null
   applicant_count: number
   posted_date?: string
   created_at?: string

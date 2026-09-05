@@ -11,7 +11,7 @@ from ..serializers import (
 	HistoryAccessLogSerializer,
 	UnlockHistorySerializer,
 )
-from ..services import can_view_history, create_record, create_unlock_transaction, unlock_history_with_credits, update_record
+from ..services import can_view_history, create_record, unlock_history_with_credits, update_record
 from apps.accounts.models import WorkerProfile
 
 
@@ -84,24 +84,17 @@ class UnlockHistoryView(APIView):
 		serializer.is_valid(raise_exception=True)
 		worker = get_object_or_404(WorkerProfile, pk=serializer.validated_data['worker_id'])
 		try:
-			if serializer.validated_data.get('use_credits'):
-				key = serializer.validated_data.get('idempotency_key') or f'history-unlock:{request.user.id}:{worker.id}'
-				log, entry = unlock_history_with_credits(
-					employer=request.user.employer_profile,
-					worker=worker,
-					idempotency_key=key,
-				)
-				return Response({'access_id': log.id, 'credit_entry_id': entry.id, 'status': 'completed'}, status=status.HTTP_201_CREATED)
-			transaction = create_unlock_transaction(
+			key = serializer.validated_data.get('idempotency_key') or f'history-unlock:{request.user.id}:{worker.id}'
+			log, entry = unlock_history_with_credits(
 				employer=request.user.employer_profile,
 				worker=worker,
-				amount_ksh=serializer.validated_data['amount_ksh'],
+				idempotency_key=key,
 			)
 		except PermissionError as exc:
 			return Response({'detail': str(exc)}, status=status.HTTP_403_FORBIDDEN)
 		except ValueError as exc:
 			return Response({'detail': str(exc)}, status=status.HTTP_400_BAD_REQUEST)
-		return Response({'transaction_id': transaction.id, 'status': transaction.status}, status=status.HTTP_202_ACCEPTED)
+		return Response({'access_id': log.id, 'credit_entry_id': entry.id, 'status': 'completed'}, status=status.HTTP_201_CREATED)
 
 
 class MyHistoryAccessView(generics.ListAPIView):

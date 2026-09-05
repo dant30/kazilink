@@ -68,11 +68,16 @@ This roadmap tracks the current repository state as of 2026-09-05. It separates 
 | M-Pesa STK Push initiation | ✅✅ | Configurable Daraja OAuth/STK request code exists. |
 | M-Pesa STK Push retry handling | ✅✅ | Bounded retries cover transient provider/network failures without retrying 4xx requests. |
 | Kazi Credits wallet and ledger | ✅✅ | User wallets, immutable ledger entries, role-aware catalog pricing, and idempotent spending are implemented. |
-| Kazi Credits M-Pesa recharge | ❌❌ | Recharge initiation and native callback settlement code exist, but end-to-end Daraja settlement still needs validation. |
+| Configurable Kazi Credits economy | ✅✅ | Admin-configurable KSh conversion rate, minimum recharge, referral rewards, non-expiring credits, and atomic user transfers are implemented. Current defaults: KSh 50 per credit and KSh 100 minimum recharge. |
+| Kazi Credits M-Pesa recharge | ❌❌ | Recharge initiation and native callback settlement code exist; purchases require at least KSh 100 and use the admin-controlled conversion rate (default KSh 50 per credit). End-to-end Daraja settlement, duplicate callback, timeout, and captured-payment failure scenarios still need validation. |
 | Native Daraja callback processing | ✅✅ | Native `Body.stkCallback` callbacks settle credit recharges and existing employer transactions idempotently. |
 | Signed M-Pesa callback | ❌❌ | Optional custom HMAC validation remains supported, but Daraja does not provide that signature header. |
-| Payment/history integration tests | ❌❌ | Credit wallet unit coverage exists; full recharge, callback, and history-unlock integration coverage is still needed. |
-| Frontend unlock and checkout UX | ❌❌ | Shared Kazi Credits wallet/recharge UI, employer payment modal, worker application balance gate, and legal consent UX exist; feature-specific history unlock and boost controls remain incomplete. |
+| Payment/history integration tests | ❌❌ | Credit wallet unit coverage covers pricing, minimum recharge, idempotent spending, and transfers; full recharge, callback, failed-action rollback, history-unlock, and subscription cash-payment integration coverage is still needed. |
+| Frontend credit wallet and recharge | ❌❌ | Worker and employer payment pages expose the shared wallet, KSh recharge form, catalog, and ledger. Workers now have a dedicated `Buy Kazi Credits` sidebar entry; completed recharge polling/status feedback and end-to-end purchase validation still need work. |
+| Credit-consuming action backend | ✅✅ | History unlock, application, 24-hour featured jobs, 7-day job boosts, and 7-day profile boosts spend through the idempotent ledger inside atomic transactions. Promotion expiry is persisted and active featured/boosted jobs and profiles are prioritized in marketplace ordering. |
+| Frontend credit-consuming actions | ❌❌ | Worker applications, employer history unlock, employer job feature/boost, and worker profile boost now have cost disclosure, balance gates, confirmation dialogs, error states, and wallet refresh. Dedicated history-detail rendering and richer active-promotion status indicators remain incomplete. |
+| Credit payment-surface cleanup | ✅✅ | New generic employer payment initiation accepts only cash subscriptions; legacy platform-action refunds are rejected and completed legacy payment callbacks no longer grant platform access. Historical payment records remain readable for audit purposes. |
+| Credit policy and refund UX | ❌❌ | Backend behavior supports non-expiring credits, transfers, and no cash refunds, but the frontend does not consistently explain non-expiry, non-refundable purchases, failed-action restoration, referral-credit restrictions, or cancellation/refund handling for time-based boosts. |
 
 ## Phase 4: Reputation And Communication
 
@@ -141,10 +146,10 @@ This roadmap tracks the current repository state as of 2026-09-05. It separates 
 
 ## Current Priorities
 
-1. Finish Channels consumers/routing and real-time messaging.
-2. Add the rapid-submission and duplicate-job fraud rules.
-3. Add payment/history integration tests and frontend tests.
-4. Implement SMS/push delivery, recurring billing, seed data, and deployment validation.
+1. Complete the Kazi Credits frontend action flows: worker recharge entry, confirmation/insufficient-credit states, history unlock, profile boost, and employer job feature/boost controls.
+2. Remove or restrict legacy direct-payment action paths while keeping subscriptions cash-based.
+3. Add recharge/callback/history integration tests, failed-action rollback tests, and frontend credit-flow tests.
+4. Finish Channels consumers/routing, the rapid-submission and duplicate-job fraud rules, SMS/push delivery, recurring billing, seed data, and deployment validation.
 
 ## Validation Commands
 

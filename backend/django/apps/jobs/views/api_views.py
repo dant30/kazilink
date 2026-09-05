@@ -10,7 +10,7 @@ from core.permissions import IsWorker
 from ..models import Job
 from ..permissions import CanManageJob, IsEmployer, IsJobParticipant
 from ..serializers import JobSerializer, JobWriteSerializer
-from ..services import close_job, create_job, match_jobs_for_worker, search_jobs, update_job
+from ..services import boost_job_with_credits, close_job, create_job, feature_job_with_credits, match_jobs_for_worker, search_jobs, update_job
 
 
 def query_bool(value):
@@ -80,6 +80,31 @@ class CloseJobView(APIView):
 		self.check_object_permissions(request, job)
 		close_job(job=job)
 		return Response(JobSerializer(job).data)
+
+
+class CreditJobActionView(APIView):
+	permission_classes = [CanManageJob]
+	action = None
+
+	def post(self, request, pk):
+		job = get_object_or_404(Job.objects.select_related('employer__user', 'establishment'), pk=pk)
+		self.check_object_permissions(request, job)
+		key = request.data.get('idempotency_key') or f'{self.action}:{request.user.id}:{job.id}'
+		try:
+			job, entry = self.action(employer=request.user.employer_profile, job=job, idempotency_key=key)
+		except PermissionError as exc:
+			return Response({'detail': str(exc)}, status=status.HTTP_403_FORBIDDEN)
+		except ValueError as exc:
+			return Response({'detail': str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+		return Response({'job': JobSerializer(job).data, 'credit_entry_id': entry.id, 'status': 'completed'}, status=status.HTTP_201_CREATED)
+
+
+class CreditFeatureJobView(CreditJobActionView):
+	action = staticmethod(feature_job_with_credits)
+
+
+class CreditBoostJobView(CreditJobActionView):
+	action = staticmethod(boost_job_with_credits)
 
 
 class RecommendedJobsView(generics.ListAPIView):

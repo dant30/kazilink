@@ -4,6 +4,7 @@ import { Link, useParams } from 'react-router-dom'
 
 import { useAuthStore } from '../../auth/store/authStore'
 import { Button } from '../../../shared/components/ui/Button'
+import { ConfirmDialog } from '../../../shared/components/ui/ConfirmDialog'
 import { Skeleton } from '../../../shared/components/ui/Skeleton'
 import { Badge } from '../../../shared/components/ui/Badge'
 import { useJob } from '../hooks'
@@ -18,12 +19,18 @@ export function JobDetailPage() {
   const { job, loading, error } = useJob(Number(jobId))
   const [applying, setApplying] = useState(false)
   const [feedback, setFeedback] = useState('')
+  const [feedbackError, setFeedbackError] = useState(false)
   const [creditBalance, setCreditBalance] = useState<number | null>(null)
+  const [confirmApplication, setConfirmApplication] = useState(false)
+  const [premiumAction, setPremiumAction] = useState<'feature' | 'boost' | null>(null)
+  const [premiumActionLoading, setPremiumActionLoading] = useState(false)
+  const [premiumActionFeedback, setPremiumActionFeedback] = useState('')
+  const [premiumActionError, setPremiumActionError] = useState(false)
 
   useEffect(() => {
-    if (!isWorker) return
+    if (!user || (!isWorker && !isEmployer)) return
     endpoints.credits.wallet().then((response) => setCreditBalance(response.wallet.balance)).catch(() => setCreditBalance(null))
-  }, [isWorker])
+  }, [isEmployer, isWorker, user])
 
   if (loading) {
     return (
@@ -50,6 +57,30 @@ export function JobDetailPage() {
   const roleType = job.job_type?.replace(/_/g, ' ') || 'shift'
   const requirements = job.requirements?.length ? job.requirements : ['Previous hospitality experience preferred.', 'Reliable and punctual attendance.', 'Strong customer service and teamwork.']
   const benefits = job.benefits?.length ? job.benefits : ['Daily or weekly pay options', 'Supportive staff environment', 'Client referral opportunities']
+  const premiumActionCost = premiumAction === 'feature' ? 3 : 5
+  const runPremiumAction = async () => {
+    if (!premiumAction) return
+    setPremiumActionLoading(true)
+    setPremiumActionFeedback('')
+    setPremiumActionError(false)
+    try {
+      const key = `${premiumAction}:${job.id}:${Date.now()}`
+      if (premiumAction === 'feature') {
+        await endpoints.jobs.featureWithCredits(job.id, key)
+      } else {
+        await endpoints.jobs.boostWithCredits(job.id, key)
+      }
+      const response = await endpoints.credits.wallet()
+      setCreditBalance(response.wallet.balance)
+      setPremiumActionFeedback(premiumAction === 'feature' ? 'Job featured for 24 hours.' : 'Job boosted for 7 days.')
+      setPremiumAction(null)
+    } catch (reason) {
+      setPremiumActionError(true)
+      setPremiumActionFeedback(reason instanceof Error ? reason.message : 'The action failed. Your credits were not charged.')
+    } finally {
+      setPremiumActionLoading(false)
+    }
+  }
 
   return (
     <section className="mx-auto max-w-6xl space-y-6 px-4 py-8 sm:px-6 lg:px-8">
@@ -136,6 +167,14 @@ export function JobDetailPage() {
 
               {isEmployer ? (
                 <div className="mt-4 space-y-3">
+                  <div className="rounded-xl border border-slate-200 bg-white px-3 py-3 text-xs text-slate-600">
+                    <div className="flex items-center justify-between"><span>Credit balance</span><strong className="text-[#0A2540]">{creditBalance ?? '...'} Kazi Credits</strong></div>
+                    {creditBalance === 0 && <p className="mt-2 text-amber-700">You need credits for premium job visibility. <Link to="/payments" className="font-bold underline">Buy Kazi Credits</Link></p>}
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <Button variant="outline" size="sm" disabled={creditBalance === 0 || premiumActionLoading} onClick={() => setPremiumAction('feature')}>Feature · 3</Button>
+                    <Button variant="outline" size="sm" disabled={creditBalance === 0 || premiumActionLoading} onClick={() => setPremiumAction('boost')}>Boost · 5</Button>
+                  </div>
                   <Link
                     to="/jobs/new"
                     className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#0A2540] px-4 py-3 text-sm font-bold text-white transition hover:bg-[#123860]"
@@ -149,29 +188,24 @@ export function JobDetailPage() {
                   >
                     View applicants
                   </Link>
+                  {premiumActionFeedback && <p className={`rounded-xl border px-3 py-2 text-xs font-medium ${premiumActionError ? 'border-rose-200 bg-rose-50 text-rose-700' : 'border-emerald-200 bg-emerald-50 text-emerald-700'}`}>{premiumActionFeedback}</p>}
                 </div>
               ) : user && isWorker ? (
                 <>
-                <p className="mt-4 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs text-slate-600">Applying uses 1 Kazi Credit. Balance: <strong className="text-[#0A2540]">{creditBalance ?? '...'}</strong></p>
+                <p className="mt-4 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs text-slate-600">Cost: <strong className="text-[#0A2540]">1 Kazi Credit</strong> per successful application. Balance: <strong className="text-[#0A2540]">{creditBalance ?? '...'}</strong></p>
+                {creditBalance === 0 && (
+                  <div className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-3 text-xs font-medium text-amber-800">
+                    You need 1 Kazi Credit to apply. <Link to="/payments" className="font-bold underline">Buy Kazi Credits</Link>
+                  </div>
+                )}
                 <Button
                   variant="primary"
                   size="lg"
                   className="mt-4 w-full justify-center"
                   disabled={applying || !isWorker || creditBalance === 0}
-                  onClick={async () => {
-                    setApplying(true)
-                    setFeedback('')
-                    try {
-                      await applyForJob(job.id)
-                      setFeedback('Application submitted successfully.')
-                    } catch (reason) {
-                      setFeedback(reason instanceof Error ? reason.message : 'Could not submit application.')
-                    } finally {
-                      setApplying(false)
-                    }
-                  }}
+                  onClick={() => setConfirmApplication(true)}
                 >
-                  {applying ? 'Applying...' : 'Apply now'}
+                  Apply now
                 </Button>
                 </>
               ) : user ? (
@@ -186,7 +220,7 @@ export function JobDetailPage() {
               )}
 
               {feedback && (
-                <p className="mt-3 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-medium text-emerald-700">
+                <p className={`mt-3 rounded-xl border px-3 py-2 text-xs font-medium ${feedbackError ? 'border-rose-200 bg-rose-50 text-rose-700' : 'border-emerald-200 bg-emerald-50 text-emerald-700'}`}>
                   {feedback}
                 </p>
               )}
@@ -216,6 +250,40 @@ export function JobDetailPage() {
           </aside>
         </div>
       </div>
+      <ConfirmDialog
+        isOpen={confirmApplication}
+        title="Confirm job application"
+        message={<span>This successful application will use <strong>1 Kazi Credit</strong>. Your balance is <strong>{creditBalance ?? '...'}</strong>. Credits are restored if the application cannot be completed.</span>}
+        confirmLabel="Use 1 Credit"
+        loading={applying}
+        onCancel={() => setConfirmApplication(false)}
+        onConfirm={async () => {
+          setApplying(true)
+          setFeedback('')
+          setFeedbackError(false)
+          try {
+            await applyForJob(job.id)
+            const response = await endpoints.credits.wallet()
+            setCreditBalance(response.wallet.balance)
+            setFeedback('Application submitted successfully. 1 Kazi Credit used.')
+            setConfirmApplication(false)
+          } catch (reason) {
+            setFeedbackError(true)
+            setFeedback(reason instanceof Error ? reason.message : 'Could not submit application. Your credits were not charged.')
+          } finally {
+            setApplying(false)
+          }
+        }}
+      />
+      <ConfirmDialog
+        isOpen={Boolean(premiumAction)}
+        title={premiumAction === 'feature' ? 'Feature this job?' : 'Boost this job?'}
+        message={<span>This will use <strong>{premiumActionCost} Kazi Credits</strong>. {premiumAction === 'feature' ? 'Your job will be featured for 24 hours.' : 'Your job will receive a boost for 7 days.'} Your balance is <strong>{creditBalance ?? '...'}</strong>.</span>}
+        confirmLabel={`Use ${premiumActionCost} Credits`}
+        loading={premiumActionLoading}
+        onCancel={() => setPremiumAction(null)}
+        onConfirm={runPremiumAction}
+      />
     </section>
   )
 }

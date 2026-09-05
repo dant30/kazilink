@@ -16,7 +16,7 @@ class TransactionSerializer(serializers.ModelSerializer):
 
 
 class PaymentInitiateSerializer(serializers.Serializer):
-	transaction_type = serializers.ChoiceField(choices=Transaction.TransactionType.choices)
+	transaction_type = serializers.ChoiceField(choices=((Transaction.TransactionType.SUBSCRIPTION, 'Subscription'),))
 	amount_ksh = serializers.IntegerField(min_value=1)
 	phone_number = serializers.CharField(max_length=20, required=False, allow_blank=True)
 	metadata = serializers.JSONField(required=False, default=dict)

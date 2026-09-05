@@ -1,6 +1,11 @@
 from django.contrib import admin
 
-from .models import CreditLedgerEntry, CreditRecharge, CreditWallet
+from .models import CreditEconomyConfig, CreditLedgerEntry, CreditRecharge, CreditWallet
+
+
+@admin.register(CreditEconomyConfig)
+class CreditEconomyConfigAdmin(admin.ModelAdmin):
+	list_display = ('ksh_per_credit', 'minimum_recharge_ksh', 'referrer_reward_credits', 'referred_reward_credits', 'updated_at')
 
 
 @admin.register(CreditWallet)

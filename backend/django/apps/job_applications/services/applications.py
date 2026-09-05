@@ -32,7 +32,7 @@ def create_application(*, worker, job, cover_note=''):
     application = JobApplication.objects.create(job=job, worker=worker, cover_note=cover_note)
     spend_credits(
         user=worker.user,
-        action='priority_application',
+        action='application',
         reference=f'job:{job.id}',
         idempotency_key=f'application:{application.id}',
         metadata={'application_id': application.id, 'job_id': job.id},

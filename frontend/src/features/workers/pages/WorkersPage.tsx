@@ -1,19 +1,31 @@
 import { useEffect, useMemo, useState } from 'react'
 import { MapPin, Search, ShieldCheck, Star, UserRound } from 'lucide-react'
+import { Link } from 'react-router-dom'
 
+import { endpoints } from '../../../core/api'
+import { useAuthStore } from '../../auth/store/authStore'
 import { ErrorBoundary } from '../../../shared/components/ui/ErrorBoundary'
 import { PageHeader } from '../../../shared/components/ui/PageHeader'
+import { Button } from '../../../shared/components/ui/Button'
+import { ConfirmDialog } from '../../../shared/components/ui/ConfirmDialog'
 import { Select } from '../../../shared/components/ui/Select'
 import { EmptyState } from '../../../shared/components/feedback'
 import { workerServices } from '../services'
 import type { WorkerProfile } from '../types'
 
 export function WorkersPage() {
+  const { user } = useAuthStore()
+  const isEmployer = Boolean(user?.is_employer && !user?.is_worker)
   const [workers, setWorkers] = useState<WorkerProfile[]>([])
   const [query, setQuery] = useState('')
   const [location, setLocation] = useState('')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [creditBalance, setCreditBalance] = useState<number | null>(null)
+  const [unlockWorker, setUnlockWorker] = useState<WorkerProfile | null>(null)
+  const [unlocking, setUnlocking] = useState(false)
+  const [actionMessage, setActionMessage] = useState('')
+  const [actionError, setActionError] = useState(false)
 
   useEffect(() => {
     let active = true
@@ -33,6 +45,30 @@ export function WorkersPage() {
       active = false
     }
   }, [])
+
+  useEffect(() => {
+    if (!isEmployer) return
+    endpoints.credits.wallet().then((response) => setCreditBalance(response.wallet.balance)).catch(() => setCreditBalance(null))
+  }, [isEmployer])
+
+  const unlockHistory = async () => {
+    if (!unlockWorker) return
+    setUnlocking(true)
+    setActionMessage('')
+    setActionError(false)
+    try {
+      await endpoints.employmentHistory.unlock({ worker_id: unlockWorker.id, idempotency_key: `history-unlock:${unlockWorker.id}:${Date.now()}` })
+      const response = await endpoints.credits.wallet()
+      setCreditBalance(response.wallet.balance)
+      setActionMessage(`Employment history unlocked for ${unlockWorker.user.full_name}.`)
+      setUnlockWorker(null)
+    } catch (reason) {
+      setActionError(true)
+      setActionMessage(reason instanceof Error ? reason.message : 'The history unlock failed. Your credits were not charged.')
+    } finally {
+      setUnlocking(false)
+    }
+  }
 
   const locations = useMemo(() => [...new Set(workers.map((worker) => worker.location).filter(Boolean))].sort(), [workers])
   const filteredWorkers = useMemo(() => {
@@ -85,12 +121,23 @@ export function WorkersPage() {
                   </div>
                   <div className="mt-4 flex items-center gap-1 text-sm font-bold text-slate-700"><Star className="h-4 w-4 fill-amber-400 text-amber-400" />{Number(worker.rating).toFixed(1)} <span className="font-normal text-slate-400">({worker.reviews_count} reviews)</span></div>
                   {worker.skills.length > 0 && <div className="mt-4 flex flex-wrap gap-2">{worker.skills.slice(0, 4).map((skill) => <span key={skill} className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-600">{skill}</span>)}</div>}
+                  {isEmployer && <div className="mt-5 border-t border-slate-100 pt-4"><p className="mb-2 text-xs text-slate-500">History unlock: 1 Kazi Credit. Balance: <strong>{creditBalance ?? '...'}</strong></p>{creditBalance === 0 ? <Link to="/payments" className="text-xs font-bold text-[#FF6B00] underline">Buy Kazi Credits</Link> : <Button size="sm" variant="outline" disabled={creditBalance === null || creditBalance < 1} onClick={() => setUnlockWorker(worker)}>Unlock employment history</Button>}</div>}
                 </article>
               ))}
             </div>
           ) : <EmptyState title="No workers match these filters" description="Try adjusting the search criteria." icon={<UserRound className="h-8 w-8" />} />
         )}
       </section>
+      {actionMessage && <div className={`rounded-xl border px-4 py-3 text-sm font-semibold ${actionError ? 'border-rose-200 bg-rose-50 text-rose-700' : 'border-emerald-200 bg-emerald-50 text-emerald-700'}`}>{actionMessage}</div>}
+      <ConfirmDialog
+        isOpen={Boolean(unlockWorker)}
+        title="Unlock employment history?"
+        message={<span>This will use <strong>1 Kazi Credit</strong> to unlock {unlockWorker?.user.full_name}&apos;s consented employment history. Your balance is <strong>{creditBalance ?? '...'}</strong>.</span>}
+        confirmLabel="Use 1 Credit"
+        loading={unlocking}
+        onCancel={() => setUnlockWorker(null)}
+        onConfirm={unlockHistory}
+      />
     </ErrorBoundary>
   )
 }

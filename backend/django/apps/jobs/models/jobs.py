@@ -31,6 +31,8 @@ class Job(models.Model):
 	benefits = ArrayField(models.TextField(), blank=True, default=list)
 	is_urgent = models.BooleanField(default=False)
 	is_featured = models.BooleanField(default=False)
+	featured_until = models.DateTimeField(null=True, blank=True)
+	boost_until = models.DateTimeField(null=True, blank=True)
 	status = models.CharField(max_length=20, choices=Status.choices, default=Status.OPEN)
 	applicant_count = models.PositiveIntegerField(default=0)
 	posted_date = models.DateTimeField(auto_now_add=True)

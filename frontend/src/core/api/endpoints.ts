@@ -46,6 +46,8 @@ export const endpoints = {
     close: (id: number) => post<Job>(`/jobs/${id}/close/`, {}),
     recommended: () => get<Paginated<Job> | Job[]>('/jobs/recommended/'),
     adminList: () => get<Paginated<Job> | Job[]>('/jobs/admin/list/'),
+    featureWithCredits: (id: number, idempotency_key: string) => post<{ job: Job; credit_entry_id: number }>(`/jobs/${id}/credits/feature/`, { idempotency_key }),
+    boostWithCredits: (id: number, idempotency_key: string) => post<{ job: Job; credit_entry_id: number }>(`/jobs/${id}/credits/boost/`, { idempotency_key }),
   },
   establishments: {
     list: (query = '') => get<Paginated<Establishment> | Establishment[]>(`/establishments/${query ? `?${query}` : ''}`),
@@ -62,7 +64,7 @@ export const endpoints = {
     detail: (id: number) => get<EmploymentRecord>(`/employment-history/mine/${id}/`),
     update: (id: number, data: Record<string, unknown>) => patch<EmploymentRecord>(`/employment-history/mine/${id}/`, data),
     remove: (id: number) => del<void>(`/employment-history/mine/${id}/`),
-    unlock: (data: { worker_id: number; amount_ksh: number }) => post('/employment-history/unlock/', data),
+    unlock: (data: { worker_id: number; idempotency_key?: string }) => post('/employment-history/unlock/', data),
     access: () => get('/employment-history/access/'),
     consent: (consent_history_sharing: boolean) => patch('/employment-history/consent/', { consent_history_sharing }),
     worker: (workerId: number) => get(`/employment-history/worker/${workerId}/`),
@@ -144,6 +146,7 @@ export const endpoints = {
   workers: {
     me: () => get<WorkerProfile>('/workers/me/'),
     update: (data: UpdateWorkerProfilePayload | FormData) => patch<WorkerProfile>('/workers/me/', data),
+    boostProfileWithCredits: (idempotency_key: string) => post<{ profile: WorkerProfile; credit_entry_id: number }>('/workers/me/credits/boost/', { idempotency_key }),
     detail: (id: number) => get<WorkerProfile>(`/workers/${id}/`),
     list: (query = '') => get<Paginated<WorkerProfile> | WorkerProfile[]>(`/workers/${query ? `?${query}` : ''}`),
   },

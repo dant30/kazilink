@@ -42,6 +42,7 @@ export interface WorkerProfile {
 	last_employer: string | null
 	background_check_verified: boolean
 	open_to_work: boolean
+	profile_boost_until?: string | null
 }
 
 export interface UpdateWorkerProfilePayload {

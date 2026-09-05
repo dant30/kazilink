@@ -1,11 +1,11 @@
 import secrets
 import string
 
-from django.conf import settings
 from django.db import transaction
 from django.utils import timezone
 
 from apps.credits.models import CreditLedgerEntry
+from apps.credits.models import CreditEconomyConfig
 from apps.credits.services.wallet_service import get_or_create_wallet, record_ledger_entry
 
 from ..models import Referral, ReferralCode, User
@@ -41,8 +41,8 @@ def resolve_referral_code(*, code, referred_user):
 		referrer=referrer,
 		referred=referred_user,
 		code=owner_record,
-		referrer_reward=int(getattr(settings, 'REFERRAL_REFERRER_CREDITS', 5)),
-		referred_reward=int(getattr(settings, 'REFERRAL_REFERRED_CREDITS', 2)),
+		referrer_reward=CreditEconomyConfig.current().referrer_reward_credits,
+		referred_reward=CreditEconomyConfig.current().referred_reward_credits,
 	)
 
 

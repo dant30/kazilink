@@ -24,7 +24,3 @@ def notify_completed_payment(sender, instance, created, **kwargs):
 			notification_type='payment',
 			link_tab='payments',
 		)
-		if instance.transaction_type == Transaction.TransactionType.HISTORY_UNLOCK:
-			from apps.employment_history.services import grant_history_access
-
-			grant_history_access(transaction=instance)

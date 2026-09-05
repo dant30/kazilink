@@ -13,7 +13,7 @@ const sections = [
 
 const faqs = [
   ['Can employers hire workers permanently?', 'Yes. Employers may post permanent full-time and part-time positions with written contracts, agreed salaries, probation terms, and applicable statutory benefits.'],
-  ['Why is there a KSh 100 history unlock fee?', 'The fee supports manual supervisor verification, National ID checks, and privacy controls that prevent spam and candidate scraping.'],
+  ['How do Kazi Credits work?', 'Employers use 1 Kazi Credit to unlock consented employment history. Credits are purchased through M-Pesa, do not expire, and are not refundable for cash.'],
   ['Is KaziLink compliant with the Kenya Data Protection Act 2019?', 'Workers consent to reference checks and controlled sharing with verified employers. Full National ID numbers and home addresses remain private.'],
   ['What happens after a confirmed shift no-show?', 'Reliability scores are reduced after confirmed no-shows. Repeated violations may lead to temporary suspension or permanent removal from the marketplace.'],
 ]
