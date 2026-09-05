@@ -6,6 +6,7 @@ import { FormSection } from '../../../shared/components/forms/FormSection'
 import { AuthField, AuthPanel } from '../components'
 import { login } from '../services'
 import { authStore } from '../store'
+import { isValidKenyanPhone, normalizeKenyanPhone } from '../../../core/utils'
 
 export function LoginPage() {
   const navigate = useNavigate()
@@ -20,8 +21,10 @@ export function LoginPage() {
     setSaving(true)
     setError('')
 
+    const normalizedPhone = normalizeKenyanPhone(phone)
+    if (!normalizedPhone) { setError('Please enter a valid Kenyan mobile number.'); setSaving(false); return }
     try {
-      const response = await login(phone, password)
+      const response = await login(normalizedPhone, password)
       authStore.setSession(response.user, response.tokens)
       const requestedPath = (location.state as { from?: { pathname?: string } } | null)?.from?.pathname
       const roleDashboard = response.user.is_staff || response.user.is_superuser
@@ -53,8 +56,10 @@ export function LoginPage() {
               type="tel"
               inputMode="tel"
               autoComplete="tel"
+              placeholder="0712 345 678 or +254 7XX XXX XXX"
               value={phone}
               onChange={(event) => setPhone(event.target.value)}
+              helperText={isValidKenyanPhone(phone) ? `Standard format: ${normalizeKenyanPhone(phone)}` : 'Use a Kenyan mobile number'}
             />
 
             <AuthField

@@ -5,6 +5,7 @@ import { Button } from '../../../shared/components/ui/Button'
 import { AuthField, AuthPanel } from '../components'
 import { verifyPhone } from '../services'
 import { authStore } from '../store'
+import { normalizeKenyanPhone } from '../../../core/utils'
 
 export function VerifyPhonePage() {
   const navigate = useNavigate()
@@ -19,10 +20,13 @@ export function VerifyPhonePage() {
     setSaving(true)
     setError('')
 
+    const normalizedPhone = normalizeKenyanPhone(phone)
+    if (!normalizedPhone) { setError('Please enter a valid Kenyan mobile number.'); setSaving(false); return }
     try {
-      const response = await verifyPhone(phone, code)
+      const response = await verifyPhone(normalizedPhone, code.trim())
       authStore.setSession(response.user, response.tokens)
-      navigate('/dashboard')
+      const destination = response.user.is_staff || response.user.is_superuser ? '/admin' : response.user.is_employer && !response.user.is_worker ? '/dashboard/employer' : '/dashboard/worker'
+      navigate(destination)
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : 'Verification failed.')
     } finally {

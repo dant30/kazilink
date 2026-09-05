@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom'
 import { Button } from '../../../shared/components/ui/Button'
 import { AuthField, AuthPanel } from '../components'
 import { passwordResetStore, usePasswordResetStore } from '../store/passwordResetStore'
+import { normalizeKenyanPhone } from '../../../core/utils'
 
 export function ForgotPasswordPage() {
   const state = usePasswordResetStore()
@@ -28,7 +29,7 @@ export function ForgotPasswordPage() {
 }
 
 function RequestStep({ phone, setPhone, loading, error }: { phone: string; setPhone: (value: string) => void; loading: boolean; error: string }) {
-  const submit = async (event: FormEvent) => { event.preventDefault(); if (phone.trim()) await passwordResetStore.request(phone.trim()).catch(() => undefined) }
+  const submit = async (event: FormEvent) => { event.preventDefault(); const normalized = normalizeKenyanPhone(phone); if (normalized) await passwordResetStore.request(normalized).catch(() => undefined) }
   return <form className="space-y-5" onSubmit={submit}>
     <div className="flex items-start gap-3 rounded-2xl border border-sky-200 bg-sky-50 p-4 text-sm text-sky-900"><MessageSquareText className="mt-0.5 h-5 w-5 shrink-0" /><p>We will send a reset code by SMS if an account exists for this phone number.</p></div>
     <AuthField label="Phone number" required type="tel" inputMode="tel" autoComplete="tel" value={phone} onChange={(event) => setPhone(event.target.value)} placeholder="07xx xxx xxx" />

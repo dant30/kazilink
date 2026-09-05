@@ -1,2 +1,5 @@
 export { cn } from './cn'
 export { installNotificationSoundUnlock, playNotificationSound } from './notificationSound'
+export { isValidKenyanPhone, normalizeKenyanPhone } from './phone'
+export { evaluatePasswordStrength } from './passwordStrength'
+export type { PasswordStrengthLevel, PasswordStrengthResult } from './passwordStrength'
