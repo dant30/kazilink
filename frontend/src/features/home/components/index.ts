@@ -1,3 +1,10 @@
 // frontend/src/features/home/components/index.ts
 export { LandingHero } from './LandingHero'
 export { HeroParticles } from './HeroParticles'
+export { VenuePartners } from './VenuePartners'
+export { VerifiedTalentSpotlight } from './VerifiedTalentSpotlight'
+export { PassportShowcase } from './PassportShowcase'
+export { ShiftRoiCalculator } from './ShiftRoiCalculator'
+export { TrustComparison } from './TrustComparison'
+export { FaqSection } from './FaqSection'
+export { LandingCta } from './LandingCta'

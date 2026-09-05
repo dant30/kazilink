@@ -11,9 +11,11 @@ export interface LandingHeroProps {
   searchLocation: string
   setSearchLocation: Dispatch<SetStateAction<string>>
   onSearch: () => void
+  roleOptions: Array<{ value: string; label: string }>
+  liveJobs: number
 }
 
-export function LandingHero({ searchRole, setSearchRole, searchLocation, setSearchLocation, onSearch }: LandingHeroProps) {
+export function LandingHero({ searchRole, setSearchRole, searchLocation, setSearchLocation, onSearch, roleOptions, liveJobs }: LandingHeroProps) {
   return (
     <section className="relative overflow-hidden bg-gradient-to-b from-[#0A2540] via-[#081F36] to-[#051424] py-16 text-white sm:py-24">
       <HeroParticles />
@@ -35,7 +37,7 @@ export function LandingHero({ searchRole, setSearchRole, searchLocation, setSear
             <label className="flex w-full items-center gap-2.5 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 sm:w-1/2">
               <Search className="h-4 w-4 shrink-0 text-[#0A2540]" />
               <span className="sr-only">Hospitality role</span>
-              <Select aria-label="Hospitality role" value={searchRole} onChange={setSearchRole} options={[{ value: '', label: 'All Hospitality Roles' }, { value: 'Waiter', label: 'Waiters & Waitresses' }, { value: 'Bartender', label: 'Mixologists & Bartenders' }, { value: 'Barmaid', label: 'Barmaids' }, { value: 'Cleaner', label: 'Cleaners & Stewards' }, { value: 'Chef', label: 'Kitchen Chefs & Cooks' }, { value: 'Barista', label: 'Baristas' }]} className="flex-1" />
+              <Select searchable aria-label="Worker role" value={searchRole} onChange={setSearchRole} options={[{ value: '', label: 'All worker roles' }, ...roleOptions]} className="flex-1" />
             </label>
             <label className="flex w-full items-center gap-2.5 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 sm:w-1/2">
               <MapPin className="h-4 w-4 shrink-0 text-[#0A2540]" />
@@ -47,7 +49,7 @@ export function LandingHero({ searchRole, setSearchRole, searchLocation, setSear
             </button>
           </div>
           <div className="grid grid-cols-2 gap-4 border-t border-slate-800 pt-8 text-left sm:grid-cols-4">
-            {[['1,420+', 'Vetted Workers'], ['280+', 'Venues Hiring'], ['99.4%', 'Reference Accuracy'], ['KSh 100', 'History Unlocks']].map(([value, label]) => (
+            {[[String(liveJobs), 'Live opportunities'], [String(roleOptions.length), 'Role categories'], ['2', 'Roles supported'], ['24/7', 'Profile access']].map(([value, label]) => (
               <div className="p-2" key={label}><p className="font-display text-2xl font-black text-[#FF6B00] sm:text-3xl">{value}</p><p className="mt-0.5 text-xs text-slate-400">{label}</p></div>
             ))}
           </div>

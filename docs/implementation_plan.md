@@ -119,7 +119,7 @@ This roadmap tracks the current repository state as of 2026-08-29. It separates 
 | Deliverable | Status | Current state |
 | --- | --- | --- |
 | Public routes and auth navigation | ✅✅ | Public route definitions and auth redirects exist. |
-| Landing page | ❌❌ | Current public screen is a minimal placeholder. |
+| Landing page | ✅✅ | Public landing experience includes backend-fed role search, live jobs, worker profile positioning, trust education, FAQ, calculator, and role-aware calls to action. |
 | Worker/employer onboarding funnels | ❌❌ | Registration APIs exist, but role-specific onboarding UI is incomplete. |
 | Testimonials and feature presentation | ❌❌ | Not implemented. |
 

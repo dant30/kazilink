@@ -1,21 +1,12 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ArrowRight, Briefcase, Building2, CheckCircle2, ChevronRight, ShieldCheck, Star, Users } from 'lucide-react'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
 
 import { useAuthStore } from '../../auth'
 import { useJobs } from '../../jobs/hooks'
+import { endpoints } from '../../../core/api'
 import { Button } from '../../../shared/components/ui/Button'
-import { LandingHero } from '../components'
-
-const categories = [
-  { value: 'Waiter', label: 'Waiters & Waitresses', count: 184 },
-  { value: 'Bartender', label: 'Bartenders & Mixologists', count: 96 },
-  { value: 'Barmaid', label: 'Barmaids', count: 142 },
-  { value: 'Cleaner', label: 'Cleaners & Stewards', count: 210 },
-  { value: 'Chef', label: 'Chefs & Cooks', count: 88 },
-  { value: 'Barista', label: 'Baristas', count: 75 },
-  { value: 'Security', label: 'Security & Bouncers', count: 64 },
-]
+import { FaqSection, LandingCta, LandingHero, PassportShowcase, ShiftRoiCalculator, TrustComparison, VenuePartners, VerifiedTalentSpotlight } from '../components'
 
 const trustFeatures = [
   { icon: ShieldCheck, title: 'Verified onboarding', text: 'Every profile is checked for reliability, work history, and employer references.' },
@@ -28,13 +19,19 @@ export function LandingPage() {
   const navigate = useNavigate()
   const [searchRole, setSearchRole] = useState('')
   const [searchLocation, setSearchLocation] = useState('')
-  const { jobs } = useJobs({ category: searchRole || undefined, location: searchLocation || undefined })
+  const { jobs } = useJobs({ location: searchLocation || undefined })
+  const [roleOptions, setRoleOptions] = useState<Array<{ value: string; label: string }>>([])
+
+  useEffect(() => {
+    endpoints.auth.workerOccupations().then((response) => setRoleOptions(response.occupations)).catch(() => setRoleOptions([]))
+  }, [])
 
   if (user) return <Navigate to="/dashboard" replace />
 
   return (
     <main className="min-h-screen bg-slate-50">
-      <LandingHero searchRole={searchRole} setSearchRole={setSearchRole} searchLocation={searchLocation} setSearchLocation={setSearchLocation} onSearch={() => navigate('/jobs')} />
+      <LandingHero searchRole={searchRole} setSearchRole={setSearchRole} searchLocation={searchLocation} setSearchLocation={setSearchLocation} onSearch={() => { const params = new URLSearchParams(); if (searchRole) params.set('category', searchRole); if (searchLocation) params.set('location', searchLocation); navigate(`/jobs${params.toString() ? `?${params.toString()}` : ''}`) }} roleOptions={roleOptions} liveJobs={jobs.length} />
+      <VenuePartners />
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
           <div className="card-kazilink flex flex-col justify-between p-8">
@@ -72,7 +69,7 @@ export function LandingPage() {
               <ul className="mb-8 space-y-3 text-xs font-medium text-slate-300">
                 <li className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-[#FF6B00]" /> Transparent pay rates in Kenyan Shillings</li>
                 <li className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-[#FF6B00]" /> Direct calls from restaurants and lounges</li>
-                <li className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-[#FF6B00]" /> Free registration with M-Pesa-ready payouts</li>
+                <li className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-[#FF6B00]" /> Free registration with clear rates and work records</li>
               </ul>
             </div>
             <Button variant="primary" size="lg" className="w-full justify-between bg-[#FF6B00] hover:bg-[#E55F00]" onClick={() => navigate('/register')}>
@@ -82,6 +79,8 @@ export function LandingPage() {
           </div>
         </div>
       </section>
+      <VerifiedTalentSpotlight jobs={jobs} />
+      <PassportShowcase />
       <section className="border-y border-slate-200 bg-white py-12">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
@@ -95,24 +94,28 @@ export function LandingPage() {
           </div>
 
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-7">
-            {categories.map((category) => (
+            {roleOptions.slice(0, 14).map((category) => (
               <button
                 key={category.value}
                 type="button"
                 onClick={() => {
                   setSearchRole(category.value)
-                  navigate('/jobs')
+                  navigate(`/jobs?category=${encodeURIComponent(category.value)}`)
                 }}
                 className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-left transition hover:border-[#FED7AA] hover:bg-[#FFF4EB] group"
               >
                 <div className="mb-2 text-2xl transition-transform group-hover:scale-110">✦</div>
                 <h3 className="text-xs font-bold text-slate-800 group-hover:text-[#FF6B00]">{category.label}</h3>
-                <p className="mt-0.5 text-[10px] text-slate-500">{category.count} verified active</p>
+                <p className="mt-0.5 text-[10px] text-slate-500">Explore this role</p>
               </button>
             ))}
           </div>
         </div>
       </section>
+      <ShiftRoiCalculator />
+      <TrustComparison />
+      <FaqSection />
+      <LandingCta />
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="mb-10 text-center">
           <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#FF6B00]">Why employers choose KaziLink</p>
@@ -166,7 +169,7 @@ export function LandingPage() {
           <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
             {[
               ['1', 'Browse free profiles', 'Review worker skills, rates, and reliability history before reaching out.'],
-              ['2', 'Unlock references', 'Use the secure M-Pesa verification flow to reveal detailed employment records.'],
+              ['2', 'Unlock references', 'Use Kazi Credits to reveal detailed employment records when access is available.'],
               ['3', 'Book with confidence', 'Confirm the role, pay safely, and keep the network accountable through ratings.'],
             ].map(([number, title, text]) => (
               <div key={number} className="rounded-2xl border border-white/10 bg-white/5 p-6">
