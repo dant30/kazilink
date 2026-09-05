@@ -60,7 +60,7 @@ services:
       - key: ADMIN_PASSWORD
         sync: false
       - key: MPESA_ENABLED
-        value: "false"
+        value: "true"
       - key: MPESA_BASE_URL
         value: https://sandbox.safaricom.co.ke
       - key: MPESA_CONSUMER_KEY
@@ -81,6 +81,12 @@ services:
         value: "3"
       - key: MPESA_WEBHOOK_SECRET
         sync: false
+      - key: CREDIT_KSH_PER_CREDIT
+        value: "20"
+      - key: REFERRAL_REFERRER_CREDITS
+        value: "5"
+      - key: REFERRAL_REFERRED_CREDITS
+        value: "2"
       - key: SMS_ENABLED
         value: "true"
       - key: SMS_API_BASE_URL

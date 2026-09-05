@@ -8,4 +8,5 @@ from .user import (
 )
 from .verification import PhoneVerificationSerializer
 from .password_reset import PasswordResetConfirmSerializer, PasswordResetRequestSerializer, PasswordResetVerifySerializer
+from .referrals import ReferralSerializer, ReferralSummarySerializer
 

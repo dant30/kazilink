@@ -22,6 +22,7 @@ INSTALLED_APPS = [
 	'corsheaders',
 	'channels',
 	'apps.accounts.apps.AccountsConfig',
+	'apps.credits.apps.CreditsConfig',
 	'apps.analytics.apps.AnalyticsConfig',
 	'apps.audit.apps.AuditConfig',
 	'apps.employment_history.apps.EmploymentHistoryConfig',
@@ -45,6 +46,7 @@ MIDDLEWARE = [
 	'django.middleware.common.CommonMiddleware',
 	'django.middleware.csrf.CsrfViewMiddleware',
 	'django.contrib.auth.middleware.AuthenticationMiddleware',
+	'apps.credits.middleware.CreditsContextMiddleware',
 	'apps.audit.middleware.AuditRequestMiddleware',
 	'apps.analytics.middleware.AnalyticsContextMiddleware',
 	'apps.notifications.middleware.NotificationCountMiddleware',
@@ -143,6 +145,9 @@ MPESA_API_TIMEOUT_SECONDS = int(os.getenv('MPESA_API_TIMEOUT_SECONDS', '15'))
 MPESA_STK_MAX_RETRIES = int(os.getenv('MPESA_STK_MAX_RETRIES', '2'))
 MPESA_STK_RETRY_BACKOFF_SECONDS = float(os.getenv('MPESA_STK_RETRY_BACKOFF_SECONDS', '3'))
 MPESA_WEBHOOK_SECRET = os.getenv('MPESA_WEBHOOK_SECRET', '')
+CREDIT_KSH_PER_CREDIT = int(os.getenv('CREDIT_KSH_PER_CREDIT', '20'))
+REFERRAL_REFERRER_CREDITS = int(os.getenv('REFERRAL_REFERRER_CREDITS', '5'))
+REFERRAL_REFERRED_CREDITS = int(os.getenv('REFERRAL_REFERRED_CREDITS', '2'))
 FRAUD_PAYMENT_THRESHOLD_KSH = int(os.getenv('FRAUD_PAYMENT_THRESHOLD_KSH', '100000'))
 AUDIT_LOG_RETENTION_DAYS = int(os.getenv('AUDIT_LOG_RETENTION_DAYS', '365'))
 SMS_ENABLED = os.getenv('SMS_ENABLED', 'false').lower() == 'true'

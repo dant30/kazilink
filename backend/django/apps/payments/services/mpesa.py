@@ -75,6 +75,7 @@ def initiate_stk_push(*, transaction, phone_number):
 		headers={'Authorization': f'Basic {credentials}'},
 	)
 	access_token = token_response['access_token']
+	description = getattr(transaction, 'transaction_type', 'Kazi Credits recharge')
 	return _request_stk_push(
 		f'{base_url}/mpesa/stkpush/v1/processrequest',
 		headers={'Authorization': f'Bearer {access_token}'},
@@ -89,6 +90,6 @@ def initiate_stk_push(*, transaction, phone_number):
 			'PhoneNumber': phone_number,
 			'CallBackURL': callback_url,
 			'AccountReference': str(transaction.id),
-			'TransactionDesc': transaction.transaction_type,
+			'TransactionDesc': description,
 		},
 	)

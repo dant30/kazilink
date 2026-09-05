@@ -9,6 +9,7 @@ import { useUpdateEmployerProfile } from '../hooks/useUpdateEmployerProfile'
 import { EmployerEstablishmentsCard, EmployerInfoCard, EmployerSettingsCard, EmployerStatsCard } from '../components'
 import type { UpdateEmployerProfilePayload } from '../types'
 import { ErrorBoundary } from '../../../shared/components/ui/ErrorBoundary'
+import { ReferralCard } from '../../accounts/components/ReferralCard'
 
 export function EmployerProfilePage() {
   const { profile, establishments, loading, error, refresh } = useEmployerProfile()
@@ -58,7 +59,7 @@ export function EmployerProfilePage() {
     </PageHeader>
     {success && <div className="rounded-2xl border border-green-200 bg-green-50 p-4 font-semibold text-green-700">Profile updated successfully.</div>}
     {updateError && <div className="rounded-2xl border border-red-200 bg-red-50 p-4 font-semibold text-red-700">{updateError}</div>}
-    <div className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]"><div className="space-y-6"><EmployerInfoCard values={form} onChange={change} /><EmployerEstablishmentsCard establishments={establishments} /></div><aside className="space-y-6"><EmployerSettingsCard profile={profile} onChange={changeSetting} /><EmployerStatsCard profile={profile} /></aside></div>
+    <div className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]"><div className="space-y-6"><EmployerInfoCard values={form} onChange={change} /><EmployerEstablishmentsCard establishments={establishments} /></div><aside className="space-y-6"><EmployerSettingsCard profile={profile} onChange={changeSetting} /><EmployerStatsCard profile={profile} /><ReferralCard /></aside></div>
     <div className="flex justify-end rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"><Button onClick={save} disabled={updating}>{updating ? 'Saving...' : 'Save profile'}</Button></div>
   </section></ErrorBoundary>
 }

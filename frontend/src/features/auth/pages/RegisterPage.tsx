@@ -23,6 +23,7 @@ export function RegisterPage() {
     expected_daily_rate_ksh: '',
     bio: '',
     contact_person: '',
+    referral_code: '',
   })
   const [error, setError] = useState('')
   const [saving, setSaving] = useState(false)
@@ -63,6 +64,7 @@ export function RegisterPage() {
       }
 
       if (form.email.trim()) payload.email = form.email.trim()
+      if (form.referral_code.trim()) payload.referral_code = form.referral_code.trim().toUpperCase()
 
       if (role === 'worker') {
         if (!form.primary_role.trim()) {
@@ -187,6 +189,12 @@ export function RegisterPage() {
               autoComplete="new-password"
               value={form.confirm_password}
               onChange={(event) => update('confirm_password', event.target.value)}
+            />
+            <AuthField
+              label="Referral code"
+              value={form.referral_code}
+              onChange={(event) => update('referral_code', event.target.value)}
+              placeholder="KAZI-XXXXXXXX"
             />
 
             {role === 'worker' ? (

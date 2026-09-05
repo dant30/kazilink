@@ -38,6 +38,21 @@ kazilink/
 │   │   │
 │   │   ├── apps/
 │   │   │   │
+│   │   │   ├── credits/                     # Kazi Credits wallet and ledger
+│   │   │   │   ├── models/{__init__.py,wallets.py}
+│   │   │   │   ├── serializers/{__init__.py,credits.py}
+│   │   │   │   ├── services/{__init__.py,catalog.py,recharge_service.py,wallet_service.py}
+│   │   │   │   ├── views/{__init__.py,api_views.py}
+│   │   │   │   ├── migrations/{__init__.py,0001_initial.py}
+│   │   │   │   ├── admin.py
+│   │   │   │   ├── apps.py
+│       │   │   ├── middleware.py
+│       │   │   ├── permissions.py
+│       │   │   ├── signals.py
+│       │   │   ├── tasks.py
+│   │   │   │   ├── tests.py
+│   │   │   │   └── urls.py
+│   │   │   │
 │   │   │   ├── accounts/                    # (was users)
 │   │   │   │   ├── migrations/
 │   │   │   │   ├── models/
@@ -47,7 +62,8 @@ kazilink/
 │   │   │   │   │   ├── worker.py
 │   │   │   │   │   ├── employer.py
 │   │   │   │   │   ├── verification.py     # Identity/phone verification
-│   │   │   │   │   └── role.py
+│   │   │   │   │   ├── role.py
+│   │   │   │   │   └── referral.py           # Referral code and attribution models
 │   │   │   │   ├── serializers/
 │   │   │   │   ├── services/
 │   │   │   │   │   ├── authentication.py

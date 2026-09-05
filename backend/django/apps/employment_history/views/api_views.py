@@ -11,7 +11,7 @@ from ..serializers import (
 	HistoryAccessLogSerializer,
 	UnlockHistorySerializer,
 )
-from ..services import can_view_history, create_record, create_unlock_transaction, update_record
+from ..services import can_view_history, create_record, create_unlock_transaction, unlock_history_with_credits, update_record
 from apps.accounts.models import WorkerProfile
 
 
@@ -84,6 +84,14 @@ class UnlockHistoryView(APIView):
 		serializer.is_valid(raise_exception=True)
 		worker = get_object_or_404(WorkerProfile, pk=serializer.validated_data['worker_id'])
 		try:
+			if serializer.validated_data.get('use_credits'):
+				key = serializer.validated_data.get('idempotency_key') or f'history-unlock:{request.user.id}:{worker.id}'
+				log, entry = unlock_history_with_credits(
+					employer=request.user.employer_profile,
+					worker=worker,
+					idempotency_key=key,
+				)
+				return Response({'access_id': log.id, 'credit_entry_id': entry.id, 'status': 'completed'}, status=status.HTTP_201_CREATED)
 			transaction = create_unlock_transaction(
 				employer=request.user.employer_profile,
 				worker=worker,

@@ -11,6 +11,7 @@ import { WorkerInfoCard, WorkerStatusCard, WorkerStatsCard } from '../components
 import { FormSection } from '../../../shared/components/forms'
 import { ErrorBoundary } from '../../../shared/components/ui/ErrorBoundary'
 import type { UpdateWorkerProfilePayload } from '../types'
+import { ReferralCard } from '../../accounts/components/ReferralCard'
 
 export function WorkerProfilePage() {
 	const { user } = useAuthStore()
@@ -174,6 +175,7 @@ export function WorkerProfilePage() {
 
 					{/* Stats Card */}
 					<WorkerStatsCard profile={profile} loading={loading} />
+					<ReferralCard />
 
 					<div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
 						<h3 className="text-sm font-black uppercase tracking-[0.18em] text-slate-700">Trust & visibility</h3>

@@ -31,6 +31,7 @@ This roadmap tracks the current repository state as of 2026-08-29. It separates 
 | Worker and employer registration | ✅✅ | Registration service and role-aware validation exist. |
 | Worker profile required fields | ✅✅ | Availability, daily rate, bio, and location are validated and migrated. |
 | Phone verification workflow | ✅✅ | OTP generation, hashing, expiry, and verification service exist. |
+| User referral codes and rewards | ✅✅ | Users receive unique KAZI codes; attribution and one-time Kazi Credits rewards occur after phone verification. |
 | SMS provider integration | ❌❌ | OTP generation exists, but Africa's Talking/Twilio transport is not implemented. |
 | Employer business verification | ✅✅ | Model, document field, admin workflow surfaces, and verification-related code exist. |
 | S3/local storage production integration | ❌❌ | Storage abstractions exist, but production object-storage integration is not verified. |
@@ -62,9 +63,13 @@ This roadmap tracks the current repository state as of 2026-08-29. It separates 
 | Employment verification queue | ✅✅ | Verification serializers, views, permissions, and routes exist. |
 | Automated reference SMS/email | ❌❌ | Reference data is stored, but outbound verification messaging is not implemented. |
 | M-Pesa STK Push initiation | ✅✅ | Configurable Daraja OAuth/STK request code exists. |
-| Signed M-Pesa callback | ✅✅ | Webhook signature validation and idempotent completion/failure handling exist. |
-| Payment/history integration tests | ❌❌ | No meaningful integration test suite is currently present. |
-| Frontend unlock and checkout UX | ❌❌ | API endpoints exist, but the complete checkout modal and worker/employer pages are not implemented. |
+| M-Pesa STK Push retry handling | ✅✅ | Bounded retries cover transient provider/network failures without retrying 4xx requests. |
+| Kazi Credits wallet and ledger | ✅✅ | User wallets, immutable ledger entries, role-aware catalog pricing, and idempotent spending are implemented. |
+| Kazi Credits M-Pesa recharge | ❌❌ | Recharge initiation and native callback settlement code exist, but end-to-end Daraja settlement still needs validation. |
+| Native Daraja callback processing | ✅✅ | Native `Body.stkCallback` callbacks settle credit recharges and existing employer transactions idempotently. |
+| Signed M-Pesa callback | ❌❌ | Optional custom HMAC validation remains supported, but Daraja does not provide that signature header. |
+| Payment/history integration tests | ❌❌ | Credit wallet unit coverage exists; full recharge, callback, and history-unlock integration coverage is still needed. |
+| Frontend unlock and checkout UX | ❌❌ | Shared Kazi Credits wallet/recharge UI and employer payment modal exist; feature-specific worker unlock and boost controls remain incomplete. |
 
 ## Phase 4: Reputation And Communication
 

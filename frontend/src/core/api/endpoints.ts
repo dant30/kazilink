@@ -10,13 +10,14 @@ import type { Job } from '../../features/jobs/types'
 import type { JobApplication } from '../../features/job_applications/types'
 import type { Conversation, Message } from '../../features/messaging/types'
 import type { Notification } from '../../features/notifications/types'
-import type { PaymentInitiateInput, PaymentInitiateResponse, Transaction } from '../../features/payments/types'
+import type { CreditCatalogResponse, CreditWalletResponse, PaymentInitiateInput, PaymentInitiateResponse, Transaction } from '../../features/payments/types'
 import type { Review, ReviewUpdateInput } from '../../features/ratings/types'
 import type { Subscription, SubscriptionCheckout, SubscriptionCheckoutResponse, SubscriptionPlan } from '../../features/subscriptions/types'
 import type { SupportTicket } from '../../features/support/types'
 import type { KPISnapshot } from '../../features/analytics/types'
 import type { WorkerProfile, UpdateWorkerProfilePayload } from '../../features/workers/types'
 import type { EmployerProfile, UpdateEmployerProfilePayload } from '../../features/employers/types'
+import type { ReferralSummary } from '../../features/accounts/types/referrals'
 
 export const endpoints = {
   auth: {
@@ -33,6 +34,7 @@ export const endpoints = {
     updateProfile: (data: Record<string, unknown>) => patch('/accounts/profile/', data),
     employerProfile: () => get<EmployerProfile>('/accounts/employer-profile/'),
     updateEmployerProfile: (data: UpdateEmployerProfilePayload | FormData) => patch<EmployerProfile>('/accounts/employer-profile/', data),
+    referrals: () => get<ReferralSummary>('/accounts/referrals/'),
     adminUsers: () => get<Paginated<User> | User[]>('/accounts/admin/users/'),
   },
   jobs: {
@@ -106,6 +108,12 @@ export const endpoints = {
     create: (data: PaymentInitiateInput) => post<PaymentInitiateResponse>('/payments/', data),
     refund: (id: number) => post<Transaction>(`/payments/${id}/refund/`, {}),
     adminList: () => get<Paginated<Transaction> | Transaction[]>('/payments/admin/list/'),
+  },
+  credits: {
+    catalog: () => get<CreditCatalogResponse>('/credits/catalog/'),
+    wallet: () => get<CreditWalletResponse>('/credits/wallet/'),
+    recharge: (data: { amount_ksh: number; phone_number?: string }) => post('/credits/recharge/', data),
+    spend: (data: { action: string; reference?: string; idempotency_key: string; metadata?: Record<string, unknown> }) => post('/credits/spend/', data),
   },
   subscriptions: {
     list: () => get<Paginated<Subscription> | Subscription[]>('/subscriptions/'),

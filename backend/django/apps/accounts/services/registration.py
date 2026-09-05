@@ -7,10 +7,11 @@ from core.authentication.otp import generate_otp, hash_otp
 from core.services.sms import send_sms
 
 from ..models import EmployerProfile, PhoneVerification, User, UserRole, WorkerProfile
+from .referrals import resolve_referral_code
 
 
 @transaction.atomic
-def register_user(*, phone, full_name, password, role, email='', primary_role='', location='', availability='immediate', expected_daily_rate_ksh=0, bio='', contact_person=''):
+def register_user(*, phone, full_name, password, role, email='', primary_role='', location='', availability='immediate', expected_daily_rate_ksh=0, bio='', contact_person='', referral_code=''):
 	if User.objects.filter(phone=phone).exists():
 		raise ValueError('An account with this phone number already exists.')
 	if role == UserRole.Role.WORKER and not primary_role:
@@ -38,6 +39,8 @@ def register_user(*, phone, full_name, password, role, email='', primary_role=''
 		)
 	else:
 		EmployerProfile.objects.create(user=user, contact_person=contact_person)
+	if referral_code:
+		resolve_referral_code(code=referral_code, referred_user=user)
 
 	code = generate_otp()
 	PhoneVerification.objects.create(

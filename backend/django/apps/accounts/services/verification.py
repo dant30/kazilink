@@ -4,6 +4,7 @@ from django.utils import timezone
 from core.authentication.otp import verify_otp
 
 from ..models import PhoneVerification, User
+from .referrals import reward_referral
 
 
 @transaction.atomic
@@ -29,4 +30,5 @@ def verify_phone(*, phone, code):
 	user = verification.user
 	user.is_phone_verified = True
 	user.save(update_fields=['is_phone_verified'])
+	reward_referral(user=user)
 	return user

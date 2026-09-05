@@ -3,3 +3,4 @@ export type Transaction = { id: number; employer: number; employer_name: string;
 export type PaymentInitiateInput = { transaction_type: string; amount_ksh: number; phone_number?: string; metadata?: Record<string, unknown> }
 export type PaymentInitiateResponse = { transaction: Transaction; provider: Record<string, unknown> }
 export type TransactionListResponse = Transaction[] | { count: number; next: string | null; previous: string | null; results: Transaction[] }
+export type { CreditAction, CreditCatalogResponse, CreditLedgerEntry, CreditRecharge, CreditWallet, CreditWalletResponse } from './credits'

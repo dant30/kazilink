@@ -49,7 +49,9 @@ class HistoryAccessLogSerializer(serializers.ModelSerializer):
 
 class UnlockHistorySerializer(serializers.Serializer):
     worker_id = serializers.IntegerField(min_value=1)
-    amount_ksh = serializers.IntegerField(min_value=1, default=100)
+    amount_ksh = serializers.IntegerField(min_value=1, default=100, required=False)
+    use_credits = serializers.BooleanField(default=False, required=False)
+    idempotency_key = serializers.CharField(max_length=100, required=False, allow_blank=True)
 
 
 class VerifyEmploymentSerializer(serializers.Serializer):

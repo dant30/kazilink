@@ -1,5 +1,5 @@
 // frontend/src/shared/layouts/Header.tsx
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import {
 	Bell,
@@ -21,6 +21,7 @@ import { Sidebar } from './Sidebar'
 import { useNotifications } from '../../features/notifications/hooks/useNotifications'
 import { ACCESS_TOKEN_KEY } from '../../core/api'
 import { localStorageStore } from '../../core/storage'
+import { endpoints } from '../../core/api/endpoints'
 
 export function Header() {
 	const navigate = useNavigate()
@@ -28,6 +29,7 @@ export function Header() {
 	const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 	const [notifDropdownOpen, setNotifDropdownOpen] = useState(false)
 	const [userMenuOpen, setUserMenuOpen] = useState(false)
+	const [creditBalance, setCreditBalance] = useState<number | null>(null)
 
 	function signOut() {
 		setUserMenuOpen(false)
@@ -56,6 +58,13 @@ export function Header() {
 	}
 
 	const signedIn = localStorageStore.has(ACCESS_TOKEN_KEY)
+	useEffect(() => {
+		if (!signedIn) {
+			setCreditBalance(null)
+			return
+		}
+		endpoints.credits.wallet().then((response) => setCreditBalance(response.wallet.balance)).catch(() => setCreditBalance(null))
+	}, [signedIn])
 	const isAdmin = Boolean(storedUser?.is_staff || storedUser?.is_superuser)
 	const isWorker = Boolean(storedUser?.is_worker)
 	const isEmployer = Boolean(storedUser?.is_employer && !storedUser?.is_worker)
@@ -91,10 +100,10 @@ export function Header() {
 						Verified Hospitality & Casual Staff Network • Real-Time Attendance & Payouts
 					</span>
 				</div>
-				<div className="hidden md:flex items-center gap-4 text-[11px] text-slate-300">
-					<span>M-Pesa Direct Escrow</span>
+				<div className="flex min-w-0 flex-1 items-center justify-end gap-2 text-[11px] text-slate-300 sm:gap-4">
+					{signedIn ? <span className="font-semibold text-white">Kazi Credits: {creditBalance ?? '...'}</span> : <span>Trusted hiring and work opportunities</span>}
 					<span className="text-slate-500">•</span>
-					<span>Verified Employment Passports</span>
+					<span className="hidden truncate sm:inline">{signedIn ? 'Use credits for premium platform actions' : 'Built for Kenya\'s workforce'}</span>
 				</div>
 			</div>
 

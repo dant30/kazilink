@@ -26,6 +26,7 @@ class RegistrationSerializer(serializers.Serializer):
     expected_daily_rate_ksh = serializers.IntegerField(min_value=0, required=False)
     bio = serializers.CharField(required=False, allow_blank=False)
     contact_person = serializers.CharField(max_length=255, required=False)
+    referral_code = serializers.CharField(max_length=20, required=False, allow_blank=True)
 
     def validate(self, attrs):
         if attrs['role'] == UserRole.Role.WORKER:
