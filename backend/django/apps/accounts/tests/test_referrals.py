@@ -1,4 +1,5 @@
 from django.test import TestCase
+from rest_framework.test import APIClient
 
 from apps.accounts.models import User
 from apps.accounts.services.referrals import ensure_referral_code, resolve_referral_code, reward_referral
@@ -10,11 +11,19 @@ class ReferralTests(TestCase):
 	def setUp(self):
 		self.referrer = User.objects.create_user(phone='254700000101', full_name='Referrer', password='password', is_worker=True)
 		self.referred = User.objects.create_user(phone='254700000102', full_name='Referred', password='password', is_worker=True)
+		self.client = APIClient()
 
 	def test_users_receive_unique_code(self):
 		code = ensure_referral_code(user=self.referrer)
 		self.assertTrue(code.startswith('KAZI-'))
 		self.assertEqual(code, ensure_referral_code(user=self.referrer))
+
+	def test_referral_summary_loads_without_referrals(self):
+		self.client.force_authenticate(user=self.referrer)
+		response = self.client.get('/api/accounts/referrals/')
+		self.assertEqual(response.status_code, 200)
+		self.assertTrue(response.data['code'].startswith('KAZI-'))
+		self.assertEqual(response.data['referrals'], [])
 
 	def test_verification_reward_is_granted_once(self):
 		code = ensure_referral_code(user=self.referrer)

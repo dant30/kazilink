@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from ..models import Referral
-from ..serializers import ReferralSerializer, ReferralSummarySerializer
+from ..serializers import ReferralSerializer
 from ..services.referrals import ensure_referral_code
 
 
@@ -23,4 +23,4 @@ class ReferralSummaryView(APIView):
 			'credits_earned': credits_earned,
 			'referrals': ReferralSerializer(referrals, many=True).data,
 		}
-		return Response(ReferralSummarySerializer(data).data)
+		return Response(data)
