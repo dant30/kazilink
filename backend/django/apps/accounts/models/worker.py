@@ -9,6 +9,10 @@ class WorkerProfile(models.Model):
 		NIGHT_SHIFTS = 'night_shifts', 'Night shifts'
 		FULL_TIME = 'full_time', 'Full time'
 		PART_TIME = 'part_time', 'Part time'
+		WEEKENDS = 'weekends', 'Weekends'
+		WEEKDAYS = 'weekdays', 'Weekdays'
+		DAY_SHIFTS = 'day_shifts', 'Day shifts'
+		FLEXIBLE = 'flexible', 'Flexible schedule'
 
 	user = models.OneToOneField('accounts.User', on_delete=models.CASCADE, related_name='worker_profile')
 	primary_role = models.CharField(max_length=100)

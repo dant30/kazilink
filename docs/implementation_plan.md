@@ -29,7 +29,7 @@ This roadmap tracks the current repository state as of 2026-08-29. It separates 
 | --- | --- | --- |
 | User/profile 1:1 relationships | ✅✅ | Worker and employer profiles extend User through one-to-one relationships. |
 | Worker and employer registration | ✅✅ | Registration service and role-aware validation exist. |
-| Worker profile required fields | ✅✅ | Availability, daily rate, bio, and location are validated and migrated. |
+| Worker profile required fields | ✅✅ | Availability, daily rate, bio, and location are validated and migrated; registration loads expanded occupation and availability catalogs from the backend with searchable selectors. |
 | Phone verification workflow | ✅✅ | OTP generation, hashing, expiry, and verification service exist. |
 | User referral codes and rewards | ✅✅ | Users receive unique KAZI codes; attribution and one-time Kazi Credits rewards occur after phone verification. |
 | SMS provider integration | ❌❌ | OTP generation exists, but Africa's Talking/Twilio transport is not implemented. |

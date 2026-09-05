@@ -18,20 +18,23 @@ export interface SelectProps extends Omit<React.SelectHTMLAttributes<HTMLSelectE
   helperText?: string
   required?: boolean
   className?: string
+  searchable?: boolean
 }
 
 function normalizeOption(option: SelectOption | string): SelectOption {
   return typeof option === 'string' ? { value: option, label: option } : option
 }
 
-export const Select: React.FC<SelectProps> = ({ label, options, value, onChange, error, helperText, required, className, disabled, id: providedId, name, ...props }) => {
+export const Select: React.FC<SelectProps> = ({ label, options, value, onChange, error, helperText, required, className, disabled, searchable = false, id: providedId, name, ...props }) => {
   const generatedId = useId()
   const id = providedId || generatedId
   const listboxId = `${id}-options`
   const containerRef = useRef<HTMLDivElement>(null)
   const optionRefs = useRef<Array<HTMLButtonElement | null>>([])
   const [open, setOpen] = useState(false)
+  const [searchTerm, setSearchTerm] = useState('')
   const normalizedOptions = options.map(normalizeOption)
+  const filteredOptions = normalizedOptions.filter((option) => !searchTerm.trim() || option.label.toLowerCase().includes(searchTerm.trim().toLowerCase()) || option.value.toLowerCase().includes(searchTerm.trim().toLowerCase()))
   const selectedOption = normalizedOptions.find((option) => option.value === value)
   const selectedIndex = normalizedOptions.findIndex((option) => option.value === value)
   const [highlightedIndex, setHighlightedIndex] = useState(Math.max(0, selectedIndex))
@@ -66,6 +69,7 @@ export const Select: React.FC<SelectProps> = ({ label, options, value, onChange,
     if (option.disabled) return
     onChange(option.value)
     setOpen(false)
+    setSearchTerm('')
   }
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>) => {
@@ -114,7 +118,8 @@ export const Select: React.FC<SelectProps> = ({ label, options, value, onChange,
       {name && <input type="hidden" name={name} value={value} required={required} disabled={disabled} />}
       {open && !disabled && (
         <div id={listboxId} role="listbox" aria-label={label || 'Options'} className="absolute left-0 right-0 z-50 mt-2 max-h-64 overflow-y-auto rounded-xl border border-slate-200 bg-white p-1.5 shadow-xl shadow-slate-900/10">
-          {normalizedOptions.length ? normalizedOptions.map((option, index) => (
+          {searchable && <input autoFocus type="search" value={searchTerm} onChange={(event) => { setSearchTerm(event.target.value); setHighlightedIndex(0) }} placeholder="Search options..." aria-label={`Search ${label || 'options'}`} className="mb-1.5 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-[#0A2540]" />}
+          {filteredOptions.length ? filteredOptions.map((option, index) => (
             <button ref={(element) => { optionRefs.current[index] = element }} key={`${option.value}-${index}`} type="button" role="option" aria-selected={option.value === value} aria-disabled={option.disabled} disabled={option.disabled} onMouseEnter={() => !option.disabled && setHighlightedIndex(index)} onClick={() => choose(option)} className={cn('flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-left text-sm transition', option.disabled ? 'cursor-not-allowed text-slate-300' : 'cursor-pointer text-slate-700 hover:bg-orange-50 hover:text-slate-900', highlightedIndex === index && !option.disabled && 'bg-slate-100', option.value === value && 'font-semibold text-[#0A2540]')}>
               <span className="min-w-0"><span className="block truncate">{option.label}</span>{option.sublabel && <span className="block truncate text-xs font-normal text-slate-400">{option.sublabel}</span>}</span>
               {option.value === value && <Check className="h-4 w-4 shrink-0 text-[#FF6B00]" />}

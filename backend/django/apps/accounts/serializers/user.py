@@ -2,6 +2,7 @@ from django.contrib.auth import authenticate
 from rest_framework import serializers
 
 from ..models import EmployerProfile, Profile, User, UserRole, WorkerProfile
+from ..services.occupations import WORKER_AVAILABILITIES
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -22,7 +23,7 @@ class RegistrationSerializer(serializers.Serializer):
     role = serializers.ChoiceField(choices=UserRole.Role.choices)
     primary_role = serializers.CharField(max_length=100, required=False)
     location = serializers.CharField(max_length=100, required=False)
-    availability = serializers.ChoiceField(choices=('immediate', 'night_shifts', 'full_time', 'part_time'), required=False)
+    availability = serializers.ChoiceField(choices=WORKER_AVAILABILITIES, required=False)
     expected_daily_rate_ksh = serializers.IntegerField(min_value=0, required=False)
     bio = serializers.CharField(required=False, allow_blank=False)
     contact_person = serializers.CharField(max_length=255, required=False)

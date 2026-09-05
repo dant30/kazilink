@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
 import { FormActions } from '../../../shared/components/forms/FormActions'
@@ -7,6 +7,7 @@ import { Checkbox } from '../../../shared/components/ui/Checkbox'
 import { Select } from '../../../shared/components/ui/Select'
 import { AuthField, AuthPanel } from '../components'
 import { register } from '../services'
+import { endpoints } from '../../../core/api'
 
 export function RegisterPage() {
   const navigate = useNavigate()
@@ -28,6 +29,12 @@ export function RegisterPage() {
   const [error, setError] = useState('')
   const [saving, setSaving] = useState(false)
   const [termsAccepted, setTermsAccepted] = useState(false)
+  const [workerRoles, setWorkerRoles] = useState<Array<{ value: string; label: string }>>([])
+  const [availabilityOptions, setAvailabilityOptions] = useState<Array<{ value: string; label: string }>>([])
+
+  useEffect(() => {
+    endpoints.auth.workerOccupations().then((response) => { setWorkerRoles(response.occupations); setAvailabilityOptions(response.availability) }).catch(() => { setWorkerRoles([{ value: 'other', label: 'Other hospitality or domestic role' }]); setAvailabilityOptions([{ value: 'immediate', label: 'Immediate' }, { value: 'full_time', label: 'Full time' }, { value: 'weekends', label: 'Weekends' }]) })
+  }, [])
 
   const update = (key: keyof typeof form, value: string) =>
     setForm((current) => ({ ...current, [key]: value }))
@@ -199,19 +206,14 @@ export function RegisterPage() {
 
             {role === 'worker' ? (
               <>
-                <AuthField
-                  label="Primary role"
-                  required
-                  value={form.primary_role}
-                  onChange={(event) => update('primary_role', event.target.value)}
-                />
+                <Select label="Primary role" required searchable value={form.primary_role} onChange={(value) => update('primary_role', value)} options={workerRoles} />
                 <AuthField
                   label="Location"
                   required
                   value={form.location}
                   onChange={(event) => update('location', event.target.value)}
                 />
-                <Select label="Availability" value={form.availability} onChange={(value) => update('availability', value)} options={[{ value: 'immediate', label: 'Immediate' }, { value: 'night_shifts', label: 'Night shifts' }, { value: 'full_time', label: 'Full time' }, { value: 'part_time', label: 'Part time' }]} />
+                <Select label="Availability" searchable value={form.availability} onChange={(value) => update('availability', value)} options={availabilityOptions} />
                 <AuthField
                   label="Expected daily rate (KSh)"
                   required
