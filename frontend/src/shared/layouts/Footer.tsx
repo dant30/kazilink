@@ -56,8 +56,8 @@ export function Footer() {
 									<span>Help Center</span>
 								</Link>
 							</li>
-							<li className="text-slate-400">Terms of Service</li>
-							<li className="text-slate-400">Privacy Policy</li>
+							<li><Link to="/terms" className="text-slate-300 hover:text-[#FF6B00] transition">Terms of Service</Link></li>
+							<li><Link to="/privacy" className="text-slate-300 hover:text-[#FF6B00] transition">Privacy Policy</Link></li>
 							<li className="text-slate-400">Kenya Data Protection Act 2019</li>
 						</ul>
 					</div>

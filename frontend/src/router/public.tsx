@@ -1,7 +1,7 @@
 // frontend/src/router/public.tsx
 import type { RouteObject } from 'react-router-dom'
 
-import { LandingPage, TermsPage } from '../features/home/pages'
+import { LandingPage, PrivacyPage, TermsPage } from '../features/home/pages'
 import { PublicLayout, UnauthorizedPage } from './route-pages'
 import { ForgotPasswordPage, LoginPage, RegisterPage, VerifyPhonePage } from '../features/auth/pages'
 import { JobDetailPage, JobsPage } from '../features/jobs/pages'
@@ -13,6 +13,7 @@ export const publicRoutes: RouteObject[] = [
 		children: [
 			{ index: true, element: <LandingPage /> },
 			{ path: 'terms', element: <TermsPage /> },
+			{ path: 'privacy', element: <PrivacyPage /> },
 			{ path: 'login', element: <LoginPage /> },
 			{ path: 'register', element: <RegisterPage /> },
 			{ path: 'verify-phone', element: <VerifyPhonePage /> },
