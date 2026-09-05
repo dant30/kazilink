@@ -32,6 +32,7 @@ export function WorkerProfilePage() {
 	const [showChecklist, setShowChecklist] = useState(false)
 	const [copiedLink, setCopiedLink] = useState(false)
 	const [skillOptions, setSkillOptions] = useState<Array<{ value: string; label: string }>>([])
+	const [availabilityOptions, setAvailabilityOptions] = useState<Array<{ value: string; label: string }>>([])
 
 	useEffect(() => {
 		if (!profile) return
@@ -57,7 +58,7 @@ export function WorkerProfilePage() {
 	}, [])
 
 	useEffect(() => {
-		endpoints.auth.workerOccupations().then((response) => setSkillOptions(response.skills)).catch(() => setSkillOptions([]))
+		endpoints.auth.workerOccupations().then((response) => { setSkillOptions(response.skills); setAvailabilityOptions(response.availability) }).catch(() => { setSkillOptions([]); setAvailabilityOptions([]) })
 	}, [])
 	const workerCriteria = [
 		['photo', 'Professional profile photo', Boolean(profile?.avatar || profile?.user.avatar || form.avatar)],
@@ -173,7 +174,7 @@ export function WorkerProfilePage() {
 			{activeTab === 'edit' && <div className="grid gap-6 xl:grid-cols-[1.3fr_0.7fr]">
 				<div className="space-y-6">
 					{/* Professional Details */}
-					<WorkerInfoCard profile={profile} loading={loading} values={form} onChange={updateForm} skillOptions={skillOptions} />
+					<WorkerInfoCard profile={profile} loading={loading} values={form} onChange={updateForm} skillOptions={skillOptions} availabilityOptions={availabilityOptions} />
 
 					{/* Experience & Skills */}
 					<FormSection title="Experience & skills" description="Highlight the strengths employers can validate quickly.">
