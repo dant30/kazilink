@@ -2,6 +2,8 @@ from django.contrib.postgres.search import SearchQuery, SearchRank
 from django.db.models import BooleanField, Case, Q, When
 from django.utils import timezone
 
+from apps.accounts.services.occupations import WORKER_OCCUPATIONS
+
 from ..models import Job
 
 
@@ -32,7 +34,14 @@ def search_jobs(*, query='', location='', category='', job_type='', status=Job.S
 	if location:
 		queryset = queryset.filter(location__iexact=location)
 	if category:
-		queryset = queryset.filter(category__iexact=category)
+		category_values = {category}
+		for value, label in WORKER_OCCUPATIONS:
+			if category.lower() in {value.lower(), label.lower()}:
+				category_values.update((value, label))
+		category_query = Q()
+		for category_value in category_values:
+			category_query |= Q(category__iexact=category_value)
+		queryset = queryset.filter(category_query)
 	if job_type:
 		queryset = queryset.filter(job_type=job_type)
 	if min_pay is not None:

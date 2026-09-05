@@ -2,6 +2,7 @@ WORKER_OCCUPATIONS = (
 	('nanny', 'Nanny / Childcare provider'),
 	('housekeeper', 'Housekeeper'),
 	('cleaner', 'Cleaner'),
+	('mama_fua', 'Mama fua / Laundry service provider'),
 	('caregiver', 'Caregiver'),
 	('cook', 'Cook / Chef'),
 	('waiter', 'Waiter / Waitress'),
@@ -106,6 +107,55 @@ WORKER_AVAILABILITIES = (
 	('flexible', 'Flexible schedule'),
 )
 
+WORK_LOCATIONS = (
+	('Nairobi', 'Nairobi'),
+	('Mombasa', 'Mombasa'),
+	('Kisumu', 'Kisumu'),
+	('Nakuru', 'Nakuru'),
+	('Eldoret', 'Eldoret'),
+	('Thika', 'Thika'),
+	('Malindi', 'Malindi'),
+	('Kitale', 'Kitale'),
+	('Garissa', 'Garissa'),
+	('Kakamega', 'Kakamega'),
+	('Nyeri', 'Nyeri'),
+	('Machakos', 'Machakos'),
+	('Meru', 'Meru'),
+	('Naivasha', 'Naivasha'),
+	('Embu', 'Embu'),
+	('Nanyuki', 'Nanyuki'),
+	('Kericho', 'Kericho'),
+	('Bungoma', 'Bungoma'),
+	('Busia', 'Busia'),
+	('Homa Bay', 'Homa Bay'),
+	('Kisii', 'Kisii'),
+	('Kitui', 'Kitui'),
+	('Lodwar', 'Lodwar'),
+	('Isiolo', 'Isiolo'),
+	('Moyale', 'Moyale'),
+	('Voi', 'Voi'),
+	('Wajir', 'Wajir'),
+	('Mandera', 'Mandera'),
+	('Bomet', 'Bomet'),
+	('Narok', 'Narok'),
+	('Bahrain - Manama', 'Bahrain - Manama'),
+	('Kuwait - Kuwait City', 'Kuwait - Kuwait City'),
+	('Oman - Muscat', 'Oman - Muscat'),
+	('Oman - Salalah', 'Oman - Salalah'),
+	('Qatar - Doha', 'Qatar - Doha'),
+	('Saudi Arabia - Riyadh', 'Saudi Arabia - Riyadh'),
+	('Saudi Arabia - Jeddah', 'Saudi Arabia - Jeddah'),
+	('Saudi Arabia - Dammam', 'Saudi Arabia - Dammam'),
+	('Saudi Arabia - Mecca', 'Saudi Arabia - Mecca'),
+	('Saudi Arabia - Medina', 'Saudi Arabia - Medina'),
+	('United Arab Emirates - Dubai', 'United Arab Emirates - Dubai'),
+	('United Arab Emirates - Abu Dhabi', 'United Arab Emirates - Abu Dhabi'),
+	('United Arab Emirates - Sharjah', 'United Arab Emirates - Sharjah'),
+	('United Arab Emirates - Ajman', 'United Arab Emirates - Ajman'),
+	('United Arab Emirates - Ras Al Khaimah', 'United Arab Emirates - Ras Al Khaimah'),
+	('United Arab Emirates - Fujairah', 'United Arab Emirates - Fujairah'),
+)
+
 
 def worker_occupation_catalog():
 	return [{'value': value, 'label': label} for value, label in WORKER_OCCUPATIONS]
@@ -113,3 +163,7 @@ def worker_occupation_catalog():
 
 def worker_availability_catalog():
 	return [{'value': value, 'label': label} for value, label in WORKER_AVAILABILITIES]
+
+
+def worker_location_catalog():
+	return [{'value': value, 'label': label} for value, label in WORK_LOCATIONS]

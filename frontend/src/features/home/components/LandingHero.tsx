@@ -11,11 +11,14 @@ export interface LandingHeroProps {
   searchLocation: string
   setSearchLocation: Dispatch<SetStateAction<string>>
   onSearch: () => void
+  searchAudience: 'jobs' | 'candidates'
+  locationOptions: Array<{ value: string; label: string }>
   roleOptions: Array<{ value: string; label: string }>
   liveJobs: number
 }
 
-export function LandingHero({ searchRole, setSearchRole, searchLocation, setSearchLocation, onSearch, roleOptions, liveJobs }: LandingHeroProps) {
+export function LandingHero({ searchRole, setSearchRole, searchLocation, setSearchLocation, onSearch, searchAudience, roleOptions, locationOptions, liveJobs }: LandingHeroProps) {
+  const isJobSearch = searchAudience === 'jobs'
   return (
     <section className="relative overflow-hidden bg-gradient-to-b from-[#0A2540] via-[#081F36] to-[#051424] py-16 text-white sm:py-24">
       <HeroParticles />
@@ -36,16 +39,16 @@ export function LandingHero({ searchRole, setSearchRole, searchLocation, setSear
           <div className="mx-auto flex max-w-3xl flex-col items-center gap-2.5 rounded-2xl border border-slate-100 bg-white p-2.5 text-slate-800 shadow-2xl sm:flex-row sm:p-3.5">
             <label className="flex w-full items-center gap-2.5 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 sm:w-1/2">
               <Search className="h-4 w-4 shrink-0 text-[#0A2540]" />
-              <span className="sr-only">Hospitality role</span>
-              <Select searchable aria-label="Worker role" value={searchRole} onChange={setSearchRole} options={[{ value: '', label: 'All worker roles' }, ...roleOptions]} className="flex-1" />
+              <span className="sr-only">{isJobSearch ? 'Job category' : 'Hospitality role'}</span>
+              <Select searchable aria-label={isJobSearch ? 'Job category' : 'Worker role'} value={searchRole} onChange={setSearchRole} options={[{ value: '', label: isJobSearch ? 'All job categories' : 'All worker roles' }, ...roleOptions]} className="flex-1" />
             </label>
             <label className="flex w-full items-center gap-2.5 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 sm:w-1/2">
               <MapPin className="h-4 w-4 shrink-0 text-[#0A2540]" />
               <span className="sr-only">Location</span>
-              <Select aria-label="Location" value={searchLocation} onChange={setSearchLocation} options={[{ value: '', label: 'All Kenya Locations' }, { value: 'Nairobi', label: 'Nairobi' }, { value: 'Mombasa', label: 'Mombasa & Coast' }, { value: 'Nakuru', label: 'Nakuru & Rift Valley' }, { value: 'Kisumu', label: 'Kisumu & Western' }]} className="flex-1" />
+              <Select searchable aria-label="Location" value={searchLocation} onChange={setSearchLocation} options={[{ value: '', label: 'All locations' }, ...locationOptions]} className="flex-1" />
             </label>
             <button type="button" onClick={onSearch} className="btn-primary-orange w-full shrink-0 text-sm sm:w-auto">
-              <span>Search Candidates</span><ArrowRight className="h-4 w-4" />
+              <span>{isJobSearch ? 'Find Jobs' : 'Search Candidates'}</span><ArrowRight className="h-4 w-4" />
             </button>
           </div>
           <div className="grid grid-cols-2 gap-4 border-t border-slate-800 pt-8 text-left sm:grid-cols-4">

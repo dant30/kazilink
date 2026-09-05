@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ArrowRight, Briefcase, Building2, CheckCircle2, ChevronRight, ShieldCheck, Star, Users } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 
@@ -7,6 +7,7 @@ import { useJobs } from '../../jobs/hooks'
 import { Button } from '../../../shared/components/ui/Button'
 import { FaqSection, LandingCta, LandingHero, PassportShowcase, ShiftRoiCalculator, TrustComparison, VenuePartners, VerifiedTalentSpotlight } from '../components'
 import { useHomeSummary } from '../hooks/useHomeSummary'
+import { endpoints } from '../../../core/api'
 
 const trustFeatures = [
   { icon: ShieldCheck, title: 'Verified onboarding', text: 'Every profile is checked for reliability, work history, and employer references.' },
@@ -19,24 +20,32 @@ export function LandingPage() {
   const navigate = useNavigate()
   const [searchRole, setSearchRole] = useState('')
   const [searchLocation, setSearchLocation] = useState('')
+  const [locationOptions, setLocationOptions] = useState<Array<{ value: string; label: string }>>([])
   const { jobs } = useJobs({ location: searchLocation || undefined })
   const { summary } = useHomeSummary()
   const roleOptions = summary?.occupations ?? []
 
+  useEffect(() => {
+    endpoints.auth.workerOccupations().then((response) => setLocationOptions(response.locations)).catch(() => setLocationOptions([]))
+  }, [])
+
   const openProtected = (path: string) => {
-    if (user) navigate('/login', { state: { from: path } })
-    else navigate(path)
+    if (user) navigate(path)
+    else navigate('/login', { state: { from: path } })
   }
 
   const searchPath = () => {
     const params = new URLSearchParams()
     if (searchRole) params.set('category', searchRole)
     if (searchLocation) params.set('location', searchLocation)
-    return `/jobs${params.toString() ? `?${params.toString()}` : ''}`
+    const target = user?.is_worker ? '/jobs' : '/workers'
+    return `${target}${params.toString() ? `?${params.toString()}` : ''}`
   }
 
+  const searchAudience = user?.is_worker ? 'jobs' : 'candidates'
+
   return <main className="min-h-screen bg-slate-50">
-    <LandingHero searchRole={searchRole} setSearchRole={setSearchRole} searchLocation={searchLocation} setSearchLocation={setSearchLocation} onSearch={() => openProtected(searchPath())} roleOptions={roleOptions} liveJobs={summary?.live_jobs ?? jobs.length} />
+    <LandingHero searchRole={searchRole} setSearchRole={setSearchRole} searchLocation={searchLocation} setSearchLocation={setSearchLocation} onSearch={() => openProtected(searchPath())} searchAudience={searchAudience} roleOptions={roleOptions} locationOptions={locationOptions} liveJobs={summary?.live_jobs ?? jobs.length} />
     <VenuePartners />
 
     <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8"><div className="grid gap-8 md:grid-cols-2">

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { MapPin, Search, ShieldCheck, Star, UserRound } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 
 import { endpoints } from '../../../core/api'
 import { useAuthStore } from '../../auth/store/authStore'
@@ -16,9 +16,10 @@ import type { WorkerProfile } from '../types'
 export function WorkersPage() {
   const { user } = useAuthStore()
   const isEmployer = Boolean(user?.is_employer && !user?.is_worker)
+  const [searchParams] = useSearchParams()
   const [workers, setWorkers] = useState<WorkerProfile[]>([])
-  const [query, setQuery] = useState('')
-  const [location, setLocation] = useState('')
+  const [query, setQuery] = useState(searchParams.get('q') || searchParams.get('category') || '')
+  const [location, setLocation] = useState(searchParams.get('location') || '')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [creditBalance, setCreditBalance] = useState<number | null>(null)

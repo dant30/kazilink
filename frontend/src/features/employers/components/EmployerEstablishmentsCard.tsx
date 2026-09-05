@@ -3,10 +3,12 @@ import { FormSection } from '../../../shared/components/forms'
 import { Badge } from '../../../shared/components/ui/Badge'
 import type { Establishment } from '../../establishments/types'
 import { EmptyState } from '../../../shared/components/feedback'
+import { Link } from 'react-router-dom'
+import { Button } from '../../../shared/components/ui/Button'
 
 export function EmployerEstablishmentsCard({ establishments }: { establishments: Establishment[] }) {
   return <FormSection title="Establishments" description="The businesses and locations you manage." icon={<ShieldCheck className="h-4 w-4" />}>
-    {establishments.length === 0 ? <EmptyState title="No establishments have been added yet" description="Add a venue profile to manage hiring and verification." icon={<ShieldCheck className="h-8 w-8" />} size="sm" /> : <div className="space-y-3">
+    {establishments.length === 0 ? <EmptyState title="No establishments have been added yet" description="Add a venue profile to manage hiring and verification." icon={<ShieldCheck className="h-8 w-8" />} size="sm" action={<Link to="/establishments"><Button size="sm" leftIcon={<ShieldCheck className="h-4 w-4" />}>Add establishment</Button></Link>} /> : <div className="space-y-3">
       {establishments.map((establishment) => <div key={establishment.id} className="flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4">
         <div><p className="text-sm font-black text-slate-900">{establishment.name}</p><p className="mt-1 text-xs text-slate-500">{establishment.establishment_type} · {establishment.location}</p></div>
         <Badge variant={establishment.is_verified ? 'success' : 'warning'}>{establishment.is_verified ? 'Verified' : 'Reviewing'}</Badge>
