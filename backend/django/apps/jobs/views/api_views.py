@@ -1,5 +1,6 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import generics, status
+from rest_framework.permissions import AllowAny
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -27,7 +28,7 @@ class JobListCreateView(generics.ListCreateAPIView):
 	serializer_class = JobSerializer
 
 	def get_permissions(self):
-		return [IsEmployer()] if self.request.method == 'POST' else [IsJobParticipant()]
+		return [IsEmployer()] if self.request.method == 'POST' else [AllowAny()]
 
 	def get_queryset(self):
 		params = self.request.query_params

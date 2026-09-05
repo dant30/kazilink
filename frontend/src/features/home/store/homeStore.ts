@@ -11,6 +11,7 @@ export const homeStore = {
   getState: () => state,
   setLoading: (loading: boolean) => { state = { ...state, loading }; notify() },
   setSummary: (summary: HomeSummary) => { state = { summary, loading: false }; notify() },
+  setError: () => { state = { ...state, loading: false }; notify() },
   subscribe: (listener: () => void) => { listeners.add(listener); return () => listeners.delete(listener) },
 }
 

@@ -1,5 +1,7 @@
 from django.db import transaction
 
+from apps.credits.services import spend_credits
+
 from ..models import JobApplication
 
 
@@ -27,7 +29,15 @@ def create_application(*, worker, job, cover_note=''):
         raise ValueError('Applications are only accepted for open jobs.')
     if JobApplication.objects.filter(job=job, worker=worker).exists():
         raise ValueError('You have already applied for this job.')
-    return JobApplication.objects.create(job=job, worker=worker, cover_note=cover_note)
+    application = JobApplication.objects.create(job=job, worker=worker, cover_note=cover_note)
+    spend_credits(
+        user=worker.user,
+        action='priority_application',
+        reference=f'job:{job.id}',
+        idempotency_key=f'application:{application.id}',
+        metadata={'application_id': application.id, 'job_id': job.id},
+    )
+    return application
 
 
 @transaction.atomic

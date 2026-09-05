@@ -1,11 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useSyncExternalStore } from 'react'
 
 import { loadHomeSummary } from '../services'
 import { homeStore } from '../store'
 
 export function useHomeSummary(enabled = true) {
-  const [error, setError] = useState('')
-  const snapshot = homeStore.getState()
+  const snapshot = useSyncExternalStore(homeStore.subscribe, homeStore.getState, homeStore.getState)
 
   useEffect(() => {
     if (!enabled) return
@@ -13,9 +12,9 @@ export function useHomeSummary(enabled = true) {
     homeStore.setLoading(true)
     loadHomeSummary()
       .then((summary) => { if (active) homeStore.setSummary(summary) })
-      .catch((reason: Error) => { if (active) { setError(reason.message); homeStore.setLoading(false) } })
+      .catch(() => { if (active) homeStore.setError() })
     return () => { active = false }
   }, [enabled])
 
-  return { ...snapshot, error }
+  return { ...snapshot }
 }

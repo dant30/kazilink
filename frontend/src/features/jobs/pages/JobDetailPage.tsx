@@ -1,5 +1,5 @@
 import { ArrowLeft, Briefcase, CheckCircle2, Clock3, MapPin, ShieldCheck, Sparkles } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 
 import { useAuthStore } from '../../auth/store/authStore'
@@ -8,6 +8,7 @@ import { Skeleton } from '../../../shared/components/ui/Skeleton'
 import { Badge } from '../../../shared/components/ui/Badge'
 import { useJob } from '../hooks'
 import { applyForJob } from '../services'
+import { endpoints } from '../../../core/api'
 
 export function JobDetailPage() {
   const { user } = useAuthStore()
@@ -17,6 +18,12 @@ export function JobDetailPage() {
   const { job, loading, error } = useJob(Number(jobId))
   const [applying, setApplying] = useState(false)
   const [feedback, setFeedback] = useState('')
+  const [creditBalance, setCreditBalance] = useState<number | null>(null)
+
+  useEffect(() => {
+    if (!isWorker) return
+    endpoints.credits.wallet().then((response) => setCreditBalance(response.wallet.balance)).catch(() => setCreditBalance(null))
+  }, [isWorker])
 
   if (loading) {
     return (
@@ -143,12 +150,14 @@ export function JobDetailPage() {
                     View applicants
                   </Link>
                 </div>
-              ) : user ? (
+              ) : user && isWorker ? (
+                <>
+                <p className="mt-4 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs text-slate-600">Applying uses 1 Kazi Credit. Balance: <strong className="text-[#0A2540]">{creditBalance ?? '...'}</strong></p>
                 <Button
                   variant="primary"
                   size="lg"
                   className="mt-4 w-full justify-center"
-                  disabled={applying}
+                  disabled={applying || !isWorker || creditBalance === 0}
                   onClick={async () => {
                     setApplying(true)
                     setFeedback('')
@@ -164,6 +173,9 @@ export function JobDetailPage() {
                 >
                   {applying ? 'Applying...' : 'Apply now'}
                 </Button>
+                </>
+              ) : user ? (
+                <p className="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-medium text-amber-800">Only worker accounts can apply for jobs.</p>
               ) : (
                 <Link
                   to="/login"

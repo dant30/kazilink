@@ -9,14 +9,12 @@ function count(value: unknown) {
 }
 
 export async function loadHomeSummary(): Promise<HomeSummary> {
-  const [jobs, notifications, tickets] = await Promise.all([
-    endpoints.jobs.recommended(),
-    endpoints.notifications.list(true),
-    endpoints.support.list(),
-  ])
+  const [jobs, catalog] = await Promise.all([endpoints.jobs.list(), endpoints.auth.workerOccupations()])
+  const occupations = catalog.occupations
   return {
-    recommended_jobs: count(jobs),
-    unread_notifications: count(notifications),
-    open_support_tickets: count(tickets),
+    live_jobs: count(jobs),
+    role_categories: occupations.length,
+    occupations,
+    availability: catalog.availability,
   }
 }
