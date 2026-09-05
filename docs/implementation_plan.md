@@ -14,7 +14,7 @@ This roadmap tracks the current repository state as of 2026-08-29. It separates 
 | Django settings split into development, production, and testing | ✅✅ | Settings modules exist and base settings are configured. |
 | PostgreSQL configuration | ✅✅ | Django is configured for PostgreSQL. |
 | Redis configuration | ✅✅ | Redis-backed cache and Channels configuration exist. |
-| Celery configuration | ✅✅ | Celery dependencies and app/task modules exist. |
+| Celery configuration | ✅✅ | Django Celery app, Redis broker/result settings, task autodiscovery, and worker task modules are configured. |
 | Custom phone-login User model | ✅✅ | `accounts.User` uses `phone` as `USERNAME_FIELD`. |
 | JWT authentication | ✅✅ | Simple JWT is configured and refresh routing exists. |
 | CORS configuration | ✅✅ | `django-cors-headers` is configured. |
@@ -30,6 +30,7 @@ This roadmap tracks the current repository state as of 2026-08-29. It separates 
 | User/profile 1:1 relationships | ✅✅ | Worker and employer profiles extend User through one-to-one relationships. |
 | Worker and employer registration | ✅✅ | Registration service and role-aware validation exist. |
 | Worker profile required fields | ✅✅ | Availability, daily rate, bio, and location are validated and migrated; registration loads expanded occupation and availability catalogs from the backend with searchable selectors. |
+| Gulf-market occupation catalog | ✅✅ | Backend catalog includes construction, technical trades, domestic work, caregiving, logistics, security, hospitality, salon, beauty, and driving roles. |
 | Phone verification workflow | ✅✅ | OTP generation, hashing, expiry, and verification service exist. |
 | User referral codes and rewards | ✅✅ | Users receive unique KAZI codes; attribution and one-time Kazi Credits rewards occur after phone verification. |
 | SMS provider integration | ❌❌ | OTP generation exists, but Africa's Talking/Twilio transport is not implemented. |
