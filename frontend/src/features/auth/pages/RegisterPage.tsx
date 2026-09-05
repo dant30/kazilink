@@ -169,6 +169,8 @@ export function RegisterPage() {
             <AuthField
               label="Phone number"
               required
+              type="tel"
+              inputMode="tel"
               autoComplete="tel"
               value={form.phone}
               onChange={(event) => update('phone', event.target.value)}

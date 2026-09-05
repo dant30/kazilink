@@ -31,7 +31,7 @@ function RequestStep({ phone, setPhone, loading, error }: { phone: string; setPh
   const submit = async (event: FormEvent) => { event.preventDefault(); if (phone.trim()) await passwordResetStore.request(phone.trim()).catch(() => undefined) }
   return <form className="space-y-5" onSubmit={submit}>
     <div className="flex items-start gap-3 rounded-2xl border border-sky-200 bg-sky-50 p-4 text-sm text-sky-900"><MessageSquareText className="mt-0.5 h-5 w-5 shrink-0" /><p>We will send a reset code by SMS if an account exists for this phone number.</p></div>
-    <AuthField label="Phone number" required autoComplete="tel" value={phone} onChange={(event) => setPhone(event.target.value)} placeholder="07xx xxx xxx" />
+    <AuthField label="Phone number" required type="tel" inputMode="tel" autoComplete="tel" value={phone} onChange={(event) => setPhone(event.target.value)} placeholder="07xx xxx xxx" />
     {error && <ErrorMessage message={error} />}
     <Button type="submit" variant="primary" size="lg" className="w-full" isLoading={loading}>{loading ? 'Sending code...' : 'Send reset code'}</Button>
     <Link to="/login" className="flex items-center justify-center gap-2 text-sm font-semibold text-[#0A2540] hover:text-[#FF6B00]"><ArrowLeft className="h-4 w-4" />Back to sign in</Link>

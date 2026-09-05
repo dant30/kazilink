@@ -40,6 +40,9 @@ export function VerifyPhonePage() {
         <AuthField
           label="Phone number"
           required
+          type="tel"
+          inputMode="tel"
+          autoComplete="tel"
           value={phone}
           onChange={(event) => setPhone(event.target.value)}
         />
