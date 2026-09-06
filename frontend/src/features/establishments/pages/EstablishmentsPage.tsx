@@ -1,4 +1,4 @@
-import { ArrowRight, Building2, MapPin, Search, ShieldCheck, Sparkles } from 'lucide-react'
+import { ArrowRight, Building2, MapPin, Search, ShieldCheck } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 
@@ -99,7 +99,7 @@ export function EstablishmentsPage() {
   return (
     <ErrorBoundary>
       <section className="mx-auto max-w-7xl space-y-6 px-4 py-8 sm:px-6 lg:px-8">
-      <PageHeader eyebrow="Establishments" title="Verified hospitality venues" actions={<div className="flex items-center gap-3"><div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-2 text-xs text-slate-200"><Sparkles className="h-4 w-4 text-[#FF6B00]" />{establishments.length} listings</div>{isEmployer && <Button type="button" onClick={() => setShowCreateForm(true)}><Building2 className="h-4 w-4" />New establishment</Button>}</div>} />
+      <PageHeader eyebrow="Establishments" title="Verified hospitality venues" actions={isEmployer ? <Button type="button" onClick={() => setShowCreateForm(true)}><Building2 className="h-4 w-4" />New establishment</Button> : undefined} />
 
       <div className="grid gap-4 md:grid-cols-3">
         <StatCard title="Verified" value={establishments.filter((item) => item.is_verified).length} subtitle="Approved venues" icon={<ShieldCheck className="h-5 w-5" />} iconBg="bg-emerald-50 text-emerald-600" />
@@ -139,11 +139,12 @@ export function EstablishmentsPage() {
               </FormField>
                 </div>
 
-              <FormField label="Address" required>
+              <FormField label="Physical location" required helperText="Enter the specific building, estate, street, or landmark manually.">
                 <textarea
                   required
                   value={form.address}
                   onChange={(event) => updateForm('address', event.target.value)}
+                  placeholder="e.g. Kasarani, near Seasons Road"
                   rows={3}
                   className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-700 placeholder:text-slate-400 focus:border-[#FF6B00] focus:bg-white focus:outline-none"
                 />
@@ -169,7 +170,7 @@ export function EstablishmentsPage() {
               <input
                 value={filters.q ?? ''}
                   onChange={(event) => { setFilters((current) => ({ ...current, q: event.target.value })); setPage(1) }}
-                placeholder="Search by name or address"
+                placeholder="Search by name or physical location"
                 className="w-44 bg-transparent outline-none placeholder:text-slate-400"
               />
             </label>

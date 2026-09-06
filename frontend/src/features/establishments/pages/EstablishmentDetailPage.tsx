@@ -28,7 +28,7 @@ export function EstablishmentDetailPage() {
               <h1 className="mt-4 text-3xl font-black text-white sm:text-4xl">{establishment.name}</h1>
               <div className="mt-4 flex flex-wrap items-center gap-4 text-sm text-slate-200">
                 <span className="inline-flex items-center gap-2"><MapPin className="h-4 w-4 text-[#FF6B00]" /> {establishment.location}</span>
-                <span className="inline-flex items-center gap-2"><Building2 className="h-4 w-4 text-[#FF6B00]" /> {establishment.address}</span>
+                <span className="inline-flex items-center gap-2"><Building2 className="h-4 w-4 text-[#FF6B00]" /> {establishment.address || establishment.location}</span>
               </div>
             </div>
 
@@ -46,7 +46,7 @@ export function EstablishmentDetailPage() {
           <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
             <h2 className="text-lg font-black text-slate-900">Overview</h2>
             <p className="mt-4 text-sm leading-7 text-slate-600">
-              This establishment is listed as a trusted hospitality venue in {establishment.location}. It is positioned to support hiring, verification, and recruitment coordination.
+              This establishment is listed as a trusted hospitality venue in {establishment.address || establishment.location}. It is positioned to support hiring, verification, and recruitment coordination.
             </p>
           </div>
 
@@ -54,7 +54,8 @@ export function EstablishmentDetailPage() {
             <h2 className="text-lg font-black text-slate-900">Profile summary</h2>
             <div className="mt-4 space-y-3 text-sm text-slate-600">
               <div className="flex justify-between gap-3"><span>Type</span><span className="font-semibold text-slate-900">{establishment.establishment_type || 'General hospitality'}</span></div>
-              <div className="flex justify-between gap-3"><span>Location</span><span className="font-semibold text-slate-900">{establishment.location}</span></div>
+              <div className="flex justify-between gap-3"><span>City / area</span><span className="font-semibold text-slate-900">{establishment.location}</span></div>
+              <div className="flex justify-between gap-3"><span>Physical location</span><span className="text-right font-semibold text-slate-900">{establishment.address || 'Not provided'}</span></div>
               <div className="flex justify-between gap-3"><span>Verified employers</span><span className="font-semibold text-slate-900">{establishment.verified_employers_count ?? 0}</span></div>
             </div>
           </div>

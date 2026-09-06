@@ -56,7 +56,7 @@ export function JobDetailPage() {
 
   const roleType = job.job_type?.replace(/_/g, ' ') || 'shift'
   const requirements = job.requirements?.length ? job.requirements : ['Previous hospitality experience preferred.', 'Reliable and punctual attendance.', 'Strong customer service and teamwork.']
-  const benefits = job.benefits?.length ? job.benefits : ['Daily or weekly pay options', 'Supportive staff environment', 'Client referral opportunities']
+  const benefits = job.benefits ?? []
   const premiumActionCost = premiumAction === 'feature' ? 3 : 5
   const runPremiumAction = async () => {
     if (!premiumAction) return
@@ -144,15 +144,15 @@ export function JobDetailPage() {
             </div>
 
             <div className="rounded-2xl border border-slate-200 bg-white p-5">
-              <h2 className="text-lg font-black text-slate-900">What you get</h2>
-              <ul className="mt-4 space-y-3">
+              <h2 className="text-lg font-black text-slate-900">Extra benefits</h2>
+              {benefits.length ? <ul className="mt-4 space-y-3">
                 {benefits.map((item) => (
                   <li key={item} className="flex items-start gap-3 text-sm text-slate-600">
                     <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-[#0A2540]" />
                     <span>{item}</span>
                   </li>
                 ))}
-              </ul>
+              </ul> : <p className="mt-3 text-sm text-slate-500">No extra benefits listed for this role.</p>}
             </div>
           </div>
 
@@ -239,7 +239,7 @@ export function JobDetailPage() {
                 </div>
                 <div className="flex justify-between gap-3">
                   <span>Posted</span>
-                  <span className="font-semibold text-slate-900">{job.posted_date || 'Recently'}</span>
+                  <span className="font-semibold text-slate-900">{formatRelativeTime(job.posted_date)}</span>
                 </div>
                 <div className="flex justify-between gap-3">
                   <span>Applicants</span>
@@ -286,4 +286,21 @@ export function JobDetailPage() {
       />
     </section>
   )
+}
+
+function formatRelativeTime(value?: string) {
+  if (!value) return 'Recently'
+  const timestamp = new Date(value).getTime()
+  if (Number.isNaN(timestamp)) return 'Recently'
+  const elapsedSeconds = Math.max(0, Math.floor((Date.now() - timestamp) / 1000))
+  if (elapsedSeconds < 60) return 'Just now'
+  const elapsedMinutes = Math.floor(elapsedSeconds / 60)
+  if (elapsedMinutes < 60) return `${elapsedMinutes} minute${elapsedMinutes === 1 ? '' : 's'} ago`
+  const elapsedHours = Math.floor(elapsedMinutes / 60)
+  if (elapsedHours < 24) return `${elapsedHours} hour${elapsedHours === 1 ? '' : 's'} ago`
+  const elapsedDays = Math.floor(elapsedHours / 24)
+  if (elapsedDays < 7) return `${elapsedDays} day${elapsedDays === 1 ? '' : 's'} ago`
+  const elapsedWeeks = Math.floor(elapsedDays / 7)
+  if (elapsedWeeks < 5) return `${elapsedWeeks} week${elapsedWeeks === 1 ? '' : 's'} ago`
+  return new Intl.DateTimeFormat(undefined, { dateStyle: 'medium' }).format(new Date(timestamp))
 }

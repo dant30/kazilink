@@ -28,3 +28,9 @@ class EstablishmentWriteSerializer(serializers.ModelSerializer):
 
     def validate_location(self, value):
         return value.strip()
+
+    def validate_address(self, value):
+        value = value.strip()
+        if not value:
+            raise serializers.ValidationError('A physical location is required.')
+        return value
