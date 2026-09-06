@@ -14,7 +14,7 @@ import type { UpdateEmployerProfilePayload } from '../types'
 import { ErrorBoundary } from '../../../shared/components/ui/ErrorBoundary'
 import { ReferralCard } from '../../accounts/components/ReferralCard'
 import { endpoints } from '../../../core/api'
-import { VerificationPanel } from '../../../shared/components/forms/VerificationPanel'
+import { VerificationPanel } from '../../accounts/components/VerificationPanel'
 
 export function EmployerProfilePage() {
   const { profile, establishments, loading, error, refresh } = useEmployerProfile()

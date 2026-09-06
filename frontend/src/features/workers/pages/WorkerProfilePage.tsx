@@ -17,7 +17,7 @@ import { Link } from 'react-router-dom'
 import { Briefcase, Check, CheckCircle2, ChevronDown, ChevronUp, Clock, Edit3, Eye, Languages, Search, Share2, ShieldAlert, ShieldCheck, Star, UserCheck, Zap } from 'lucide-react'
 import type { UpdateWorkerProfilePayload } from '../types'
 import { ReferralCard } from '../../accounts/components/ReferralCard'
-import { VerificationPanel } from '../../../shared/components/forms/VerificationPanel'
+import { VerificationPanel } from '../../accounts/components/VerificationPanel'
 
 export function WorkerProfilePage() {
 	const { user } = useAuthStore()

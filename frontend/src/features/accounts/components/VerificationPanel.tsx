@@ -1,8 +1,8 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { CheckCircle2, FileCheck2, ShieldAlert, Upload } from 'lucide-react'
 import { endpoints } from '../../../core/api'
-import { toast } from '../feedback'
-import type { VerificationDocument } from '../../../features/auth/types'
+import { toast } from '../../../shared/components/feedback'
+import type { VerificationDocument } from '../../auth/types'
 
 export function VerificationPanel({ email, phoneVerified, idVerified }: { email?: string | null; phoneVerified: boolean; idVerified: boolean }) {
   const [documents, setDocuments] = useState<VerificationDocument[]>([])

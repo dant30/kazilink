@@ -7,6 +7,8 @@ from .models import (
 	IdentityDocument,
 	PhoneVerification,
 	Profile,
+	Referral,
+	ReferralCode,
 	User,
 	UserRole,
 	WorkerProfile,
@@ -89,3 +91,18 @@ class IdentityDocumentAdmin(admin.ModelAdmin):
 		if obj.document_type == IdentityDocument.DocumentType.NATIONAL_ID:
 			obj.user.is_id_verified = obj.status == IdentityDocument.Status.VERIFIED
 			obj.user.save(update_fields=('is_id_verified',))
+
+
+@admin.register(ReferralCode)
+class ReferralCodeAdmin(admin.ModelAdmin):
+	list_display = ('code', 'owner', 'created_at')
+	search_fields = ('code', 'owner__phone', 'owner__full_name', 'owner__email')
+	readonly_fields = ('created_at',)
+
+
+@admin.register(Referral)
+class ReferralAdmin(admin.ModelAdmin):
+	list_display = ('referrer', 'referred', 'code', 'status', 'referrer_reward', 'referred_reward', 'created_at', 'rewarded_at')
+	list_filter = ('status', 'created_at', 'rewarded_at')
+	search_fields = ('referrer__phone', 'referrer__full_name', 'referred__phone', 'referred__full_name', 'code__code')
+	readonly_fields = ('created_at', 'rewarded_at')
