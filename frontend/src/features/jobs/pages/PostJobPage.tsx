@@ -6,11 +6,11 @@ import { useAuthStore } from '../../auth/store/authStore'
 import { Button } from '../../../shared/components/ui/Button'
 import { Modal } from '../../../shared/components/ui/Modal'
 import { PageHeader } from '../../../shared/components/ui/PageHeader'
-import { JobForm, type JobFormValues } from '../components'
+import { JobForm, type JobFormOptions, type JobFormValues } from '../components'
 import { createJob } from '../services'
 import { endpoints } from '../../../core/api'
 
-const fallbackOptions = {
+const fallbackOptions: JobFormOptions = {
   categories: [{ value: 'other', label: 'Other hospitality or domestic role' }],
   locations: [{ value: 'Nairobi', label: 'Nairobi' }],
   jobTypes: [{ value: 'full_time', label: 'Full time' }],
