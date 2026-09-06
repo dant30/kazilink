@@ -98,6 +98,90 @@ services:
       - key: SMS_SENDER_ID
         sync: false
 
+  - type: worker
+    name: kazilink-celery-worker
+    env: python
+    plan: free
+    region: ohio
+    rootDir: backend
+    autoDeploy: true
+    buildCommand: bash ./build.sh
+    startCommand: cd django && celery -A config.celery worker -l info
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.11
+      - key: DJANGO_SETTINGS_MODULE
+        value: config.settings.production
+      - key: SECRET_KEY
+        sync: false
+      - key: POSTGRES_DB
+        fromDatabase:
+          name: kazilink-db
+          property: database
+      - key: POSTGRES_USER
+        fromDatabase:
+          name: kazilink-db
+          property: user
+      - key: POSTGRES_PASSWORD
+        fromDatabase:
+          name: kazilink-db
+          property: password
+      - key: POSTGRES_HOST
+        fromDatabase:
+          name: kazilink-db
+          property: host
+      - key: POSTGRES_PORT
+        fromDatabase:
+          name: kazilink-db
+          property: port
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: kazilink-redis
+          property: connectionString
+
+  - type: worker
+    name: kazilink-celery-beat
+    env: python
+    plan: free
+    region: ohio
+    rootDir: backend
+    autoDeploy: true
+    buildCommand: bash ./build.sh
+    startCommand: cd django && celery -A config.celery beat -l info
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.11
+      - key: DJANGO_SETTINGS_MODULE
+        value: config.settings.production
+      - key: SECRET_KEY
+        sync: false
+      - key: POSTGRES_DB
+        fromDatabase:
+          name: kazilink-db
+          property: database
+      - key: POSTGRES_USER
+        fromDatabase:
+          name: kazilink-db
+          property: user
+      - key: POSTGRES_PASSWORD
+        fromDatabase:
+          name: kazilink-db
+          property: password
+      - key: POSTGRES_HOST
+        fromDatabase:
+          name: kazilink-db
+          property: host
+      - key: POSTGRES_PORT
+        fromDatabase:
+          name: kazilink-db
+          property: port
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: kazilink-redis
+          property: connectionString
+
   - type: web
     name: kazilink-frontend
     env: static

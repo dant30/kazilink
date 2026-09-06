@@ -7,6 +7,7 @@ from core.authentication.otp import generate_otp, hash_otp
 from core.services.sms import send_sms
 
 from ..models import EmployerProfile, PhoneVerification, User, UserRole, WorkerProfile
+from apps.notifications.services import create_notification
 from .referrals import resolve_referral_code
 
 
@@ -46,6 +47,13 @@ def register_user(*, phone, full_name, password, role, email='', primary_role=''
 		)
 	else:
 		EmployerProfile.objects.create(user=user, contact_person=contact_person)
+	create_notification(
+		user=user,
+		title='Welcome to KaziLink',
+		message='Your account is ready. Complete your profile to get better work or hiring matches.',
+		notification_type='welcome',
+		link_tab='profile',
+	)
 	if referral_code:
 		resolve_referral_code(code=referral_code, referred_user=user)
 

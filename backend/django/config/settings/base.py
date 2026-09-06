@@ -170,6 +170,17 @@ CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = TIME_ZONE
 CELERY_ENABLE_UTC = True
 CELERY_TASK_TRACK_STARTED = True
+from celery.schedules import crontab
+CELERY_BEAT_SCHEDULE = {
+	'delete-old-read-notifications': {
+		'task': 'apps.notifications.tasks.delete_old_read_notifications',
+		'schedule': crontab(hour=3, minute=0),
+	},
+	'remind-incomplete-profiles': {
+		'task': 'apps.notifications.tasks.remind_incomplete_profiles',
+		'schedule': crontab(hour=0, minute=0),
+	},
+}
 CACHES = {
 	'default': {
 		'BACKEND': 'django.core.cache.backends.redis.RedisCache',
