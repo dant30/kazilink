@@ -2,7 +2,7 @@ from django.contrib.auth import authenticate
 from rest_framework import serializers
 from core.utils.validators import normalize_kenyan_phone, validate_password_strength
 
-from ..models import EmployerProfile, Profile, User, UserRole, WorkerProfile
+from ..models import EmployerProfile, IdentityDocument, Profile, User, UserRole, WorkerProfile
 from ..services.occupations import WORKER_AVAILABILITIES
 
 
@@ -16,11 +16,18 @@ class UserSerializer(serializers.ModelSerializer):
         read_only_fields = ('id', 'is_staff', 'is_superuser', 'is_phone_verified', 'is_id_verified', 'joined_date')
 
 
+class IdentityDocumentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = IdentityDocument
+        fields = ('id', 'document_type', 'document', 'status', 'notes', 'reviewed_at', 'created_at', 'updated_at')
+        read_only_fields = ('id', 'status', 'notes', 'reviewed_at', 'created_at', 'updated_at')
+
+
 class RegistrationSerializer(serializers.Serializer):
     phone = serializers.CharField(max_length=15)
     full_name = serializers.CharField(max_length=255)
     password = serializers.CharField(write_only=True, trim_whitespace=False, validators=[validate_password_strength])
-    email = serializers.EmailField(required=False, allow_blank=True)
+    email = serializers.EmailField(required=True, allow_blank=False)
     role = serializers.ChoiceField(choices=UserRole.Role.choices)
     primary_role = serializers.CharField(max_length=100, required=False)
     location = serializers.CharField(max_length=100, required=False)

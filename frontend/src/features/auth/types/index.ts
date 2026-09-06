@@ -4,3 +4,4 @@ export type LoginResponse = { user: User; tokens: AuthTokens }
 export type RegisterPayload = Record<string, unknown>
 export type PasswordResetStep = 'request' | 'verify' | 'confirm' | 'complete'
 export type PasswordResetState = { step: PasswordResetStep; phone: string; resetToken: string; message: string; verificationCode?: string; loading: boolean; error: string }
+export type VerificationDocument = { id: number; document_type: 'national_id' | 'good_conduct'; document: string; status: 'pending' | 'verified' | 'rejected'; notes: string; reviewed_at: string | null; created_at: string; updated_at: string }

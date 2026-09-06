@@ -17,6 +17,7 @@ import { Link } from 'react-router-dom'
 import { Briefcase, Check, CheckCircle2, ChevronDown, ChevronUp, Clock, Edit3, Eye, Languages, Search, Share2, ShieldAlert, ShieldCheck, Star, UserCheck, Zap } from 'lucide-react'
 import type { UpdateWorkerProfilePayload } from '../types'
 import { ReferralCard } from '../../accounts/components/ReferralCard'
+import { VerificationPanel } from '../../../shared/components/forms/VerificationPanel'
 
 export function WorkerProfilePage() {
 	const { user } = useAuthStore()
@@ -40,6 +41,7 @@ export function WorkerProfilePage() {
 	useEffect(() => {
 		if (!profile) return
 		setForm({
+			email: profile.user.email,
 			primary_role: profile.primary_role,
 			location: profile.location,
 			years_of_experience: profile.years_of_experience,
@@ -77,7 +79,7 @@ export function WorkerProfilePage() {
 	const strengthTier = profileStrength < 40 ? 'Incomplete' : profileStrength < 70 ? 'Basic Candidate' : profileStrength < 90 ? 'High Demand' : 'All-Star Verified'
 	const isDirty = useMemo(() => Boolean(profile && ((form.primary_role ?? '') !== (profile.primary_role ?? '') || (form.location ?? '') !== (profile.location ?? '') || Number(form.years_of_experience ?? 0) !== Number(profile.years_of_experience ?? 0) || Number(form.expected_daily_rate_ksh ?? 0) !== Number(profile.expected_daily_rate_ksh ?? 0) || (form.availability ?? '') !== (profile.availability ?? '') || (form.bio ?? '') !== (profile.bio ?? '') || JSON.stringify(form.skills || []) !== JSON.stringify(profile.skills || []) || JSON.stringify(form.languages || []) !== JSON.stringify(profile.languages || []) || form.avatar instanceof File)), [form, profile])
 	const avatarSrc = avatarPreview || (form.avatar instanceof File ? URL.createObjectURL(form.avatar) : profile?.avatar || profile?.user.avatar)
-	const discardChanges = () => { if (!profile) return; setForm({ primary_role: profile.primary_role, location: profile.location, years_of_experience: profile.years_of_experience, expected_daily_rate_ksh: profile.expected_daily_rate_ksh, expected_monthly_salary_ksh: profile.expected_monthly_salary_ksh, availability: profile.availability, bio: profile.bio, skills: profile.skills, languages: profile.languages, secondary_roles: profile.secondary_roles, last_employer: profile.last_employer }); if (avatarPreview) { URL.revokeObjectURL(avatarPreview); setAvatarPreview(null) }; clearError() }
+	const discardChanges = () => { if (!profile) return; setForm({ email: profile.user.email, primary_role: profile.primary_role, location: profile.location, years_of_experience: profile.years_of_experience, expected_daily_rate_ksh: profile.expected_daily_rate_ksh, expected_monthly_salary_ksh: profile.expected_monthly_salary_ksh, availability: profile.availability, bio: profile.bio, skills: profile.skills, languages: profile.languages, secondary_roles: profile.secondary_roles, last_employer: profile.last_employer }); if (avatarPreview) { URL.revokeObjectURL(avatarPreview); setAvatarPreview(null) }; clearError() }
 	const copyProfileLink = async () => { try { await navigator.clipboard.writeText(window.location.href) } finally { setCopiedLink(true); window.setTimeout(() => setCopiedLink(false), 2000) } }
 
 	const handleStatusChange = async (field: 'open_to_work', value: boolean) => {
@@ -98,7 +100,9 @@ export function WorkerProfilePage() {
 	const saveProfile = async () => {
 		try {
 			clearError()
-			await updateProfile(form)
+			const { email, ...profileData } = form
+			if (email !== profile?.user.email) await endpoints.auth.updateMe({ email: email || null })
+			await updateProfile(profileData)
 		} catch {
 			// The update hook exposes the error state to the page.
 		}
@@ -134,6 +138,10 @@ export function WorkerProfilePage() {
 			</section>
 		)
 	}
+	if (loading && !profile) {
+		return <section className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8" aria-label="Loading worker profile" aria-busy="true"><div className="h-96 animate-pulse rounded-2xl bg-slate-200" /></section>
+	}
+	if (!profile) return <section className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8"><div className="rounded-2xl border border-slate-200 bg-white p-6 text-sm text-slate-600">Worker profile is unavailable.</div></section>
 
 	return (
 		<ErrorBoundary>
@@ -178,6 +186,7 @@ export function WorkerProfilePage() {
 				<div className="space-y-6">
 					{/* Professional Details */}
 					<WorkerInfoCard profile={profile} loading={loading} values={form} onChange={updateForm} skillOptions={skillOptions} availabilityOptions={availabilityOptions} occupationOptions={occupationOptions} languageOptions={languageOptions} locationOptions={locationOptions} />
+					<VerificationPanel email={form.email ?? profile.user.email} phoneVerified={profile.user.is_phone_verified} idVerified={profile.user.is_id_verified} />
 
 					{/* Experience & Skills */}
 					<FormSection title="Experience & skills" description="Highlight the strengths employers can validate quickly.">

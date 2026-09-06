@@ -35,7 +35,7 @@ export type Employer = EmployerProfile
 
 export type UpdateEmployerProfilePayload = Partial<Pick<EmployerProfile,
 	'business_name' | 'location' | 'business_type' | 'contact_person' | 'auto_shortlist' | 'verified_only'
->> & { avatar?: File | string | null }
+>> & { email?: string | null; avatar?: File | string | null }
 
 export type EmployerDashboardData = {
 	profile: EmployerProfile

@@ -1,5 +1,6 @@
 from .user import (
 	EmployerProfileSerializer,
+	IdentityDocumentSerializer,
 	LoginSerializer,
 	ProfileSerializer,
 	RegistrationSerializer,

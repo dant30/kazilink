@@ -1,7 +1,7 @@
 // frontend/src/core/api/endpoints.ts
 import { del, get, patch, post } from './apiClient'
 import type { Paginated } from './apiClient'
-import type { User } from '../../features/auth/types'
+import type { User, VerificationDocument } from '../../features/auth/types'
 import type { AuditLog } from '../../features/audit/types'
 import type { Establishment } from '../../features/establishments/types'
 import type { EmploymentRecord } from '../../features/employment_history/types'
@@ -30,6 +30,8 @@ export const endpoints = {
     confirmPasswordReset: (data: { phone: string; reset_token: string; new_password: string; confirm_password: string }) => post<{ message: string }>('/accounts/password-reset/confirm/', data),
     me: () => get<User>('/accounts/me/'),
     updateMe: (data: Record<string, unknown>) => patch<User>('/accounts/me/', data),
+    verificationDocuments: () => get<VerificationDocument[]>('/accounts/verification-documents/'),
+    uploadVerificationDocument: (data: FormData) => post<VerificationDocument>('/accounts/verification-documents/', data),
     profile: () => get('/accounts/profile/'),
     updateProfile: (data: Record<string, unknown>) => patch('/accounts/profile/', data),
     employerProfile: () => get<EmployerProfile>('/accounts/employer-profile/'),

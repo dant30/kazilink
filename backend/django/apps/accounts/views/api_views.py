@@ -3,6 +3,7 @@ from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework import generics
 
 from core.throttling import LoginRateThrottle, OTPRateThrottle
 
@@ -15,7 +16,9 @@ from ..serializers import (
 	PasswordResetConfirmSerializer,
 	PasswordResetRequestSerializer,
 	PasswordResetVerifySerializer,
+	IdentityDocumentSerializer,
 )
+from ..models import IdentityDocument
 from ..services.authentication import issue_tokens
 from ..services.registration import register_user
 from ..services.verification import verify_phone
@@ -127,6 +130,17 @@ class ProfileView(APIView):
 
 	def get(self, request):
 		return Response(ProfileSerializer(request.user.profile).data)
+
+
+class IdentityDocumentListCreateView(generics.ListCreateAPIView):
+	permission_classes = [IsAuthenticated]
+	serializer_class = IdentityDocumentSerializer
+
+	def get_queryset(self):
+		return IdentityDocument.objects.filter(user=self.request.user)
+
+	def perform_create(self, serializer):
+		serializer.save(user=self.request.user)
 
 	def patch(self, request):
 		serializer = ProfileSerializer(request.user.profile, data=request.data, partial=True)

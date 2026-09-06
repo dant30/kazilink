@@ -40,7 +40,8 @@ export function RegisterPage() {
 
     try {
       const payload: Record<string, unknown> = { phone: normalizedPhone, full_name: form.full_name.trim(), password: form.password, role, terms_accepted: termsAccepted, privacy_policy_accepted: privacyAccepted }
-      if (form.email.trim()) payload.email = form.email.trim()
+      if (!form.email.trim()) { setError('Email address is required.'); setSaving(false); return }
+      payload.email = form.email.trim()
       if (form.referral_code.trim()) payload.referral_code = form.referral_code.trim().toUpperCase()
       if (role === 'worker') {
         if (!form.primary_role.trim() || !form.location.trim() || !form.bio.trim() || !form.expected_daily_rate_ksh) { setError('Complete all required worker details.'); setSaving(false); return }

@@ -11,6 +11,7 @@ export function EmployerInfoCard({ values, onChange, businessTypes = [], locatio
     <div className="grid gap-4 md:grid-cols-2">
       <FormField label="Business name" required><Input value={values.business_name || ''} onChange={(event) => onChange('business_name', event.target.value)} /></FormField>
       <FormField label="Contact person" required><Input value={values.contact_person || ''} onChange={(event) => onChange('contact_person', event.target.value)} /></FormField>
+      <FormField label="Email address" required><Input type="email" value={values.email || ''} onChange={(event) => onChange('email', event.target.value)} placeholder="you@example.com" /></FormField>
       <FormField label="Location"><Select searchable value={values.location || ''} onChange={(value) => onChange('location', value)} options={[{ value: '', label: 'Select location' }, ...locations]} /></FormField>
       <FormField label="Business type"><Select searchable value={values.business_type || ''} onChange={(value) => onChange('business_type', value)} options={[{ value: '', label: 'Select business type' }, ...businessTypes]} /></FormField>
     </div>

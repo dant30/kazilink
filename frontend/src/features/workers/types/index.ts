@@ -46,6 +46,7 @@ export interface WorkerProfile {
 }
 
 export interface UpdateWorkerProfilePayload {
+	email?: string | null
 	primary_role?: string
 	secondary_roles?: string[]
 	location?: string

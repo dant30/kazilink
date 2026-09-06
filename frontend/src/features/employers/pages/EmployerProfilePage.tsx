@@ -14,6 +14,7 @@ import type { UpdateEmployerProfilePayload } from '../types'
 import { ErrorBoundary } from '../../../shared/components/ui/ErrorBoundary'
 import { ReferralCard } from '../../accounts/components/ReferralCard'
 import { endpoints } from '../../../core/api'
+import { VerificationPanel } from '../../../shared/components/forms/VerificationPanel'
 
 export function EmployerProfilePage() {
   const { profile, establishments, loading, error, refresh } = useEmployerProfile()
@@ -28,7 +29,7 @@ export function EmployerProfilePage() {
   const [locations, setLocations] = useState<Array<{ value: string; label: string }>>([])
 
   useEffect(() => {
-    if (profile) setForm({ business_name: profile.business_name, location: profile.location, business_type: profile.business_type, contact_person: profile.contact_person, avatar: profile.avatar })
+    if (profile) setForm({ email: profile.user.email, business_name: profile.business_name, location: profile.location, business_type: profile.business_type, contact_person: profile.contact_person, avatar: profile.avatar })
   }, [profile])
 
   useEffect(() => () => { if (avatarPreview) URL.revokeObjectURL(avatarPreview) }, [avatarPreview])
@@ -50,7 +51,7 @@ export function EmployerProfilePage() {
     clearError()
   }
   const changeSetting = async (field: 'auto_shortlist' | 'verified_only', value: boolean) => { await updateProfile({ [field]: value }) }
-  const save = async () => { await updateProfile(form) }
+  const save = async () => { const { email, ...profileData } = form; if (email !== profile?.user.email) await endpoints.auth.updateMe({ email: email || null }); await updateProfile(profileData) }
   const isDirty = useMemo(() => Boolean(profile && ((form.business_name ?? '') !== (profile.business_name ?? '') || (form.location ?? '') !== (profile.location ?? '') || (form.business_type ?? '') !== (profile.business_type ?? '') || (form.contact_person ?? '') !== (profile.contact_person ?? '') || form.avatar instanceof File)), [form, profile])
   const discard = () => { if (!profile) return; setForm({ business_name: profile.business_name, location: profile.location, business_type: profile.business_type, contact_person: profile.contact_person, avatar: profile.avatar }); if (avatarPreview) { URL.revokeObjectURL(avatarPreview); setAvatarPreview(null) }; clearError() }
   const criteria = [
@@ -95,6 +96,7 @@ export function EmployerProfilePage() {
       </div>
     </PageHeader>
     <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><ProgressBar value={strength} color={strengthColor} showPercentage={false} barHeightClassName="h-3" label={<span className="flex items-center gap-2 font-bold text-slate-900">{strength >= 80 ? <ShieldCheck className="h-4 w-4 text-emerald-600" /> : <ShieldAlert className="h-4 w-4 text-amber-600" />}Business trust and profile strength</span>} rightLabel={<span className="flex items-center gap-2"><Badge variant={strength >= 90 ? 'success' : 'warning'} size="sm">{strength}% · {strengthTier}</Badge><button type="button" className="text-xs font-bold text-[#FF6B00]" onClick={() => setShowChecklist((value) => !value)}>{showChecklist ? 'Hide details' : 'View checklist'} {showChecklist ? <ChevronUp className="inline h-3.5 w-3.5" /> : <ChevronDown className="inline h-3.5 w-3.5" />}</button></span>} />{showChecklist && <div className="mt-4 grid gap-2 border-t border-slate-100 pt-4 sm:grid-cols-2 lg:grid-cols-3">{criteria.map(([id, label, met]) => <div key={id} className={`flex items-center gap-2 rounded-xl p-2.5 text-xs ${met ? 'bg-emerald-50 text-emerald-800' : 'bg-slate-50 text-slate-600'}`}>{met ? <CheckCircle2 className="h-4 w-4 text-emerald-600" /> : <span className="h-2 w-2 rounded-full bg-slate-300" />}{label}</div>)}</div>}</div>
+    <VerificationPanel email={form.email ?? profile.user.email} phoneVerified={profile.user.is_phone_verified} idVerified={profile.user.is_id_verified} />
     <div className="flex rounded-2xl border border-slate-200 bg-slate-100 p-1"><button type="button" onClick={() => setActiveTab('edit')} className={`flex flex-1 items-center justify-center gap-2 rounded-xl py-2.5 text-xs font-bold ${activeTab === 'edit' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600'}`}><Edit3 className="h-3.5 w-3.5" />Edit profile and settings</button><button type="button" onClick={() => setActiveTab('preview')} className={`flex flex-1 items-center justify-center gap-2 rounded-xl py-2.5 text-xs font-bold ${activeTab === 'preview' ? 'bg-[#0A2540] text-white shadow-sm' : 'text-slate-600'}`}><Eye className="h-3.5 w-3.5 text-[#FF6B00]" />Candidate live preview</button></div>
     {success && <div className="flex items-center justify-between rounded-2xl border border-green-200 bg-green-50 p-4 font-semibold text-green-700"><span className="flex items-center gap-2"><CheckCircle2 className="h-5 w-5" />Profile updated successfully.</span><button type="button" className="text-xs font-bold" onClick={clearSuccess}>Dismiss</button></div>}
     {updateError && <div className="flex items-center justify-between rounded-2xl border border-red-200 bg-red-50 p-4 font-semibold text-red-700"><span className="flex items-center gap-2"><ShieldAlert className="h-5 w-5" />{updateError}</span><button type="button" className="text-xs font-bold" onClick={clearError}>Dismiss</button></div>}

@@ -28,3 +28,27 @@ class BusinessVerification(models.Model):
 	reviewed_at = models.DateTimeField(null=True, blank=True)
 	reviewed_by = models.ForeignKey('accounts.User', on_delete=models.SET_NULL, null=True, blank=True, related_name='business_verifications_reviewed')
 # Verification
+
+
+class IdentityDocument(models.Model):
+	class DocumentType(models.TextChoices):
+		NATIONAL_ID = 'national_id', 'National ID'
+		GOOD_CONDUCT = 'good_conduct', 'Certificate of Good Conduct'
+
+	class Status(models.TextChoices):
+		PENDING = 'pending', 'Pending review'
+		VERIFIED = 'verified', 'Verified'
+		REJECTED = 'rejected', 'Rejected'
+
+	user = models.ForeignKey('accounts.User', on_delete=models.CASCADE, related_name='identity_documents')
+	document_type = models.CharField(max_length=30, choices=DocumentType.choices)
+	document = models.FileField(upload_to='identity-verification/')
+	status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)
+	notes = models.TextField(blank=True)
+	reviewed_at = models.DateTimeField(null=True, blank=True)
+	reviewed_by = models.ForeignKey('accounts.User', on_delete=models.SET_NULL, null=True, blank=True, related_name='identity_documents_reviewed')
+	created_at = models.DateTimeField(auto_now_add=True)
+	updated_at = models.DateTimeField(auto_now=True)
+
+	class Meta:
+		ordering = ('-created_at',)

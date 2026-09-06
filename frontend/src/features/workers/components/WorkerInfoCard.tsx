@@ -74,6 +74,9 @@ export function WorkerInfoCard({ profile, loading = false, values, onChange, ski
 				<FormField label="Phone number" required>
 					<Input value={profile?.user.phone || 'Not provided'} readOnly className="cursor-not-allowed bg-slate-100 text-slate-500" />
 				</FormField>
+				<FormField label="Email address" required>
+					<Input type="email" value={values?.email ?? profile?.user.email ?? ''} onChange={(event) => onChange?.('email', event.target.value)} placeholder="you@example.com" readOnly={!onChange} />
+				</FormField>
 				<FormField label="Preferred role">
 					<Input value={values?.primary_role ?? profile?.primary_role ?? ''} onChange={(event) => onChange?.('primary_role', event.target.value)} placeholder="Preferred role" readOnly={!onChange} />
 				</FormField>

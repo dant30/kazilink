@@ -4,6 +4,7 @@ from django.contrib.auth.admin import UserAdmin
 from .models import (
 	BusinessVerification,
 	EmployerProfile,
+	IdentityDocument,
 	PhoneVerification,
 	Profile,
 	User,
@@ -74,3 +75,17 @@ class BusinessVerificationAdmin(admin.ModelAdmin):
 	list_filter = ('status',)
 	search_fields = ('employer__user__phone', 'employer__user__full_name')
 	readonly_fields = ('reviewed_at',)
+
+
+@admin.register(IdentityDocument)
+class IdentityDocumentAdmin(admin.ModelAdmin):
+	list_display = ('user', 'document_type', 'status', 'created_at', 'reviewed_at', 'reviewed_by')
+	list_filter = ('document_type', 'status')
+	search_fields = ('user__phone', 'user__full_name', 'user__email')
+	readonly_fields = ('created_at', 'updated_at')
+
+	def save_model(self, request, obj, form, change):
+		super().save_model(request, obj, form, change)
+		if obj.document_type == IdentityDocument.DocumentType.NATIONAL_ID:
+			obj.user.is_id_verified = obj.status == IdentityDocument.Status.VERIFIED
+			obj.user.save(update_fields=('is_id_verified',))
