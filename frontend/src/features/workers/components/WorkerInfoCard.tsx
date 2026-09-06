@@ -15,15 +15,20 @@ interface WorkerInfoCardProps {
 	skillOptions?: Array<{ value: string; label: string }>
 	availabilityOptions?: Array<{ value: string; label: string }>
 	occupationOptions?: Array<{ value: string; label: string }>
+	languageOptions?: Array<{ value: string; label: string }>
+	locationOptions?: Array<{ value: string; label: string }>
 }
 
-export function WorkerInfoCard({ profile, loading = false, values, onChange, skillOptions = [], availabilityOptions = [], occupationOptions = [] }: WorkerInfoCardProps) {
+export function WorkerInfoCard({ profile, loading = false, values, onChange, skillOptions = [], availabilityOptions = [], occupationOptions = [], languageOptions = [], locationOptions = [] }: WorkerInfoCardProps) {
 	const [selectedSkill, setSelectedSkill] = useState('')
 	const [selectedRole, setSelectedRole] = useState('')
+	const [selectedLanguage, setSelectedLanguage] = useState('')
 	const currentSkills = values?.skills ?? profile?.skills ?? []
 	const currentRoles = values?.secondary_roles ?? profile?.secondary_roles ?? []
+	const currentLanguages = values?.languages ?? profile?.languages ?? []
 	const availableSkillOptions = skillOptions.filter((skill) => !currentSkills.includes(skill.label) && !currentSkills.includes(skill.value))
 	const availableRoleOptions = occupationOptions.filter((role) => !currentRoles.includes(role.label) && !currentRoles.includes(role.value))
+	const availableLanguageOptions = languageOptions.filter((language) => !currentLanguages.includes(language.label) && !currentLanguages.includes(language.value))
 	const addSkill = (value: string) => {
 		if (!value || currentSkills.includes(value)) return
 		const option = skillOptions.find((skill) => skill.value === value)
@@ -38,6 +43,13 @@ export function WorkerInfoCard({ profile, loading = false, values, onChange, ski
 		setSelectedRole('')
 	}
 	const removeRole = (roleToRemove: string) => onChange?.('secondary_roles', currentRoles.filter((role) => role !== roleToRemove))
+	const addLanguage = (value: string) => {
+		if (!value || currentLanguages.includes(value)) return
+		const option = languageOptions.find((language) => language.value === value)
+		onChange?.('languages', [...currentLanguages, option?.label ?? value])
+		setSelectedLanguage('')
+	}
+	const removeLanguage = (languageToRemove: string) => onChange?.('languages', currentLanguages.filter((language) => language !== languageToRemove))
 	if (loading) {
 		return (
 			<FormSection title="Professional details" description="Share the information employers use to assess your fit for roles." icon={<BriefcaseBusiness className="h-4 w-4" />}>
@@ -72,7 +84,7 @@ export function WorkerInfoCard({ profile, loading = false, values, onChange, ski
 					<Input type="number" min="0" value={values?.expected_monthly_salary_ksh ?? profile?.expected_monthly_salary_ksh ?? ''} onChange={(event) => onChange?.('expected_monthly_salary_ksh', Number(event.target.value))} placeholder="Monthly salary in KSh" readOnly={!onChange} />
 				</FormField>
 				<FormField label="Location">
-					<Input value={values?.location ?? profile?.location ?? ''} onChange={(event) => onChange?.('location', event.target.value)} placeholder="Location" readOnly={!onChange} />
+					{onChange ? <Select searchable value={values?.location ?? profile?.location ?? ''} onChange={(value) => onChange('location', value)} options={[{ value: '', label: 'Select location' }, ...locationOptions]} /> : <Input value={profile?.location ?? ''} readOnly className="cursor-not-allowed bg-slate-100 text-slate-500" />}
 				</FormField>
 				<FormField label="Availability">
 					<Select searchable value={values?.availability ?? profile?.availability ?? ''} onChange={(value) => onChange?.('availability', value as WorkerAvailability)} options={[{ value: '', label: 'Select availability' }, ...availabilityOptions]} disabled={!onChange} />
@@ -93,8 +105,9 @@ export function WorkerInfoCard({ profile, loading = false, values, onChange, ski
 							{currentSkills.map((skill) => <span key={skill} className="inline-flex items-center gap-1 rounded-full border border-orange-200 bg-orange-50 px-2.5 py-1 text-xs font-semibold text-orange-800">{skill}{onChange && <button type="button" onClick={() => removeSkill(skill)} className="rounded-full p-0.5 hover:bg-orange-200" aria-label={`Remove ${skill}`}><X className="h-3 w-3" /></button>}</span>)}
 						</div>
 					</FormField>
-					<FormField label="Languages" helperText="Separate languages with commas.">
-						<Input value={values?.languages?.join(', ') ?? profile?.languages.join(', ') ?? ''} onChange={(event) => onChange?.('languages', event.target.value.split(',').map((language) => language.trim()).filter(Boolean))} placeholder="English, Kiswahili" readOnly={!onChange} />
+					<FormField label="Languages" helperText="Choose languages from the searchable suggestions.">
+						{onChange && <Select searchable value={selectedLanguage} onChange={addLanguage} options={[{ value: '', label: 'Add a language' }, ...availableLanguageOptions]} />}
+						<div className="mt-2 flex flex-wrap gap-2">{currentLanguages.map((language) => <span key={language} className="inline-flex items-center gap-1 rounded-full border border-purple-200 bg-purple-50 px-2.5 py-1 text-xs font-semibold text-purple-800">{language}{onChange && <button type="button" onClick={() => removeLanguage(language)} className="rounded-full p-0.5 hover:bg-purple-200" aria-label={`Remove ${language}`}><X className="h-3 w-3" /></button>}</span>)}</div>
 				</FormField>
 			</div>
 				<FormField label="Bio">

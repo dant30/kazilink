@@ -178,6 +178,28 @@ EMPLOYER_BUSINESS_TYPES = (
 	('logistics', 'Logistics company'),
 	('healthcare', 'Healthcare provider'),
 	('education', 'Education provider'),
+	('wines_spirits', 'Wines & Spirits'),
+	('other', 'Other'),
+)
+
+WORKER_LANGUAGES = (
+	('english', 'English'),
+	('kiswahili', 'Kiswahili'),
+	('kikuyu', 'Kikuyu'),
+	('luo', 'Luo'),
+	('kamba', 'Kamba'),
+	('luhya', 'Luhya'),
+	('kisii', 'Kisii'),
+	('maasai', 'Maasai'),
+	('somali', 'Somali'),
+	('arabic', 'Arabic'),
+	('hindi', 'Hindi'),
+	('urdu', 'Urdu'),
+	('french', 'French'),
+	('german', 'German'),
+	('italian', 'Italian'),
+	('spanish', 'Spanish'),
+	('mandarin', 'Mandarin'),
 	('other', 'Other'),
 )
 
@@ -249,3 +271,7 @@ def worker_skill_catalog():
 
 def employer_business_type_catalog():
 	return [{'value': value, 'label': label} for value, label in EMPLOYER_BUSINESS_TYPES]
+
+
+def worker_language_catalog():
+	return [{'value': value, 'label': label} for value, label in WORKER_LANGUAGES]
