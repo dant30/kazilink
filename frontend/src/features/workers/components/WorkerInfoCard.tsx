@@ -14,12 +14,16 @@ interface WorkerInfoCardProps {
 	onChange?: (field: keyof UpdateWorkerProfilePayload, value: string | number | string[]) => void
 	skillOptions?: Array<{ value: string; label: string }>
 	availabilityOptions?: Array<{ value: string; label: string }>
+	occupationOptions?: Array<{ value: string; label: string }>
 }
 
-export function WorkerInfoCard({ profile, loading = false, values, onChange, skillOptions = [], availabilityOptions = [] }: WorkerInfoCardProps) {
+export function WorkerInfoCard({ profile, loading = false, values, onChange, skillOptions = [], availabilityOptions = [], occupationOptions = [] }: WorkerInfoCardProps) {
 	const [selectedSkill, setSelectedSkill] = useState('')
+	const [selectedRole, setSelectedRole] = useState('')
 	const currentSkills = values?.skills ?? profile?.skills ?? []
+	const currentRoles = values?.secondary_roles ?? profile?.secondary_roles ?? []
 	const availableSkillOptions = skillOptions.filter((skill) => !currentSkills.includes(skill.label) && !currentSkills.includes(skill.value))
+	const availableRoleOptions = occupationOptions.filter((role) => !currentRoles.includes(role.label) && !currentRoles.includes(role.value))
 	const addSkill = (value: string) => {
 		if (!value || currentSkills.includes(value)) return
 		const option = skillOptions.find((skill) => skill.value === value)
@@ -27,6 +31,13 @@ export function WorkerInfoCard({ profile, loading = false, values, onChange, ski
 		setSelectedSkill('')
 	}
 	const removeSkill = (skillToRemove: string) => onChange?.('skills', currentSkills.filter((skill) => skill !== skillToRemove))
+	const addRole = (value: string) => {
+		if (!value || currentRoles.includes(value)) return
+		const option = occupationOptions.find((role) => role.value === value)
+		onChange?.('secondary_roles', [...currentRoles, option?.label ?? value])
+		setSelectedRole('')
+	}
+	const removeRole = (roleToRemove: string) => onChange?.('secondary_roles', currentRoles.filter((role) => role !== roleToRemove))
 	if (loading) {
 		return (
 			<FormSection title="Professional details" description="Share the information employers use to assess your fit for roles." icon={<BriefcaseBusiness className="h-4 w-4" />}>
@@ -72,8 +83,9 @@ export function WorkerInfoCard({ profile, loading = false, values, onChange, ski
 				<FormField label="Last employer">
 					<Input value={values?.last_employer ?? profile?.last_employer ?? ''} onChange={(event) => onChange?.('last_employer', event.target.value)} placeholder="Last employer" readOnly={!onChange} />
 					</FormField>
-					<FormField label="Secondary roles" helperText="Separate roles with commas.">
-						<Input value={values?.secondary_roles?.join(', ') ?? profile?.secondary_roles.join(', ') ?? ''} onChange={(event) => onChange?.('secondary_roles', event.target.value.split(',').map((role) => role.trim()).filter(Boolean))} placeholder="Waiter, bartender" readOnly={!onChange} />
+					<FormField label="Secondary roles" helperText="Choose other roles you can perform.">
+						{onChange && <Select searchable value={selectedRole} onChange={addRole} options={[{ value: '', label: 'Add a secondary role' }, ...availableRoleOptions]} />}
+						<div className="mt-2 flex flex-wrap gap-2">{currentRoles.map((role) => <span key={role} className="inline-flex items-center gap-1 rounded-full border border-blue-200 bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-800">{role}{onChange && <button type="button" onClick={() => removeRole(role)} className="rounded-full p-0.5 hover:bg-blue-200" aria-label={`Remove ${role}`}><X className="h-3 w-3" /></button>}</span>)}</div>
 					</FormField>
 					<FormField label="Skills" helperText="Choose skills from the searchable suggestions.">
 						{onChange && <Select searchable value={selectedSkill} onChange={addSkill} options={[{ value: '', label: 'Add a skill' }, ...availableSkillOptions]} />}

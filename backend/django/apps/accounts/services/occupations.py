@@ -162,6 +162,25 @@ WORKER_SKILLS = (
 	('social_media', 'Social media management'),
 )
 
+EMPLOYER_BUSINESS_TYPES = (
+	('hotel', 'Hotel'),
+	('restaurant', 'Restaurant'),
+	('cafe', 'Cafe / Coffee shop'),
+	('bar_lounge', 'Bar / Lounge'),
+	('catering', 'Catering business'),
+	('event_company', 'Events company'),
+	('domestic_services', 'Domestic services'),
+	('cleaning_services', 'Cleaning services'),
+	('security_services', 'Security services'),
+	('retail', 'Retail business'),
+	('salon_spa', 'Salon / Spa'),
+	('construction', 'Construction company'),
+	('logistics', 'Logistics company'),
+	('healthcare', 'Healthcare provider'),
+	('education', 'Education provider'),
+	('other', 'Other'),
+)
+
 WORK_LOCATIONS = (
 	('Nairobi', 'Nairobi'),
 	('Mombasa', 'Mombasa'),
@@ -226,3 +245,7 @@ def worker_location_catalog():
 
 def worker_skill_catalog():
 	return [{'value': value, 'label': label} for value, label in WORKER_SKILLS]
+
+
+def employer_business_type_catalog():
+	return [{'value': value, 'label': label} for value, label in EMPLOYER_BUSINESS_TYPES]
