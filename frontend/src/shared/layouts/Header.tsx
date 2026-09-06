@@ -205,7 +205,7 @@ export function Header() {
 										title="Notifications"
 									>
 										<Bell className="w-5 h-5" />
-										{unreadNotifications.length > 0 && <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#FF6B00] px-1 text-[9px] font-bold text-white">{unreadNotifications.length > 9 ? '9+' : unreadNotifications.length}</span>}
+										{unreadNotifications.length > 0 && <span className="animate-impulse absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#FF6B00] px-1 text-[9px] font-bold text-white">{unreadNotifications.length > 9 ? '9+' : unreadNotifications.length}</span>}
 									</button>
 									{notifDropdownOpen && (
 										<div className="absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-xl border border-slate-200 py-2 z-50">
