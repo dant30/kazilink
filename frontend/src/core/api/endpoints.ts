@@ -10,7 +10,7 @@ import type { Job } from '../../features/jobs/types'
 import type { JobApplication } from '../../features/job_applications/types'
 import type { Conversation, Message } from '../../features/messaging/types'
 import type { Notification } from '../../features/notifications/types'
-import type { CreditCatalogResponse, CreditWalletResponse, PaymentInitiateInput, PaymentInitiateResponse, Transaction } from '../../features/payments/types'
+import type { CreditCatalogResponse, CreditLedgerEntry, CreditWalletResponse, PaymentInitiateInput, PaymentInitiateResponse, Transaction } from '../../features/payments/types'
 import type { Review, ReviewUpdateInput } from '../../features/ratings/types'
 import type { Subscription, SubscriptionCheckout, SubscriptionCheckoutResponse, SubscriptionPlan } from '../../features/subscriptions/types'
 import type { SupportTicket } from '../../features/support/types'
@@ -117,6 +117,7 @@ export const endpoints = {
     wallet: () => get<CreditWalletResponse>('/credits/wallet/'),
     recharge: (data: { amount_ksh: number; phone_number?: string }) => post('/credits/recharge/', data),
     spend: (data: { action: string; reference?: string; idempotency_key: string; metadata?: Record<string, unknown> }) => post('/credits/spend/', data),
+    transfer: (data: { recipient_phone: string; amount: number; idempotency_key: string }) => post<CreditLedgerEntry>('/credits/transfer/', data),
   },
   subscriptions: {
     list: () => get<Paginated<Subscription> | Subscription[]>('/subscriptions/'),
