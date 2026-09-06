@@ -65,6 +65,16 @@ class CreditRechargeView(APIView):
 		return Response(CreditRechargeSerializer(recharge).data, status=status.HTTP_202_ACCEPTED)
 
 
+class CreditRechargeStatusView(APIView):
+	permission_classes = [IsAuthenticated]
+
+	def get(self, request, recharge_id):
+		recharge = CreditRecharge.objects.filter(id=recharge_id, wallet__user=request.user).first()
+		if recharge is None:
+			return Response({'detail': 'Recharge not found.'}, status=status.HTTP_404_NOT_FOUND)
+		return Response(CreditRechargeSerializer(recharge).data)
+
+
 class CreditSpendView(APIView):
 	permission_classes = [IsAuthenticated]
 

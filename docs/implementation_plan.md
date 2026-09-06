@@ -1,6 +1,6 @@
 # KaziLink Implementation Plan
 
-This roadmap tracks the current repository state as of 2026-09-05. It separates verified implementation from work that is still incomplete or not yet validated.
+This roadmap tracks the current repository state as of 2026-09-06. It separates verified implementation from work that is still incomplete or not yet validated.
 
 ## Status Legend
 
@@ -69,15 +69,16 @@ This roadmap tracks the current repository state as of 2026-09-05. It separates 
 | M-Pesa STK Push retry handling | ✅✅ | Bounded retries cover transient provider/network failures without retrying 4xx requests. |
 | Kazi Credits wallet and ledger | ✅✅ | User wallets, immutable ledger entries, role-aware catalog pricing, and idempotent spending are implemented. |
 | Configurable Kazi Credits economy | ✅✅ | Admin-configurable KSh conversion rate, minimum recharge, referral rewards, non-expiring credits, and atomic user transfers are implemented. Current defaults: KSh 50 per credit and KSh 100 minimum recharge. |
+| Kazi Credits transfer frontend | ✅✅ | Worker and employer payment pages expose a transfer modal with Kenyan phone normalization, whole-credit and balance validation, unique idempotency keys, success/error feedback, and wallet/ledger refresh after successful transfer. |
 | Kazi Credits M-Pesa recharge | ❌❌ | Recharge initiation and native callback settlement code exist; purchases require at least KSh 100 and use the admin-controlled conversion rate (default KSh 50 per credit). End-to-end Daraja settlement, duplicate callback, timeout, and captured-payment failure scenarios still need validation. |
 | Native Daraja callback processing | ✅✅ | Native `Body.stkCallback` callbacks settle credit recharges and existing employer transactions idempotently. |
 | Signed M-Pesa callback | ❌❌ | Optional custom HMAC validation remains supported, but Daraja does not provide that signature header. |
 | Payment/history integration tests | ❌❌ | Coverage now includes pricing, minimum recharge, idempotent spending, transfers, recharge settlement idempotency, native Daraja callbacks, failed promotion balance preservation, history unlock, and legacy payment rejection. Runtime execution and subscription-payment coverage still need validation. |
-| Frontend credit wallet and recharge | ❌❌ | Worker and employer payment pages expose the shared wallet, KSh recharge form, catalog, and ledger. Workers now have a dedicated `Buy Kazi Credits` sidebar entry; completed recharge polling/status feedback and end-to-end purchase validation still need work. |
+| Frontend credit wallet and recharge | ❌❌ | Worker and employer payment pages expose the shared wallet, KSh recharge form, catalog, ledger, transfer modal, and bounded status polling for pending, completed, and failed recharges. Workers have a dedicated `Buy Kazi Credits` sidebar entry; end-to-end purchase validation and richer recharge history/status UX still need work. |
 | Credit-consuming action backend | ✅✅ | History unlock, application, 24-hour featured jobs, 7-day job boosts, and 7-day profile boosts spend through the idempotent ledger inside atomic transactions. Promotion expiry is persisted and active featured/boosted jobs and profiles are prioritized in marketplace ordering. |
 | Frontend credit-consuming actions | ❌❌ | Worker applications, employer history unlock, employer job feature/boost, and worker profile boost now have cost disclosure, balance gates, confirmation dialogs, error states, and wallet refresh. Dedicated history-detail rendering and richer active-promotion status indicators remain incomplete. |
 | Credit payment-surface cleanup | ✅✅ | New generic employer payment initiation accepts only cash subscriptions; legacy platform-action refunds are rejected and completed legacy payment callbacks no longer grant platform access. Historical payment records remain readable for audit purposes. |
-| Credit policy and refund UX | ❌❌ | Backend behavior supports non-expiring credits, transfers, and no cash refunds, but the frontend does not consistently explain non-expiry, non-refundable purchases, failed-action restoration, referral-credit restrictions, or cancellation/refund handling for time-based boosts. |
+| Credit policy and refund UX | ❌❌ | Transfer guidance and irreversible-transfer messaging are now shown in the transfer modal. The frontend still does not consistently explain non-expiry, non-refundable purchases, failed-action restoration, referral-credit restrictions, or cancellation/refund handling for time-based boosts. |
 
 ## Phase 4: Reputation And Communication
 
@@ -146,10 +147,10 @@ This roadmap tracks the current repository state as of 2026-09-05. It separates 
 
 ## Current Priorities
 
-1. Execute migrations and the new credit/payment integration tests in the local environment, then add subscription cash-payment coverage.
-2. Complete recharge status polling and frontend component tests for confirmations, insufficient balances, and promotion expiry states.
-3. Add dedicated history-detail rendering and active promotion status indicators.
-4. Finish Channels consumers/routing, the rapid-submission and duplicate-job fraud rules, SMS/push delivery, recurring billing, seed data, and deployment validation.
+1. Run `manage.py check`, migration checks, and the credit/payment test suite locally; fix any runtime failures before adding new payment behavior.
+2. Implement recharge status polling and clear pending/failed/completed feedback so M-Pesa purchases do not require a manual refresh.
+3. Add frontend component tests for transfer validation, insufficient balances, idempotent retries, recharge confirmations, and promotion expiry states.
+4. Add subscription cash-payment coverage, then continue with history-detail rendering, active promotion indicators, Channels, fraud rules, messaging delivery, recurring billing, seed data, and deployment validation.
 
 ## Validation Commands
 
