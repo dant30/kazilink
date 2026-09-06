@@ -116,12 +116,12 @@ export function Sidebar({ admin = false, mobileDrawer = false, onItemClick }: Si
 
 	const containerClasses = mobileDrawer
 		? 'flex w-full bg-[#0A2540] text-slate-100 flex-col p-4 space-y-4'
-		: 'hidden md:flex flex-col w-64 shrink-0 bg-[#0A2540] text-slate-100 border-r border-slate-800 p-4 sticky top-[88px] h-[calc(100vh-88px)] overflow-y-auto z-30'
+		: 'hidden md:flex flex-col w-64 shrink-0 bg-[#0A2540] text-slate-100 border-r border-slate-800 p-4 sticky top-[88px] h-[calc(100vh-88px)] overflow-hidden z-30'
 
 	return (
 		<aside className={containerClasses} aria-label={effectiveAdmin ? 'Admin navigation' : 'Main navigation'}>
 			{!mobileDrawer && (
-				<div className="px-2 py-2 mb-4 border-b border-slate-800 pb-3">
+				<div className="shrink-0 px-2 py-2 mb-4 border-b border-slate-800 pb-3">
 					<span className="text-[10px] font-bold uppercase tracking-wider text-[#FF6B00] block">
 						{effectiveAdmin ? 'Operational Control' : isEmployer ? 'Employer Workspace' : 'Worker Workspace'}
 					</span>
@@ -129,7 +129,7 @@ export function Sidebar({ admin = false, mobileDrawer = false, onItemClick }: Si
 				</div>
 			)}
 
-			<nav className="space-y-1 flex-1">
+			<nav className="min-h-0 flex-1 space-y-1 overflow-y-auto">
 				<p className="px-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">
 					Navigation
 				</p>
@@ -157,7 +157,7 @@ export function Sidebar({ admin = false, mobileDrawer = false, onItemClick }: Si
 			</nav>
 
 			{/* Role-specific CTA */}
-			<div className="pt-4 border-t border-slate-800 mt-auto">
+			<div className="shrink-0 pt-4 border-t border-slate-800 mt-auto">
 				<button
 					type="button"
 					onClick={() => {
