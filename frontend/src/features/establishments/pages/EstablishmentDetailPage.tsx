@@ -1,10 +1,13 @@
 import { ArrowLeft, Building2, CheckCircle2, MapPin, ShieldCheck } from 'lucide-react'
 import { Link, useParams } from 'react-router-dom'
+import { useAuthStore } from '../../auth/store'
 
 import { useEstablishment } from '../hooks'
 import { Skeleton } from '../../../shared/components/ui/Skeleton'
 
 export function EstablishmentDetailPage() {
+  const { user } = useAuthStore()
+  const isEmployer = Boolean(user?.is_employer && !user?.is_worker)
   const { establishmentId } = useParams()
   const { establishment, loading, error } = useEstablishment(Number(establishmentId))
 
@@ -38,6 +41,7 @@ export function EstablishmentDetailPage() {
                 {establishment.is_verified ? <CheckCircle2 className="h-5 w-5 text-emerald-300" /> : <ShieldCheck className="h-5 w-5 text-amber-300" />}
                 {establishment.is_verified ? 'Verified' : 'Pending'}
               </p>
+              {isEmployer && <Link to={`/establishments/${establishment.id}/edit`} className="mt-4 inline-flex w-full items-center justify-center rounded-xl bg-[#FF6B00] px-4 py-2.5 text-sm font-bold text-white hover:bg-[#E55F00]">Manage establishment</Link>}
             </div>
           </div>
         </div>

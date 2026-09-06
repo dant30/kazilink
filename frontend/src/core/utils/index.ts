@@ -3,3 +3,4 @@ export { installNotificationSoundUnlock, playNotificationSound } from './notific
 export { isValidKenyanPhone, normalizeKenyanPhone } from './phone'
 export { evaluatePasswordStrength } from './passwordStrength'
 export type { PasswordStrengthLevel, PasswordStrengthResult } from './passwordStrength'
+export { formatRelativeTime } from './date'

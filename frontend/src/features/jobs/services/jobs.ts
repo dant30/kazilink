@@ -50,3 +50,12 @@ export function getRecommendedJobs() {
 export function getAdminJobs() {
   return endpoints.jobs.adminList()
 }
+
+export function updateJob(id: number, data: CreateJobInput) {
+  return endpoints.jobs.update(id, {
+    ...data,
+    pay_amount_ksh: Number(data.pay_amount_ksh),
+    requirements: data.requirements ?? [],
+    benefits: data.benefits ?? [],
+  })
+}

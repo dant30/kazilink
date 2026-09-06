@@ -11,6 +11,7 @@ export type Job = {
   job_type: JobType
   pay_amount_ksh: number
   pay_period: string
+  shift_times?: string
   description: string
   requirements: string[]
   benefits?: string[]

@@ -10,6 +10,7 @@ import { Badge } from '../../../shared/components/ui/Badge'
 import { useJob } from '../hooks'
 import { applyForJob } from '../services'
 import { endpoints } from '../../../core/api'
+import { formatRelativeTime } from '../../../core/utils'
 
 export function JobDetailPage() {
   const { user } = useAuthStore()
@@ -176,7 +177,7 @@ export function JobDetailPage() {
                     <Button variant="outline" size="sm" disabled={creditBalance === 0 || premiumActionLoading} onClick={() => setPremiumAction('boost')}>Boost · 5</Button>
                   </div>
                   <Link
-                    to="/jobs/new"
+                    to={`/jobs/${job.id}/edit`}
                     className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#0A2540] px-4 py-3 text-sm font-bold text-white transition hover:bg-[#123860]"
                   >
                     <Briefcase className="h-4 w-4" />
@@ -288,19 +289,3 @@ export function JobDetailPage() {
   )
 }
 
-function formatRelativeTime(value?: string) {
-  if (!value) return 'Recently'
-  const timestamp = new Date(value).getTime()
-  if (Number.isNaN(timestamp)) return 'Recently'
-  const elapsedSeconds = Math.max(0, Math.floor((Date.now() - timestamp) / 1000))
-  if (elapsedSeconds < 60) return 'Just now'
-  const elapsedMinutes = Math.floor(elapsedSeconds / 60)
-  if (elapsedMinutes < 60) return `${elapsedMinutes} minute${elapsedMinutes === 1 ? '' : 's'} ago`
-  const elapsedHours = Math.floor(elapsedMinutes / 60)
-  if (elapsedHours < 24) return `${elapsedHours} hour${elapsedHours === 1 ? '' : 's'} ago`
-  const elapsedDays = Math.floor(elapsedHours / 24)
-  if (elapsedDays < 7) return `${elapsedDays} day${elapsedDays === 1 ? '' : 's'} ago`
-  const elapsedWeeks = Math.floor(elapsedDays / 7)
-  if (elapsedWeeks < 5) return `${elapsedWeeks} week${elapsedWeeks === 1 ? '' : 's'} ago`
-  return new Intl.DateTimeFormat(undefined, { dateStyle: 'medium' }).format(new Date(timestamp))
-}

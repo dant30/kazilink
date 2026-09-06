@@ -3,9 +3,9 @@ import type { RouteObject } from 'react-router-dom'
 
 import { PrivateLayout, RequireAuth, Screen } from './route-pages'
 import { ApplicationDetailPage, ApplicationsPage } from '../features/job_applications/pages'
-import { JobDetailPage, JobsPage, PostJobPage } from '../features/jobs/pages'
+import { EditJobPage, JobDetailPage, JobsPage, PostJobPage } from '../features/jobs/pages'
 import { DashboardPage, EmployerDashboardPage, WorkerDashboardPage } from '../features/dashboard'
-import { EstablishmentDetailPage, EstablishmentsPage } from '../features/establishments/pages'
+import { EditEstablishmentPage, EstablishmentDetailPage, EstablishmentsPage } from '../features/establishments/pages'
 import { EmploymentHistoryPage } from '../features/employment_history/pages'
 import { EmployerProfilePage, EmployerSettingsPage } from '../features/employers/pages'
 import { WorkerProfilePage, WorkerSettingsPage, WorkersPage } from '../features/workers/pages'
@@ -30,8 +30,10 @@ export const privateRoutes: RouteObject[] = [
 			{ path: 'workers', element: <RequireAuth><WorkersPage /></RequireAuth> },
 			{ path: 'jobs/new', element: <RequireAuth><PostJobPage /></RequireAuth> },
 			{ path: 'jobs/:jobId', element: <RequireAuth><JobDetailPage /></RequireAuth> },
+			{ path: 'jobs/:jobId/edit', element: <RequireAuth><EditJobPage /></RequireAuth> },
 			{ path: 'establishments', element: <RequireAuth><EstablishmentsPage /></RequireAuth> },
 			{ path: 'establishments/:establishmentId', element: <RequireAuth><EstablishmentDetailPage /></RequireAuth> },
+			{ path: 'establishments/:establishmentId/edit', element: <RequireAuth><EditEstablishmentPage /></RequireAuth> },
 			{ path: 'applications', element: <RequireAuth><ApplicationsPage /></RequireAuth> },
 			{ path: 'applications/:applicationId', element: <RequireAuth><ApplicationDetailPage /></RequireAuth> },
 			{ path: 'employment-history', element: <RequireAuth><EmploymentHistoryPage /></RequireAuth> },

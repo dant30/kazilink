@@ -16,7 +16,7 @@ export type JobFormValues = {
   description: string
 }
 
-type JobFormOptions = {
+export type JobFormOptions = {
   categories: Array<{ value: string; label: string }>
   locations: Array<{ value: string; label: string }>
   jobTypes: Array<{ value: string; label: string }>
