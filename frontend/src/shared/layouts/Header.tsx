@@ -30,6 +30,7 @@ export function Header() {
 	const [notifDropdownOpen, setNotifDropdownOpen] = useState(false)
 	const [userMenuOpen, setUserMenuOpen] = useState(false)
 	const [creditBalance, setCreditBalance] = useState<number | null>(null)
+	const [profileImage, setProfileImage] = useState<string | null>(null)
 	const notificationRef = useRef<HTMLDivElement>(null)
 	const userMenuRef = useRef<HTMLDivElement>(null)
 
@@ -68,6 +69,18 @@ export function Header() {
 		endpoints.credits.wallet().then((response) => setCreditBalance(response.wallet.balance)).catch(() => setCreditBalance(null))
 	}, [signedIn])
 	useEffect(() => {
+		if (!signedIn) {
+			setProfileImage(null)
+			return
+		}
+		setProfileImage(storedUser?.avatar || null)
+		if (storedUser?.is_worker) {
+			endpoints.workers.me().then((profile) => setProfileImage(profile.avatar || profile.user.avatar || null)).catch(() => undefined)
+		} else if (storedUser?.is_employer) {
+			endpoints.auth.employerProfile().then((profile) => setProfileImage(profile.avatar || null)).catch(() => undefined)
+		}
+	}, [signedIn, user?.id, user?.is_worker, user?.is_employer])
+	useEffect(() => {
 		if (!notifDropdownOpen && !userMenuOpen) return
 		const closeOnOutsideClick = (event: MouseEvent) => {
 			const target = event.target as Node
@@ -96,7 +109,6 @@ export function Header() {
 			.slice(0, 2)
 			.map((part) => part[0]?.toUpperCase() ?? '')
 			.join('') || 'U'
-	const profileImage = storedUser?.avatar || null
 	const { notifications, markRead } = useNotifications({ enabled: signedIn })
 	const unreadNotifications = notifications.filter((notification) => !notification.is_read)
 
