@@ -11,7 +11,10 @@ export const employerServices = {
 }
 
 function serializeProfileUpdate(data: UpdateEmployerProfilePayload): UpdateEmployerProfilePayload | FormData {
-	if (!(data.avatar instanceof File)) return data
+	if (!(data.avatar instanceof File)) {
+		const { avatar: _avatar, ...profileData } = data
+		return profileData
+	}
 	const formData = new FormData()
 	Object.entries(data).forEach(([key, value]) => {
 		if (value !== undefined && value !== null) formData.append(key, value instanceof File ? value : String(value))
