@@ -136,7 +136,7 @@ export function Header() {
 				<div className="flex items-center justify-between h-16">
 					{/* Logo */}
 					<div className="flex items-center gap-6">
-						<Link to="/" className="flex items-center gap-2">
+							<Link to={signedIn ? dashboardPath : '/'} className="flex items-center gap-2">
 								<img src="/icons/logo-192.png" alt="KaziLink" className="h-8 w-8 rounded-xl object-cover" />
 							<span className="text-2xl font-black text-[#0A2540] tracking-tight hover:text-[#FF6B00] transition">
 								Kazi<span className="text-[#FF6B00]">Link</span>
@@ -329,8 +329,8 @@ export function Header() {
 					className="md:hidden fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex justify-end"
 					onClick={() => setMobileMenuOpen(false)}
 				>
-					<div
-						className="h-full w-[85%] max-w-sm overflow-y-auto bg-[#0A2540] text-slate-100 shadow-2xl flex flex-col"
+						<div
+							className="animate-slide-in-right h-full w-[85%] max-w-sm overflow-y-auto bg-[#0A2540] text-slate-100 shadow-2xl flex flex-col"
 						onClick={(e) => e.stopPropagation()}
 					>
 						{/* Drawer Header */}

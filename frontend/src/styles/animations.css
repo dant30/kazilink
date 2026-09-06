@@ -46,6 +46,21 @@
   animation: fadeIn 0.25s ease-out forwards;
 }
 
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.28s ease-out forwards;
+}
+
 .animate-pulse-glow {
   animation: pulseGlow 2s infinite ease-in-out;
 }
@@ -61,10 +76,12 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+	.animate-slide-in-right,
   .skeleton-shimmer {
     animation: none;
-    background: #e2e8f0;
   }
+
+  .skeleton-shimmer { background: #e2e8f0; }
 }
 
 @keyframes floatSlow {
