@@ -1,5 +1,5 @@
 import { ArrowLeft, CheckCircle2, Eye, EyeOff, KeyRound, LockKeyhole, MessageSquareText } from 'lucide-react'
-import { useEffect, useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 
 import { Button } from '../../../shared/components/ui/Button'
@@ -35,9 +35,8 @@ function RequestStep({ phone, setPhone, loading, error }: { phone: string; setPh
     <div className="flex items-start gap-3 rounded-2xl border border-sky-200 bg-sky-50 p-4 text-sm text-sky-900"><MessageSquareText className="mt-0.5 h-5 w-5 shrink-0" /><p>We will send a reset code by SMS if an account exists for this phone number.</p></div>
     <AuthField label="Phone number" required type="tel" inputMode="tel" autoComplete="tel" value={phone} onChange={(event) => setPhone(event.target.value)} placeholder="07xx xxx xxx" />
     {error && <ErrorMessage message={error} />}
-    <Link to="/login" className="flex items-center justify-center gap-2 text-sm font-semibold text-[#0A2540] hover:text-[#FF6B00]"><ArrowLeft className="h-4 w-4" />Back to sign in</Link>
   </form>
-  <FixedAuthAction formId="forgot-request-form" loading={loading} label={loading ? 'Sending code...' : 'Send reset code'} />
+  <FixedAuthAction formId="forgot-request-form" loading={loading} label={loading ? 'Sending code...' : 'Send reset code'} secondary={<Link to="/login" className="flex items-center justify-center gap-2 text-sm font-semibold text-[#0A2540] hover:text-[#FF6B00]"><ArrowLeft className="h-4 w-4" />Back to sign in</Link>} />
   </>
 }
 
@@ -49,9 +48,8 @@ function VerifyStep({ phone, code, setCode, loading, error, verificationCode }: 
     {verificationCode && <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">Development code: <strong>{verificationCode}</strong></div>}
     <AuthField label="Reset code" required inputMode="numeric" maxLength={8} value={code} onChange={(event) => setCode(event.target.value)} autoComplete="one-time-code" />
     {error && <ErrorMessage message={error} />}
-    <div className="flex items-center justify-between gap-3 text-sm"><button type="button" onClick={() => passwordResetStore.reset()} className="flex items-center gap-2 font-semibold text-slate-600 hover:text-[#0A2540]"><ArrowLeft className="h-4 w-4" />Change phone</button><button type="button" onClick={() => passwordResetStore.request(phone)} disabled={loading} className="font-semibold text-[#FF6B00] hover:text-[#E55F00]">Resend code</button></div>
   </form>
-  <FixedAuthAction formId="forgot-verify-form" loading={loading} label={loading ? 'Checking code...' : 'Verify code'} />
+  <FixedAuthAction formId="forgot-verify-form" loading={loading} label={loading ? 'Checking code...' : 'Verify code'} secondary={<div className="flex items-center justify-between gap-3 text-sm"><button type="button" onClick={() => passwordResetStore.reset()} className="flex items-center gap-2 font-semibold text-slate-600 hover:text-[#0A2540]"><ArrowLeft className="h-4 w-4" />Change phone</button><button type="button" onClick={() => passwordResetStore.request(phone)} disabled={loading} className="font-semibold text-[#FF6B00] hover:text-[#E55F00]">Resend code</button></div>} />
   </>
 }
 
@@ -63,14 +61,13 @@ function ConfirmStep({ newPassword, setNewPassword, confirmPassword, setConfirmP
     <div className="relative"><AuthField label="New password" required type={showPassword ? 'text' : 'password'} autoComplete="new-password" value={newPassword} onChange={(event) => setNewPassword(event.target.value)} /><button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-8 text-slate-400 hover:text-slate-700" aria-label={showPassword ? 'Hide password' : 'Show password'}>{showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}</button></div>
     <AuthField label="Confirm new password" required type={showPassword ? 'text' : 'password'} autoComplete="new-password" value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} />
     {error && <ErrorMessage message={error} />}
-    <button type="button" onClick={() => passwordResetStore.reset()} className="mx-auto flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-[#0A2540]"><ArrowLeft className="h-4 w-4" />Use another code</button>
   </form>
-  <FixedAuthAction formId="forgot-confirm-form" loading={loading} label={loading ? 'Updating password...' : 'Update password'} />
+  <FixedAuthAction formId="forgot-confirm-form" loading={loading} label={loading ? 'Updating password...' : 'Update password'} secondary={<button type="button" onClick={() => passwordResetStore.reset()} className="mx-auto flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-[#0A2540]"><ArrowLeft className="h-4 w-4" />Use another code</button>} />
   </>
 }
 
-function FixedAuthAction({ formId, loading, label }: { formId: string; loading: boolean; label: string }) {
-  return <div className="fixed inset-x-0 bottom-0 z-20 border-t border-slate-200 bg-white/90 px-3 py-2.5 shadow-[0_-8px_24px_rgba(15,23,42,0.08)] backdrop-blur-sm sm:static sm:border-0 sm:bg-transparent sm:px-0 sm:py-0 sm:pt-4 sm:shadow-none"><div className="mx-auto max-w-xl sm:max-w-none"><Button form={formId} type="submit" variant="primary" size="lg" className="w-full" isLoading={loading}>{label}</Button></div></div>
+function FixedAuthAction({ formId, loading, label, secondary }: { formId: string; loading: boolean; label: string; secondary: ReactNode }) {
+  return <div className="fixed inset-x-0 bottom-0 z-20 border-t border-slate-200 bg-white/90 px-3 py-2.5 shadow-[0_-8px_24px_rgba(15,23,42,0.08)] backdrop-blur-sm sm:static sm:border-0 sm:bg-transparent sm:px-0 sm:py-0 sm:pt-4 sm:shadow-none"><div className="mx-auto max-w-xl space-y-2 sm:max-w-none sm:space-y-3"><Button form={formId} type="submit" variant="primary" size="lg" className="w-full" isLoading={loading}>{label}</Button>{secondary}</div></div>
 }
 
 function CompleteStep() {
