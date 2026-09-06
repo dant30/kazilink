@@ -35,6 +35,8 @@ export function createJob(data: CreateJobInput) {
     pay_amount_ksh: Number(data.pay_amount_ksh),
     requirements: data.requirements ?? [],
     benefits: data.benefits ?? [],
+    required_skills: data.required_skills ?? [],
+    minimum_experience_years: Number(data.minimum_experience_years ?? 0),
   })
 }
 
@@ -57,5 +59,7 @@ export function updateJob(id: number, data: CreateJobInput) {
     pay_amount_ksh: Number(data.pay_amount_ksh),
     requirements: data.requirements ?? [],
     benefits: data.benefits ?? [],
+    required_skills: data.required_skills ?? [],
+    minimum_experience_years: Number(data.minimum_experience_years ?? 0),
   })
 }

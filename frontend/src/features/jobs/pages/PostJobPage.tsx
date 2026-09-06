@@ -15,6 +15,7 @@ const fallbackOptions = {
   locations: [{ value: 'Nairobi', label: 'Nairobi' }],
   jobTypes: [{ value: 'full_time', label: 'Full time' }],
   payPeriods: [{ value: 'per month', label: 'Per month' }],
+  skills: [],
 }
 
 export function PostJobPage() {
@@ -31,6 +32,8 @@ export function PostJobPage() {
     shift_times: '',
     requirements: '',
     benefits: '',
+    required_skills: [],
+    minimum_experience_years: '0',
     description: '',
   })
   const [catalog, setCatalog] = useState(fallbackOptions)
@@ -43,10 +46,11 @@ export function PostJobPage() {
       locations: response.locations,
       jobTypes: response.job_types,
       payPeriods: response.pay_periods,
+      skills: response.skills,
     })).catch(() => setCatalog(fallbackOptions))
   }, [])
 
-  const update = (key: keyof JobFormValues, value: string) => setForm((current) => ({ ...current, [key]: value }))
+  const update = (key: keyof JobFormValues, value: string | string[]) => setForm((current) => ({ ...current, [key]: value }))
 
   async function submit(event: FormEvent) {
     event.preventDefault()
@@ -59,6 +63,8 @@ export function PostJobPage() {
         pay_amount_ksh: Number(form.pay_amount_ksh),
         requirements: form.requirements.split('\n').map((item) => item.trim()).filter(Boolean),
         benefits: form.benefits.split('\n').map((item) => item.trim()).filter(Boolean),
+        required_skills: form.required_skills,
+        minimum_experience_years: Number(form.minimum_experience_years),
       })
       navigate(`/jobs/${(job as { id: number }).id}`)
     } catch (reason) {

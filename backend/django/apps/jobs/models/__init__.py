@@ -1,4 +1,4 @@
-from .jobs import Job
+from .jobs import Job, SavedJob
 
-__all__ = ['Job']
+__all__ = ['Job', 'SavedJob']
 

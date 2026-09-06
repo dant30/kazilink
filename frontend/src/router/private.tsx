@@ -3,7 +3,7 @@ import type { RouteObject } from 'react-router-dom'
 
 import { PrivateLayout, RequireAuth, Screen } from './route-pages'
 import { ApplicationDetailPage, ApplicationsPage } from '../features/job_applications/pages'
-import { EditJobPage, JobDetailPage, JobsPage, PostJobPage } from '../features/jobs/pages'
+import { EditJobPage, JobDetailPage, JobsPage, PostJobPage, SavedJobsPage } from '../features/jobs/pages'
 import { DashboardPage, EmployerDashboardPage, WorkerDashboardPage } from '../features/dashboard'
 import { EditEstablishmentPage, EstablishmentDetailPage, EstablishmentsPage } from '../features/establishments/pages'
 import { EmploymentHistoryPage } from '../features/employment_history/pages'
@@ -27,6 +27,7 @@ export const privateRoutes: RouteObject[] = [
 			{ path: 'dashboard/employer', element: <RequireAuth><EmployerDashboardPage /></RequireAuth> },
 			{ index: true, element: <RequireAuth><DashboardPage /></RequireAuth> },
 			{ path: 'jobs', element: <RequireAuth><JobsPage /></RequireAuth> },
+			{ path: 'jobs/saved', element: <RequireAuth><SavedJobsPage /></RequireAuth> },
 			{ path: 'workers', element: <RequireAuth><WorkersPage /></RequireAuth> },
 			{ path: 'jobs/new', element: <RequireAuth><PostJobPage /></RequireAuth> },
 			{ path: 'jobs/:jobId', element: <RequireAuth><JobDetailPage /></RequireAuth> },

@@ -14,6 +14,7 @@ const fallbackOptions: JobFormOptions = {
   locations: [{ value: 'Nairobi', label: 'Nairobi' }],
   jobTypes: [{ value: 'full_time', label: 'Full time' }],
   payPeriods: [{ value: 'per month', label: 'Per month' }],
+  skills: [],
 }
 
 export function EditJobPage() {
@@ -40,14 +41,16 @@ export function EditJobPage() {
         shift_times: job.shift_times ?? '',
         requirements: job.requirements?.join('\n') ?? '',
         benefits: job.benefits?.join('\n') ?? '',
+        required_skills: job.required_skills ?? [],
+        minimum_experience_years: String(job.minimum_experience_years ?? 0),
         description: job.description,
       })
-      setOptions({ categories: catalog.occupations, locations: catalog.locations, jobTypes: catalog.job_types, payPeriods: catalog.pay_periods })
+      setOptions({ categories: catalog.occupations, locations: catalog.locations, jobTypes: catalog.job_types, payPeriods: catalog.pay_periods, skills: catalog.skills })
     }).catch((reason: Error) => { if (active) setError(reason.message) }).finally(() => { if (active) setLoading(false) })
     return () => { active = false }
   }, [id])
 
-  const update = (key: keyof JobFormValues, value: string) => setForm((current) => current ? { ...current, [key]: value } : current)
+  const update = (key: keyof JobFormValues, value: string | string[]) => setForm((current) => current ? { ...current, [key]: value } : current)
 
   const submit = async (event: FormEvent) => {
     event.preventDefault()
@@ -72,5 +75,5 @@ export function EditJobPage() {
   if (loading) return <section className="mx-auto max-w-5xl px-4 py-12"><p className="text-sm text-slate-500">Loading role...</p></section>
   if (!form) return <section className="mx-auto max-w-5xl space-y-4 px-4 py-12"><p className="text-sm text-rose-700">{error || 'Role not found.'}</p><Link to={`/jobs/${id}`} className="inline-flex items-center gap-2 text-sm font-bold text-[#0A2540]"><ArrowLeft className="h-4 w-4" />Back to role</Link></section>
 
-  return <section className="mx-auto max-w-5xl space-y-6 px-4 py-8 sm:px-6 lg:px-8"><Link to={`/jobs/${id}`} className="inline-flex items-center gap-2 text-sm font-bold text-[#0A2540]"><ArrowLeft className="h-4 w-4" />Back to role</Link><PageHeader eyebrow="Employer workspace" title="Manage role" description="Update the details applicants see for this role." icon={<Briefcase className="h-5 w-5" />} /><Modal isOpen onClose={() => navigate(`/jobs/${id}`)} title="Manage role" subtitle="Update the role details and applicant expectations." maxWidth="2xl"><JobForm values={form} options={options} saving={saving} error={error} onChange={update} onSubmit={submit} /></Modal><Button variant="ghost" onClick={() => navigate(`/jobs/${id}`)}>Cancel</Button></section>
+  return <section className="mx-auto max-w-5xl space-y-6 px-4 py-8 sm:px-6 lg:px-8"><Link to={`/jobs/${id}`} className="inline-flex items-center gap-2 text-sm font-bold text-[#0A2540]"><ArrowLeft className="h-4 w-4" />Back to role</Link><PageHeader eyebrow="Employer workspace" title="Manage role" description="Update the details applicants see for this role." icon={<Briefcase className="h-5 w-5" />} /><Modal isOpen onClose={() => navigate(`/jobs/${id}`)} title="Manage role" subtitle="Update the role details and applicant expectations." maxWidth="2xl"><JobForm values={form} options={options} saving={saving} error={error} onChange={update} onSubmit={submit} submitLabel="Save changes" /></Modal><Button variant="ghost" onClick={() => navigate(`/jobs/${id}`)}>Cancel</Button></section>
 }

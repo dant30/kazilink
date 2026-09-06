@@ -1,3 +1,4 @@
+from apps.credits.services import get_or_create_wallet
 from datetime import timedelta
 
 from django.test import TestCase
@@ -8,7 +9,7 @@ from apps.credits.services import get_or_create_wallet
 from apps.employment_history.models import HistoryAccessLog
 from apps.employment_history.services import unlock_history_with_credits
 
-from ..models import Job
+from ..models import Job, SavedJob
 from ..services import boost_job_with_credits, feature_job_with_credits
 
 
@@ -84,3 +85,14 @@ class CreditPromotionTests(TestCase):
 		self.assertEqual(entry.amount, -1)
 		self.assertEqual(wallet.balance, 0)
 		self.assertEqual(HistoryAccessLog.objects.count(), 1)
+
+	def test_structured_requirements_and_saved_jobs_are_unique(self):
+		self.job.required_skills = ['food_safety', 'customer_service']
+		self.job.minimum_experience_years = 2
+		self.job.save(update_fields=('required_skills', 'minimum_experience_years'))
+		SavedJob.objects.get_or_create(worker=self.worker, job=self.job)
+		SavedJob.objects.get_or_create(worker=self.worker, job=self.job)
+		self.job.refresh_from_db()
+		self.assertEqual(self.job.required_skills, ['food_safety', 'customer_service'])
+		self.assertEqual(self.job.minimum_experience_years, 2)
+		self.assertEqual(SavedJob.objects.filter(worker=self.worker, job=self.job).count(), 1)

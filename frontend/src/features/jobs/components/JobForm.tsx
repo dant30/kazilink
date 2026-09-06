@@ -13,6 +13,8 @@ export type JobFormValues = {
   shift_times: string
   requirements: string
   benefits: string
+  required_skills: string[]
+  minimum_experience_years: string
   description: string
 }
 
@@ -21,6 +23,7 @@ export type JobFormOptions = {
   locations: Array<{ value: string; label: string }>
   jobTypes: Array<{ value: string; label: string }>
   payPeriods: Array<{ value: string; label: string }>
+  skills: Array<{ value: string; label: string }>
 }
 
 export function JobForm({
@@ -30,13 +33,15 @@ export function JobForm({
   options,
   onChange,
   onSubmit,
+  submitLabel = 'Post job',
 }: {
   values: JobFormValues
   saving: boolean
   error: string
   options: JobFormOptions
-  onChange: (key: keyof JobFormValues, value: string) => void
+  onChange: (key: keyof JobFormValues, value: string | string[]) => void
   onSubmit: (event: FormEvent) => void
+  submitLabel?: string
 }) {
   const fieldClass =
     'w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-700 placeholder:text-slate-400 focus:border-[#FF6B00] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#FFB380]'
@@ -84,6 +89,15 @@ export function JobForm({
           <FormField label="Shift times">
             <input value={values.shift_times} onChange={(event) => onChange('shift_times', event.target.value)} placeholder="e.g. 8:00 AM - 5:00 PM, Monday to Friday" className={fieldClass} />
           </FormField>
+
+          <FormField label="Minimum experience" helperText="Set 0 for entry-level roles.">
+            <input type="number" min="0" value={values.minimum_experience_years} onChange={(event) => onChange('minimum_experience_years', event.target.value)} placeholder="0" className={fieldClass} />
+          </FormField>
+
+          <FormField label="Required skills" helperText="Search and add skills from the worker catalog.">
+            <Select searchable value="" onChange={(value) => { if (value && !values.required_skills.includes(value)) onChange('required_skills', [...values.required_skills, value]) }} options={[{ value: '', label: 'Add a skill' }, ...options.skills.filter((skill) => !values.required_skills.includes(skill.value))]} />
+            <div className="mt-2 flex flex-wrap gap-2">{values.required_skills.map((skill) => { const option = options.skills.find((item) => item.value === skill); return <button type="button" key={skill} onClick={() => onChange('required_skills', values.required_skills.filter((item) => item !== skill))} className="rounded-full bg-orange-50 px-2.5 py-1 text-xs font-semibold text-[#C2410C]">{option?.label || skill} x</button> })}</div>
+          </FormField>
         </div>
 
         <FormField label="Description" required>
@@ -108,7 +122,7 @@ export function JobForm({
       </FormSection>
 
       <ValidationErrors errors={error ? [error] : null} />
-      <FormActions submitLabel={saving ? 'Posting...' : 'Post job'} loading={saving} />
+      <FormActions submitLabel={saving ? `${submitLabel === 'Post job' ? 'Posting' : 'Saving'}...` : submitLabel} loading={saving} />
     </form>
   )
 }

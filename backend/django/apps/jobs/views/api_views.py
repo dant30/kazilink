@@ -1,13 +1,13 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import generics, status
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from core.permissions import IsWorker
 
-from ..models import Job
+from ..models import Job, SavedJob
 from ..permissions import CanManageJob, IsEmployer, IsJobParticipant
 from ..serializers import JobSerializer, JobWriteSerializer
 from ..services import boost_job_with_credits, close_job, create_job, feature_job_with_credits, match_jobs_for_worker, search_jobs, update_job
@@ -81,6 +81,36 @@ class CloseJobView(APIView):
 		close_job(job=job)
 		return Response(JobSerializer(job).data)
 
+
+class SavedJobView(APIView):
+	permission_classes = [IsAuthenticated]
+
+	def post(self, request, pk):
+		if not request.user.is_worker or not hasattr(request.user, 'worker_profile'):
+			return Response({'detail': 'Only worker accounts can save jobs.'}, status=status.HTTP_403_FORBIDDEN)
+		job = get_object_or_404(Job, pk=pk)
+		SavedJob.objects.get_or_create(worker=request.user.worker_profile, job=job)
+		return Response({'saved': True})
+
+	def delete(self, request, pk):
+		if not request.user.is_worker or not hasattr(request.user, 'worker_profile'):
+			return Response({'detail': 'Only worker accounts can save jobs.'}, status=status.HTTP_403_FORBIDDEN)
+		SavedJob.objects.filter(worker=request.user.worker_profile, job_id=pk).delete()
+		return Response({'saved': False})
+
+	def get(self, request, pk):
+		if not request.user.is_worker or not hasattr(request.user, 'worker_profile'):
+			return Response({'saved': False})
+		return Response({'saved': SavedJob.objects.filter(worker=request.user.worker_profile, job_id=pk).exists()})
+
+class SavedJobListView(APIView):
+	permission_classes = [IsAuthenticated]
+
+	def get(self, request):
+		if not request.user.is_worker or not hasattr(request.user, 'worker_profile'):
+			return Response([])
+		jobs = Job.objects.filter(saved_by_workers__worker=request.user.worker_profile).select_related('employer__user', 'establishment')
+		return Response(JobSerializer(jobs, many=True).data)
 
 class CreditJobActionView(APIView):
 	permission_classes = [CanManageJob]

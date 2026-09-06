@@ -40,9 +40,13 @@ export const endpoints = {
   },
   jobs: {
     list: (query = '') => get<Paginated<Job> | Job[]>(`/jobs/${query ? `?${query}` : ''}`),
+      saved: () => get<Job[]>('/jobs/saved/'),
     detail: (id: number) => get<Job>(`/jobs/${id}/`),
     create: (data: Record<string, unknown>) => post<Job>('/jobs/', data),
     update: (id: number, data: Record<string, unknown>) => patch<Job>(`/jobs/${id}/`, data),
+    saveStatus: (id: number) => get<{ saved: boolean }>(`/jobs/${id}/save/`),
+    save: (id: number) => post<{ saved: boolean }>(`/jobs/${id}/save/`, {}),
+    unsave: (id: number) => del<{ saved: boolean }>(`/jobs/${id}/save/`),
     close: (id: number) => post<Job>(`/jobs/${id}/close/`, {}),
     recommended: () => get<Paginated<Job> | Job[]>('/jobs/recommended/'),
     adminList: () => get<Paginated<Job> | Job[]>('/jobs/admin/list/'),

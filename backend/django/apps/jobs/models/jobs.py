@@ -29,6 +29,8 @@ class Job(models.Model):
 	search_document = SearchVectorField(null=True, editable=False)
 	requirements = ArrayField(models.TextField(), blank=True, default=list)
 	benefits = ArrayField(models.TextField(), blank=True, default=list)
+	required_skills = ArrayField(models.CharField(max_length=100), blank=True, default=list)
+	minimum_experience_years = models.PositiveIntegerField(default=0)
 	is_urgent = models.BooleanField(default=False)
 	is_featured = models.BooleanField(default=False)
 	featured_until = models.DateTimeField(null=True, blank=True)
@@ -39,6 +41,16 @@ class Job(models.Model):
 
 	def __str__(self):
 		return self.title
+
+
+class SavedJob(models.Model):
+	worker = models.ForeignKey('accounts.WorkerProfile', on_delete=models.CASCADE, related_name='saved_jobs')
+	job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name='saved_by_workers')
+	created_at = models.DateTimeField(auto_now_add=True)
+
+	class Meta:
+		constraints = [models.UniqueConstraint(fields=('worker', 'job'), name='jobs_saved_job_worker_job_unique')]
+		ordering = ('-created_at',)
 
 
 

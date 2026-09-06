@@ -15,6 +15,8 @@ export type Job = {
   description: string
   requirements: string[]
   benefits?: string[]
+  required_skills: string[]
+  minimum_experience_years: number
   status: JobStatus
   is_urgent: boolean
   is_featured: boolean
@@ -49,6 +51,8 @@ export type CreateJobInput = {
   shift_times?: string
   requirements?: string[]
   benefits?: string[]
+  required_skills?: string[]
+  minimum_experience_years?: number | string
   status?: string
   is_urgent?: boolean
   is_featured?: boolean

@@ -1,4 +1,4 @@
-import { ArrowLeft, Briefcase, CheckCircle2, Clock3, MapPin, ShieldCheck, Sparkles } from 'lucide-react'
+import { ArrowLeft, Bookmark, Briefcase, Check, CheckCircle2, Clock3, MapPin, Share2, ShieldCheck, Sparkles } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 
@@ -27,11 +27,42 @@ export function JobDetailPage() {
   const [premiumActionLoading, setPremiumActionLoading] = useState(false)
   const [premiumActionFeedback, setPremiumActionFeedback] = useState('')
   const [premiumActionError, setPremiumActionError] = useState(false)
+  const [saved, setSaved] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [shared, setShared] = useState(false)
 
   useEffect(() => {
     if (!user || (!isWorker && !isEmployer)) return
     endpoints.credits.wallet().then((response) => setCreditBalance(response.wallet.balance)).catch(() => setCreditBalance(null))
   }, [isEmployer, isWorker, user])
+
+  useEffect(() => {
+    if (!isWorker || !jobId) return
+    endpoints.jobs.saveStatus(Number(jobId)).then((response) => setSaved(response.saved)).catch(() => setSaved(false))
+  }, [isWorker, jobId])
+
+  const toggleSaved = async () => {
+    if (!job) return
+    setSaving(true)
+    try {
+      const response = saved ? await endpoints.jobs.unsave(job.id) : await endpoints.jobs.save(job.id)
+      setSaved(response.saved)
+    } catch (reason) {
+      setFeedback(reason instanceof Error ? reason.message : 'Unable to update saved jobs.')
+      setFeedbackError(true)
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const shareJob = async () => {
+    if (!job) return
+    const shareData = { title: job.title, text: `${job.title} in ${job.location} on KaziLink`, url: window.location.href }
+    try {
+      if (navigator.share) await navigator.share(shareData)
+      else { await navigator.clipboard.writeText(window.location.href); setShared(true); window.setTimeout(() => setShared(false), 2000) }
+    } catch {}
+  }
 
   if (loading) {
     return (
@@ -120,6 +151,7 @@ export function JobDetailPage() {
               <p className="text-sm text-slate-200">{job.pay_period || 'per shift'}</p>
             </div>
           </div>
+          {isWorker && <div className="mt-5 flex flex-wrap gap-2"><Button variant="outline" size="sm" onClick={() => void toggleSaved()} disabled={saving} leftIcon={saved ? <Check className="h-4 w-4" /> : <Bookmark className="h-4 w-4" />}>{saved ? 'Saved' : 'Save job'}</Button><Button variant="outline" size="sm" onClick={() => void shareJob()} leftIcon={<Share2 className="h-4 w-4" />}>{shared ? 'Link copied' : 'Share job'}</Button></div>}
         </div>
 
         <div className="grid gap-6 p-6 lg:grid-cols-[1.5fr_0.8fr] lg:p-8">
@@ -142,6 +174,12 @@ export function JobDetailPage() {
                   </li>
                 ))}
               </ul>
+            </div>
+
+            <div className="rounded-2xl border border-slate-200 bg-white p-5">
+              <h2 className="text-lg font-black text-slate-900">Skills and experience</h2>
+              <p className="mt-3 text-sm text-slate-600">Minimum experience: <strong className="text-slate-900">{job.minimum_experience_years || 0} years</strong></p>
+              {job.required_skills?.length ? <div className="mt-4 flex flex-wrap gap-2">{job.required_skills.map((skill) => <span key={skill} className="rounded-full bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-700">{skill.replace(/_/g, ' ')}</span>)}</div> : <p className="mt-3 text-sm text-slate-500">No structured skills were specified.</p>}
             </div>
 
             <div className="rounded-2xl border border-slate-200 bg-white p-5">

@@ -15,8 +15,14 @@ def match_jobs_for_worker(worker, limit=20):
 		jobs = jobs.filter(search_document=SearchQuery(search_terms, search_type='websearch', config='simple'))
 	scored = []
 	for job in jobs:
-		job_text = ' '.join([job.category, job.title, *job.requirements]).casefold()
-		score = sum(1 for skill in worker_skills if skill in job_text)
+		if worker.years_of_experience < job.minimum_experience_years:
+			continue
+		job_text = ' '.join([job.category, job.title, *job.requirements, *job.required_skills]).casefold()
+		matched_skills = sum(1 for skill in worker_skills if skill in job_text)
+		score = matched_skills
+		if job.required_skills:
+			score += sum(2 for skill in job.required_skills if skill.casefold() in worker_skills)
+		score += 1
 		if job.location.casefold() == worker.location.casefold():
 			score += 2
 		if score:

@@ -22,6 +22,7 @@ import { localStorageStore } from '../../core/storage'
 const workerNavItems = [
 	{ path: '/dashboard/worker', label: 'Worker Dashboard', icon: Home },
 	{ path: '/jobs', label: 'Find Shifts & Gigs', icon: Briefcase },
+	{ path: '/jobs/saved', label: 'Saved Jobs', icon: Briefcase },
 	{ path: '/applications', label: 'My Applications', icon: FileText },
 	{ path: '/employment-history', label: 'Work Passport / History', icon: Award },
 	{ path: '/payments', label: 'Buy Kazi Credits', icon: CreditCard },
