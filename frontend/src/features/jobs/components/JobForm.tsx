@@ -10,19 +10,31 @@ export type JobFormValues = {
   job_type: string
   pay_amount_ksh: string
   pay_period: string
+  shift_times: string
+  requirements: string
+  benefits: string
   description: string
+}
+
+type JobFormOptions = {
+  categories: Array<{ value: string; label: string }>
+  locations: Array<{ value: string; label: string }>
+  jobTypes: Array<{ value: string; label: string }>
+  payPeriods: Array<{ value: string; label: string }>
 }
 
 export function JobForm({
   values,
   saving,
   error,
+  options,
   onChange,
   onSubmit,
 }: {
   values: JobFormValues
   saving: boolean
   error: string
+  options: JobFormOptions
   onChange: (key: keyof JobFormValues, value: string) => void
   onSubmit: (event: FormEvent) => void
 }) {
@@ -44,23 +56,11 @@ export function JobForm({
           </FormField>
 
           <FormField label="Category" required>
-            <input
-              required
-              value={values.category}
-              onChange={(event) => onChange('category', event.target.value)}
-              placeholder="Hospitality"
-              className={fieldClass}
-            />
+            <Select searchable required value={values.category} onChange={(value) => onChange('category', value)} options={[{ value: '', label: 'Select category' }, ...options.categories]} />
           </FormField>
 
           <FormField label="Location" required>
-            <input
-              required
-              value={values.location}
-              onChange={(event) => onChange('location', event.target.value)}
-              placeholder="Nairobi"
-              className={fieldClass}
-            />
+            <Select searchable required value={values.location} onChange={(value) => onChange('location', value)} options={[{ value: '', label: 'Select location' }, ...options.locations]} />
           </FormField>
 
           <FormField label="Pay amount" required>
@@ -76,16 +76,14 @@ export function JobForm({
           </FormField>
 
           <FormField label="Pay period" required>
-            <input
-              required
-              value={values.pay_period}
-              onChange={(event) => onChange('pay_period', event.target.value)}
-              placeholder="per month"
-              className={fieldClass}
-            />
+            <Select searchable required value={values.pay_period} onChange={(value) => onChange('pay_period', value)} options={[{ value: '', label: 'Select pay period' }, ...options.payPeriods]} />
           </FormField>
 
-          <Select label="Job type" required value={values.job_type} onChange={(value) => onChange('job_type', value)} options={[{ value: 'full_time', label: 'Full time' }, { value: 'part_time', label: 'Part time' }, { value: 'weekend_gig', label: 'Weekend gig' }, { value: 'daily_shift', label: 'Daily shift' }, { value: 'shift_24hr', label: '24-hour shift' }]} />
+          <Select searchable label="Job type" required value={values.job_type} onChange={(value) => onChange('job_type', value)} options={[{ value: '', label: 'Select job type' }, ...options.jobTypes]} />
+
+          <FormField label="Shift times">
+            <input value={values.shift_times} onChange={(event) => onChange('shift_times', event.target.value)} placeholder="e.g. 8:00 AM - 5:00 PM, Monday to Friday" className={fieldClass} />
+          </FormField>
         </div>
 
         <FormField label="Description" required>
@@ -98,6 +96,15 @@ export function JobForm({
             className={`${fieldClass} resize-none`}
           />
         </FormField>
+
+        <div className="grid gap-5 md:grid-cols-2">
+          <FormField label="Requirements" helperText="Add one requirement per line.">
+            <textarea value={values.requirements} onChange={(event) => onChange('requirements', event.target.value)} placeholder="e.g. 2 years of experience\nFood safety certificate" rows={4} className={`${fieldClass} resize-none`} />
+          </FormField>
+          <FormField label="Benefits" helperText="Add one benefit per line.">
+            <textarea value={values.benefits} onChange={(event) => onChange('benefits', event.target.value)} placeholder="e.g. Staff meals\nTransport allowance" rows={4} className={`${fieldClass} resize-none`} />
+          </FormField>
+        </div>
       </FormSection>
 
       <ValidationErrors errors={error ? [error] : null} />

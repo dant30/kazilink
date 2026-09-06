@@ -45,6 +45,7 @@ export type CreateJobInput = {
   pay_amount_ksh: number | string
   pay_period: string
   description: string
+  shift_times?: string
   requirements?: string[]
   benefits?: string[]
   status?: string

@@ -121,7 +121,12 @@ export function JobsPage() {
               ))}
             </div>
           ) : (
-            <EmptyState title="No open jobs match these filters" description="Try adjusting the search criteria." icon={<Briefcase className="h-8 w-8" />} />
+            <EmptyState
+              title="No open jobs match these filters"
+              description="Try adjusting the search criteria."
+              icon={<Briefcase className="h-8 w-8" />}
+              action={isEmployer ? <Link to="/jobs/new" className="inline-flex items-center gap-2 rounded-xl bg-[#FF6B00] px-4 py-3 text-sm font-bold text-white transition hover:bg-[#E55F00]"><Briefcase className="h-4 w-4" />Post a job</Link> : undefined}
+            />
           )}
           <Pagination page={page} pageSize={pageSize} total={jobs.length} onPageChange={setPage} />
         </div>

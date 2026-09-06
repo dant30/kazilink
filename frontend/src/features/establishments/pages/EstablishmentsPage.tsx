@@ -1,5 +1,5 @@
 import { ArrowRight, Building2, MapPin, Search, ShieldCheck, Sparkles } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 
 import { useAuthStore } from '../../auth/store/authStore'
@@ -15,6 +15,18 @@ import { Modal } from '../../../shared/components/ui/Modal'
 import { PageHeader } from '../../../shared/components/ui/PageHeader'
 import { Pagination } from '../../../shared/components/ui/Pagination'
 import { EmptyState } from '../../../shared/components/feedback'
+import { endpoints } from '../../../core/api'
+
+type CatalogOption = { value: string; label: string }
+
+const fallbackBusinessTypes: CatalogOption[] = [
+  { value: 'hotel', label: 'Hotel' },
+  { value: 'restaurant', label: 'Restaurant' },
+  { value: 'cafe', label: 'Cafe / Coffee shop' },
+  { value: 'other', label: 'Other' },
+]
+
+const fallbackLocations: CatalogOption[] = [{ value: 'Nairobi', label: 'Nairobi' }]
 
 const blankForm: EstablishmentInput = {
   name: '',
@@ -32,6 +44,8 @@ export function EstablishmentsPage() {
   const [form, setForm] = useState<EstablishmentInput>(blankForm)
   const [saving, setSaving] = useState(false)
   const [formError, setFormError] = useState('')
+  const [businessTypes, setBusinessTypes] = useState<CatalogOption[]>(fallbackBusinessTypes)
+  const [locations, setLocations] = useState<CatalogOption[]>(fallbackLocations)
   const [page, setPage] = useState(1)
   const { establishments, loading, error, refetch } = useEstablishments(filters)
   const pageSize = 8
@@ -45,7 +59,17 @@ export function EstablishmentsPage() {
     [establishments],
   )
 
-  const typeOptions = [{ value: '', label: 'All types' }, { value: 'Restaurant', label: 'Restaurant' }, { value: 'Hotel', label: 'Hotel' }, { value: 'Cafe', label: 'Cafe' }, { value: 'Hospitality', label: 'Hospitality' }]
+  useEffect(() => {
+    endpoints.auth.workerOccupations().then((response) => {
+      setBusinessTypes(response.business_types)
+      setLocations(response.locations)
+    }).catch(() => {
+      setBusinessTypes(fallbackBusinessTypes)
+      setLocations(fallbackLocations)
+    })
+  }, [])
+
+  const typeOptions = [{ value: '', label: 'All types' }, ...businessTypes]
 
   const updateForm = (key: keyof EstablishmentInput, value: string) => {
     setForm((current) => ({ ...current, [key]: value }))
@@ -98,23 +122,11 @@ export function EstablishmentsPage() {
               </FormField>
 
               <FormField label="Type" required>
-                <input
-                  required
-                  value={form.establishment_type}
-                  onChange={(event) => updateForm('establishment_type', event.target.value)}
-                  placeholder="Restaurant, Hotel, Cafe"
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-700 placeholder:text-slate-400 focus:border-[#FF6B00] focus:bg-white focus:outline-none"
-                />
+                <Select searchable required value={form.establishment_type} onChange={(value) => updateForm('establishment_type', value)} options={[{ value: '', label: 'Select establishment type' }, ...businessTypes]} />
               </FormField>
 
               <FormField label="Location" required>
-                <input
-                  required
-                  value={form.location}
-                  onChange={(event) => updateForm('location', event.target.value)}
-                  placeholder="Nairobi"
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-700 placeholder:text-slate-400 focus:border-[#FF6B00] focus:bg-white focus:outline-none"
-                />
+                <Select searchable required value={form.location} onChange={(value) => updateForm('location', value)} options={[{ value: '', label: 'Select location' }, ...locations]} />
               </FormField>
 
               <FormField label="Logo URL" helperText="Optional. Use a publicly accessible image URL.">
@@ -179,7 +191,12 @@ export function EstablishmentsPage() {
             )}
 
             {establishments.length === 0 ? (
-              <EmptyState title="No establishments match your search" description="Try adjusting the search criteria." icon={<Building2 className="h-8 w-8" />} />
+              <EmptyState
+                title="No establishments match your search"
+                description="Try adjusting the search criteria."
+                icon={<Building2 className="h-8 w-8" />}
+                action={isEmployer ? <Button type="button" onClick={() => setShowCreateForm(true)}><Building2 className="h-4 w-4" />Add establishment</Button> : undefined}
+              />
             ) : (
               <div className="grid gap-4 xl:grid-cols-2">
                 {visibleEstablishments.map((establishment) => (

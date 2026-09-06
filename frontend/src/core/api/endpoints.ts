@@ -35,7 +35,7 @@ export const endpoints = {
     employerProfile: () => get<EmployerProfile>('/accounts/employer-profile/'),
     updateEmployerProfile: (data: UpdateEmployerProfilePayload | FormData) => patch<EmployerProfile>('/accounts/employer-profile/', data),
     referrals: () => get<ReferralSummary>('/accounts/referrals/'),
-    workerOccupations: () => get<{ occupations: Array<{ value: string; label: string }>; availability: Array<{ value: string; label: string }>; locations: Array<{ value: string; label: string }>; skills: Array<{ value: string; label: string }>; languages: Array<{ value: string; label: string }>; business_types: Array<{ value: string; label: string }> }>('/accounts/worker-occupations/'),
+    workerOccupations: () => get<{ occupations: Array<{ value: string; label: string }>; availability: Array<{ value: string; label: string }>; locations: Array<{ value: string; label: string }>; skills: Array<{ value: string; label: string }>; languages: Array<{ value: string; label: string }>; business_types: Array<{ value: string; label: string }>; job_types: Array<{ value: string; label: string }>; pay_periods: Array<{ value: string; label: string }> }>('/accounts/worker-occupations/'),
     adminUsers: () => get<Paginated<User> | User[]>('/accounts/admin/users/'),
   },
   jobs: {

@@ -36,7 +36,7 @@ export const Select: React.FC<SelectProps> = ({ label, options, value, onChange,
   const normalizedOptions = options.map(normalizeOption)
   const filteredOptions = normalizedOptions.filter((option) => !searchTerm.trim() || option.label.toLowerCase().includes(searchTerm.trim().toLowerCase()) || option.value.toLowerCase().includes(searchTerm.trim().toLowerCase()))
   const selectedOption = normalizedOptions.find((option) => option.value === value)
-  const selectedIndex = normalizedOptions.findIndex((option) => option.value === value)
+  const selectedIndex = filteredOptions.findIndex((option) => option.value === value)
   const [highlightedIndex, setHighlightedIndex] = useState(Math.max(0, selectedIndex))
 
   useEffect(() => {
@@ -56,10 +56,10 @@ export const Select: React.FC<SelectProps> = ({ label, options, value, onChange,
     if (open) optionRefs.current[highlightedIndex]?.scrollIntoView({ block: 'nearest' })
   }, [highlightedIndex, open])
 
-  const availableIndex = (start: number, direction: 1 | -1) => {
+  const availableIndex = (optionsToSearch: SelectOption[], start: number, direction: 1 | -1) => {
     let index = start
-    while (index >= 0 && index < normalizedOptions.length) {
-      if (!normalizedOptions[index].disabled) return index
+    while (index >= 0 && index < optionsToSearch.length) {
+      if (!optionsToSearch[index].disabled) return index
       index += direction
     }
     return -1
@@ -81,7 +81,7 @@ export const Select: React.FC<SelectProps> = ({ label, options, value, onChange,
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault()
       if (open) {
-        const option = normalizedOptions[highlightedIndex]
+        const option = filteredOptions[highlightedIndex]
         if (option) choose(option)
       } else setOpen(true)
       return
@@ -89,7 +89,7 @@ export const Select: React.FC<SelectProps> = ({ label, options, value, onChange,
     if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
       event.preventDefault()
       const direction = event.key === 'ArrowDown' ? 1 : -1
-      const nextIndex = availableIndex((open ? highlightedIndex : selectedIndex) + direction, direction)
+      const nextIndex = availableIndex(filteredOptions, (open ? highlightedIndex : selectedIndex) + direction, direction)
       if (nextIndex >= 0) {
         setHighlightedIndex(nextIndex)
         setOpen(true)
@@ -99,8 +99,8 @@ export const Select: React.FC<SelectProps> = ({ label, options, value, onChange,
     if (event.key === 'Home' || event.key === 'End') {
       event.preventDefault()
       const direction = event.key === 'Home' ? 1 : -1
-      const start = event.key === 'Home' ? 0 : normalizedOptions.length - 1
-      const nextIndex = availableIndex(start, direction)
+      const start = event.key === 'Home' ? 0 : filteredOptions.length - 1
+      const nextIndex = availableIndex(filteredOptions, start, direction)
       if (nextIndex >= 0) {
         setHighlightedIndex(nextIndex)
         setOpen(true)

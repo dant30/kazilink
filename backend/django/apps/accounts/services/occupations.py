@@ -182,6 +182,21 @@ EMPLOYER_BUSINESS_TYPES = (
 	('other', 'Other'),
 )
 
+JOB_TYPES = (
+	('full_time', 'Full time'),
+	('part_time', 'Part time'),
+	('weekend_gig', 'Weekend gig'),
+	('daily_shift', 'Daily shift'),
+	('shift_24hr', '24-hour shift'),
+)
+
+PAY_PERIODS = (
+	('per hour', 'Per hour'),
+	('per day', 'Per day'),
+	('per week', 'Per week'),
+	('per month', 'Per month'),
+)
+
 WORKER_LANGUAGES = (
 	('english', 'English'),
 	('kiswahili', 'Kiswahili'),
@@ -271,6 +286,14 @@ def worker_skill_catalog():
 
 def employer_business_type_catalog():
 	return [{'value': value, 'label': label} for value, label in EMPLOYER_BUSINESS_TYPES]
+
+
+def job_type_catalog():
+	return [{'value': value, 'label': label} for value, label in JOB_TYPES]
+
+
+def pay_period_catalog():
+	return [{'value': value, 'label': label} for value, label in PAY_PERIODS]
 
 
 def worker_language_catalog():
