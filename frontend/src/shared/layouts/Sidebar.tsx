@@ -129,7 +129,7 @@ export function Sidebar({ admin = false, mobileDrawer = false, onItemClick }: Si
 				</div>
 			)}
 
-			<nav className="min-h-0 flex-1 space-y-1 overflow-y-auto">
+			<nav className={`min-h-0 flex-1 space-y-1 overflow-y-auto ${!mobileDrawer ? 'sidebar-nav-scrollbar' : ''}`}>
 				<p className="px-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">
 					Navigation
 				</p>
