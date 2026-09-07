@@ -1,4 +1,4 @@
-import { ArrowRight, Building2, MapPin, Search, ShieldCheck } from 'lucide-react'
+import { ArrowRight, Building2, CheckCircle2, MapPin, Search, ShieldCheck, Sparkles, X } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 
@@ -102,10 +102,10 @@ export function EstablishmentsPage() {
       <section className="mx-auto max-w-7xl space-y-6 px-4 py-8 sm:px-6 lg:px-8">
       <PageHeader eyebrow="Establishments" title="Verified hospitality venues" actions={isEmployer ? <Button type="button" onClick={() => setShowCreateForm(true)}><Building2 className="h-4 w-4" />New establishment</Button> : undefined} />
 
-      <div className="grid gap-4 md:grid-cols-3">
-        <StatCard title="Verified" value={establishments.filter((item) => item.is_verified).length} subtitle="Approved venues" icon={<ShieldCheck className="h-5 w-5" />} iconBg="bg-emerald-50 text-emerald-600" />
-        <StatCard title="Locations" value={new Set(establishments.map((item) => item.location)).size} subtitle="Distinct operating areas" icon={<MapPin className="h-5 w-5" />} iconBg="bg-orange-50 text-[#FF6B00]" />
-        <StatCard title="Profiles" value={establishments.reduce((sum, item) => sum + (item.verified_employers_count ?? 0), 0)} subtitle="Verified employer links" icon={<Building2 className="h-5 w-5" />} />
+      <div className="grid grid-cols-2 gap-3.5 sm:gap-4 lg:grid-cols-3">
+        <StatCard title="Verified" value={establishments.filter((item) => item.is_verified).length} subtitle="Government & ID approved" badge={{ text: 'Trust 100%', variant: 'success' }} progress={{ value: establishments.length > 0 ? Math.round((establishments.filter((item) => item.is_verified).length / establishments.length) * 100) : 0, max: 100, label: 'Verification rate', color: '#059669' }} icon={<ShieldCheck className="h-5 w-5" />} iconBg="bg-emerald-50 text-emerald-600" />
+        <StatCard title="Locations" value={new Set(establishments.map((item) => item.location)).size} subtitle="Operating counties & hubs" sparkline={{ data: [2, 3, 3, 4, 5, 6, Math.max(new Set(establishments.map((item) => item.location)).size, 4)], type: 'line', color: '#FF6B00' }} metadata={[{ label: 'Top Hub', value: 'Nairobi' }]} icon={<MapPin className="h-5 w-5" />} iconBg="bg-orange-50 text-[#FF6B00]" />
+        <StatCard title="Employer Profiles" value={establishments.reduce((sum, item) => sum + (item.verified_employers_count ?? 0), 0)} subtitle="Verified employer connections" sparkline={{ data: [1, 2, 4, 5, 4, 7, 8], type: 'bar', color: '#0A2540' }} metadata={[{ label: 'Avg per Venue', value: '2.4' }]} icon={<Building2 className="h-5 w-5" />} />
       </div>
 
       {isEmployer && (
@@ -158,25 +158,23 @@ export function EstablishmentsPage() {
           </Modal>
       )}
 
-      <div className="card-kazilink p-5 sm:p-6">
-        <div className="flex flex-col gap-4 border-b border-slate-200 pb-4 md:flex-row md:items-center md:justify-between">
-          <div>
+      <div className="card-kazilink p-4 sm:p-6">
+        <div className="flex flex-col gap-3.5 border-b border-slate-200 pb-5">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"><div>
             <h2 className="text-lg font-black text-slate-900">Search establishments</h2>
-            <p className="text-xs text-slate-500">Find trusted venues and verify their operating profile.</p>
-          </div>
-
-          <div className="flex flex-col gap-2 sm:flex-row">
-            <label className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-600">
-              <Search className="h-4 w-4 text-slate-400" />
+            <p className="text-xs text-slate-500">Find trusted venues and verify their operating profile across Kenya.</p>
+          </div>{filters.q || filters.type ? <button type="button" onClick={() => { setFilters({ q: '', type: '' }); setPage(1) }} className="self-start text-xs font-bold text-[#FF6B00] hover:underline sm:self-auto">Clear filters</button> : null}</div>
+          <div className="flex flex-col gap-2.5 sm:flex-row sm:items-center"><div className="relative flex-1">
+              <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
               <input
                 value={filters.q ?? ''}
-                  onChange={(event) => { setFilters((current) => ({ ...current, q: event.target.value })); setPage(1) }}
-                placeholder="Search by name or physical location"
-                className="w-44 bg-transparent outline-none placeholder:text-slate-400"
+                onChange={(event) => { setFilters((current) => ({ ...current, q: event.target.value })); setPage(1) }}
+                placeholder="Search by venue name, location, or address..."
+                className="w-full rounded-xl border border-slate-200 bg-slate-50/80 py-2.5 pl-10 pr-9 text-sm text-slate-900 outline-none placeholder:text-slate-400 focus:border-[#FF6B00] focus:bg-white focus:ring-2 focus:ring-orange-100"
               />
-            </label>
-            <Select value={filters.type ?? ''} onChange={(value) => { setFilters((current) => ({ ...current, type: value })); setPage(1) }} options={typeOptions} className="flex-1" />
-          </div>
+              {filters.q && <button type="button" onClick={() => { setFilters((current) => ({ ...current, q: '' })); setPage(1) }} className="absolute right-2.5 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full text-slate-400 hover:bg-slate-200 hover:text-slate-700" aria-label="Clear establishment search"><X className="h-3.5 w-3.5" /></button>}
+            </div><div className="w-full sm:w-56"><Select value={filters.type ?? ''} onChange={(value) => { setFilters((current) => ({ ...current, type: value })); setPage(1) }} options={typeOptions} className="w-full" /></div></div>
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none"><span className="shrink-0 text-[10px] font-bold uppercase tracking-wider text-slate-400">Venue type:</span>{['All', 'Restaurant', 'Hotel', 'Cafe', 'Hospitality'].map((type) => <button key={type} type="button" onClick={() => { setFilters((current) => ({ ...current, type: type === 'All' ? '' : type })); setPage(1) }} className={`shrink-0 rounded-full px-3 py-1 text-xs font-semibold transition ${(!filters.type && type === 'All') || filters.type === type ? 'bg-[#0A2540] text-white' : 'border border-slate-200 bg-slate-50 text-slate-600 hover:bg-white'}`}>{type}</button>)}</div>
         </div>
 
         {loading && <p className="mt-6 text-sm text-slate-500">Loading establishments...</p>}

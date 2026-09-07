@@ -1,4 +1,4 @@
-import { Briefcase, FileText, Filter, ListFilter } from 'lucide-react'
+import { ArrowRight, Briefcase, FileText, Filter, ListFilter } from 'lucide-react'
 import { useMemo, useState } from 'react'
 
 import { useAuthStore } from '../../auth/store/authStore'
@@ -57,24 +57,20 @@ export function ApplicationsPage() {
         }
       />
 
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <StatCard title="Total" value={counts.total} subtitle="Applications received" sparkline={[3, 5, 4, 8, 7, 10, Math.max(counts.total, 8)]} metadata={[{ label: 'Conversion', value: `${counts.total ? Math.round(counts.hired / counts.total * 100) : 0}%` }]} icon={<FileText className="h-5 w-5" />} />
-        <StatCard title="Shortlisted" value={counts.shortlisted} subtitle="Candidates to review" badge={{ text: 'Priority', variant: 'orange' }} icon={<ApplicationStatusBadge status="shortlisted" />} iconBg="bg-orange-50 text-[#FF6B00]" />
-        <StatCard title="Interviews" value={counts.interview} subtitle="Scheduled conversations" badge={{ text: 'Calendar', variant: 'blue' }} icon={<ApplicationStatusBadge status="interview_scheduled" />} iconBg="bg-sky-50 text-sky-600" />
-        <StatCard title="Hired" value={counts.hired} subtitle="Successful placements" progress={{ value: counts.total ? Math.round(counts.hired / counts.total * 100) : 0, max: 100, label: 'Placement rate', color: '#059669' }} icon={<ApplicationStatusBadge status="hired" />} iconBg="bg-emerald-50 text-emerald-600" />
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+          <StatCard title="Total" value={counts.total} subtitle="Applications received" sparkline={[3, 5, 4, 8, 7, 10, Math.max(counts.total, 8)]} metadata={[{ label: 'Conversion', value: `${counts.total > 0 ? Math.round((counts.hired / counts.total) * 100) : 0}%` }]} icon={<FileText className="h-5 w-5" />} />
+          <StatCard title="Shortlisted" value={counts.shortlisted} subtitle="Candidates to review" badge={{ text: 'Priority', variant: 'orange' }} sparkline={{ data: [1, 2, 1, 3, 4, 5, Math.max(counts.shortlisted, 2)], type: 'bar', color: '#FF6B00' }} icon={<ApplicationStatusBadge status="shortlisted" />} iconBg="bg-orange-50 text-[#FF6B00]" />
+          <StatCard title="Interviews" value={counts.interview} subtitle="Scheduled conversations" badge={{ text: 'Calendar', variant: 'blue' }} sparkline={{ data: [0, 1, 1, 2, 2, 3, Math.max(counts.interview, 1)], type: 'line', color: '#0284C7' }} icon={<ApplicationStatusBadge status="interview_scheduled" />} iconBg="bg-sky-50 text-sky-600" />
+          <StatCard title="Hired" value={counts.hired} subtitle="Successful placements" progress={{ value: counts.total > 0 ? Math.round((counts.hired / counts.total) * 100) : 0, max: 100, label: 'Placement rate', color: '#059669' }} metadata={[{ label: 'Escrow Released', value: 'Instant' }]} icon={<ApplicationStatusBadge status="hired" />} iconBg="bg-emerald-50 text-emerald-600" />
       </div>
 
-      <div className="card-kazilink p-5 sm:p-6">
-        <div className="flex flex-col gap-4 border-b border-slate-200 pb-4 md:flex-row md:items-center md:justify-between">
-          <div>
+      <div className="card-kazilink p-4 sm:p-6">
+        <div className="flex flex-col gap-3.5 border-b border-slate-200 pb-4">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"><div>
             <h2 className="text-lg font-black text-slate-900">Review applications</h2>
             <p className="text-xs text-slate-500">Track outstanding candidate activity and next steps.</p>
-          </div>
-
-          <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2">
-            <Filter className="h-4 w-4 text-slate-400" />
-            <Select value={statusFilter} onChange={(value) => { setStatusFilter(value as JobApplicationStatus | ''); setPage(1) }} options={statusOptions} className="flex-1" />
-          </div>
+          </div>{statusFilter && <button type="button" onClick={() => { setStatusFilter(''); setPage(1) }} className="self-start text-xs font-bold text-[#FF6B00] hover:underline sm:self-auto">Reset filter</button>}</div>
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none"><span className="shrink-0 text-[10px] font-bold uppercase tracking-wider text-slate-400">Status:</span>{statusOptions.map((option) => <button key={option.value || 'all'} type="button" onClick={() => { setStatusFilter(option.value); setPage(1) }} className={`shrink-0 rounded-full px-3 py-1 text-xs font-semibold transition ${statusFilter === option.value ? 'bg-[#0A2540] text-white' : 'border border-slate-200 bg-slate-50 text-slate-600 hover:bg-white'}`}>{option.label}</button>)}</div>
         </div>
 
         {loading && <div className="mt-6 grid gap-4 lg:grid-cols-2" aria-label="Loading applications" aria-busy="true">{Array.from({ length: 4 }, (_, index) => <Skeleton key={index} className="h-48 rounded-2xl" />)}</div>}
@@ -91,7 +87,7 @@ export function ApplicationsPage() {
         )}
 
         {!loading && !error && applications.length > 0 && (
-          <div className="mt-6 grid grid-cols-2 gap-3">
+          <div className="mt-6 grid gap-4 lg:grid-cols-2">
             {visibleApplications.map((application) => (
               <ApplicationCard key={application.id} application={application} />
             ))}
