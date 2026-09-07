@@ -15,7 +15,7 @@ export function Footer() {
 						</p>
 						<div className="flex flex-wrap gap-2 pt-1"><div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-slate-300">
 							<ShieldCheck className="w-4 h-4 text-[#FF6B00]" />
-							<span className="text-[11px]">100% Kenyan Reference Checked</span></div><div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-xs text-emerald-400"><CreditCard className="w-4 h-4" /><span className="text-[11px]">M-Pesa Escrow Protected</span></div></div>
+							<span className="text-[11px]">100% Kenyan Reference Checked</span></div></div>
 					</div>
 
 					{/* Column 2: Quick Links */}

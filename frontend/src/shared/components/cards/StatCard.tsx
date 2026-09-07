@@ -297,7 +297,7 @@ export const StatCard: React.FC<StatCardProps> = ({
 
             {/* Value & Sparkline Row */}
             <div className="flex min-w-0 flex-wrap items-baseline justify-between gap-1.5 mt-1">
-              <p className="min-w-0 break-words text-xl font-black text-slate-900 tracking-tight sm:text-3xl">
+              <p className="min-w-0 break-words text-xl font-semibold text-slate-900 tracking-tight sm:text-3xl sm:font-semibold">
                 {value}
               </p>
               {renderSparkline()}

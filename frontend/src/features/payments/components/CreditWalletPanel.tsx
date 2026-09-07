@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { ArrowDownLeft, ArrowUpRight, RefreshCw } from 'lucide-react'
+import { ArrowDownLeft, ArrowUpRight, RefreshCw, Zap } from 'lucide-react'
 import { endpoints } from '../../../core/api'
 import { EmptyState, toast } from '../../../shared/components/feedback'
 import { Button } from '../../../shared/components/ui/Button'
@@ -30,8 +30,8 @@ export function CreditWalletPanel({ role, refreshToken = 0, onBalanceChange }: C
 
   const visibleActions = catalog?.actions.filter((item) => item.roles.includes(role)) || []
 
-  return <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-    <div className="mb-5 flex items-center justify-end">
+  return <section className="space-y-6 rounded-3xl border border-slate-200 bg-white p-4 shadow-xs sm:p-7">
+    <div className="flex items-center justify-end border-b border-slate-100 pb-4">
       <Button variant="ghost" size="sm" onClick={() => void refresh()} disabled={loading} leftIcon={<RefreshCw className="h-4 w-4" />}>Refresh</Button>
     </div>
     <div className="grid gap-5 lg:grid-cols-2">
@@ -41,7 +41,7 @@ export function CreditWalletPanel({ role, refreshToken = 0, onBalanceChange }: C
             <h3 className="text-sm font-black text-[#0A2540]">What credits can unlock</h3>
             <p className="mt-1 text-xs text-slate-500">Premium actions for your account.</p>
           </div>
-          <span className="rounded-full bg-orange-100 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-[#C2410C]">Catalog</span>
+          <span className="rounded-full bg-orange-100 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-[#C2410C]"><Zap className="mr-1 inline h-3 w-3" />Catalog</span>
         </div>
         <div className="space-y-2">
           {visibleActions.map((item) => <div key={item.key} className="flex items-center justify-between gap-3 rounded-lg border border-slate-200 bg-white px-3 py-3 text-sm"><span className="font-medium text-slate-700">{item.label}</span><strong className="shrink-0 text-[#FF6B00]">{item.credits} credit{item.credits === 1 ? '' : 's'}</strong></div>)}
