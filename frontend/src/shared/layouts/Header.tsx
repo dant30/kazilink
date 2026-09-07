@@ -190,7 +190,7 @@ export function Header() {
 								{/* Messages */}
 								<Link
 									to={messagePath}
-									className="p-2 rounded-xl text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition"
+									className="hidden p-2 rounded-xl text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition md:inline-flex"
 									title="Messages"
 								>
 									<MessageSquare className="w-5 h-5" />
