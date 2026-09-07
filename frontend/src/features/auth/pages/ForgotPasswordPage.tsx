@@ -67,7 +67,7 @@ function ConfirmStep({ newPassword, setNewPassword, confirmPassword, setConfirmP
 }
 
 function FixedAuthAction({ formId, loading, label, secondary }: { formId: string; loading: boolean; label: string; secondary: ReactNode }) {
-  return <div className="fixed inset-x-0 bottom-0 z-20 border-t border-slate-200 bg-white/90 px-3 py-2.5 shadow-[0_-8px_24px_rgba(15,23,42,0.08)] backdrop-blur-sm sm:static sm:border-0 sm:bg-transparent sm:px-0 sm:py-0 sm:pt-4 sm:shadow-none"><div className="mx-auto max-w-xl space-y-2 sm:max-w-none sm:space-y-3"><Button form={formId} type="submit" variant="primary" size="lg" className="w-full" isLoading={loading}>{label}</Button>{secondary}</div></div>
+  return <div className="fixed inset-x-0 bottom-16 z-30 border-t border-slate-200 bg-white/95 px-3 py-2.5 shadow-[0_-8px_24px_rgba(15,23,42,0.08)] backdrop-blur-sm sm:static sm:border-0 sm:bg-transparent sm:px-0 sm:py-0 sm:pt-4 sm:shadow-none"><div className="mx-auto max-w-xl space-y-2 sm:max-w-none sm:space-y-3"><Button form={formId} type="submit" variant="primary" size="lg" className="w-full" isLoading={loading}>{label}</Button>{secondary}</div></div>
 }
 
 function CompleteStep() {
