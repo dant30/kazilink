@@ -40,7 +40,7 @@ export const BackToTop: React.FC<BackToTopProps> = ({
       onClick={scrollToTop}
       aria-label="Scroll to top"
       id="back-to-top-btn"
-      className={`fixed bottom-20 right-6 z-40 w-11 h-11 rounded-full bg-[#0A2540] hover:bg-[#FF6B00] text-white shadow-xl hover:shadow-2xl border-2 border-white/20 transition-all duration-300 transform hover:-translate-y-1 active:translate-y-0 group flex items-center justify-center ${className}`}
+      className={`fixed bottom-36 right-4 z-40 w-11 h-11 rounded-full bg-[#0A2540] hover:bg-[#FF6B00] text-white shadow-xl hover:shadow-2xl border-2 border-white/20 transition-all duration-300 transform hover:-translate-y-1 active:translate-y-0 group flex items-center justify-center sm:bottom-20 sm:right-6 ${className}`}
     >
       <ArrowUp className="w-5 h-5 transition-transform group-hover:-translate-y-0.5" />
     </button>

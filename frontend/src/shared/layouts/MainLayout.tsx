@@ -8,6 +8,7 @@ import { Sidebar } from './Sidebar'
 import { useAuthStore } from '../../features/auth/store'
 import { ToastContainer } from '../components/feedback'
 import { localStorageStore } from '../../core/storage'
+import { MobileBottomNav } from './MobileBottomNav'
 
 interface MainLayoutProps {
 	children: React.ReactNode
@@ -41,12 +42,13 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children, admin = false 
 			<div className="flex flex-1 w-full relative items-start">
 				{/* Sidebar is ONLY visible when a user is authenticated */}
 				{signedIn && <Sidebar admin={isAdmin} />}
-				<main className="flex-1 w-full min-w-0">{children}</main>
+				<main className="flex-1 w-full min-w-0 pb-20 md:pb-0">{children}</main>
 			</div>
 			<Footer />
 			<FloatingButton />
 			<BackToTop />
 			<ToastContainer />
+			<MobileBottomNav />
 		</div>
 	)
 }

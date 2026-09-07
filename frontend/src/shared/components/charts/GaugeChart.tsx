@@ -54,7 +54,7 @@ export const GaugeChart: React.FC<GaugeChartProps> = ({
           width={size}
           height={size / 2 + 20}
           viewBox={`0 0 ${size} ${size / 2 + 20}`}
-          className="overflow-visible"
+          className="h-auto max-w-full overflow-visible"
         >
           {/* Background Track */}
           <path

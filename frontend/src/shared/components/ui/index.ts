@@ -45,3 +45,5 @@ export type { SwitchProps } from './Switch'
 
 export { TimePicker } from './TimePicker'
 export { Toggle } from './Toggle'
+export { Tabs } from './Tabs'
+export type { TabsProps, TabItem, TabBadgeVariant, TabSize, TabVariant } from './Tabs'

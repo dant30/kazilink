@@ -38,7 +38,7 @@ export const FloatingButton: React.FC = () => {
   }
 
   return (
-    <div ref={containerRef} className="fixed bottom-6 right-6 z-40 flex flex-col items-end">
+    <div ref={containerRef} className="fixed bottom-20 right-4 z-40 flex flex-col items-end sm:bottom-6 sm:right-6">
       {/* Expanded Support Card Modal */}
       {isOpen && (
         <div className="mb-3 w-80 sm:w-96 bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden animate-fade-in divide-y divide-slate-100">

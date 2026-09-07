@@ -1,4 +1,4 @@
-import { ArrowRight, Briefcase, FileText, Filter, ListFilter } from 'lucide-react'
+import { Briefcase, FileText, Filter, ListFilter } from 'lucide-react'
 import { useMemo, useState } from 'react'
 
 import { useAuthStore } from '../../auth/store/authStore'
@@ -58,10 +58,10 @@ export function ApplicationsPage() {
       />
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <StatCard title="Total" value={counts.total} subtitle="Applications received" icon={<FileText className="h-5 w-5" />} />
-        <StatCard title="Shortlisted" value={counts.shortlisted} subtitle="Candidates to review" icon={<ApplicationStatusBadge status="shortlisted" />} iconBg="bg-orange-50 text-[#FF6B00]" />
-        <StatCard title="Interviews" value={counts.interview} subtitle="Scheduled conversations" icon={<ApplicationStatusBadge status="interview_scheduled" />} iconBg="bg-sky-50 text-sky-600" />
-        <StatCard title="Hired" value={counts.hired} subtitle="Successful applications" icon={<ApplicationStatusBadge status="hired" />} iconBg="bg-emerald-50 text-emerald-600" />
+        <StatCard title="Total" value={counts.total} subtitle="Applications received" sparkline={[3, 5, 4, 8, 7, 10, Math.max(counts.total, 8)]} metadata={[{ label: 'Conversion', value: `${counts.total ? Math.round(counts.hired / counts.total * 100) : 0}%` }]} icon={<FileText className="h-5 w-5" />} />
+        <StatCard title="Shortlisted" value={counts.shortlisted} subtitle="Candidates to review" badge={{ text: 'Priority', variant: 'orange' }} icon={<ApplicationStatusBadge status="shortlisted" />} iconBg="bg-orange-50 text-[#FF6B00]" />
+        <StatCard title="Interviews" value={counts.interview} subtitle="Scheduled conversations" badge={{ text: 'Calendar', variant: 'blue' }} icon={<ApplicationStatusBadge status="interview_scheduled" />} iconBg="bg-sky-50 text-sky-600" />
+        <StatCard title="Hired" value={counts.hired} subtitle="Successful placements" progress={{ value: counts.total ? Math.round(counts.hired / counts.total * 100) : 0, max: 100, label: 'Placement rate', color: '#059669' }} icon={<ApplicationStatusBadge status="hired" />} iconBg="bg-emerald-50 text-emerald-600" />
       </div>
 
       <div className="card-kazilink p-5 sm:p-6">
