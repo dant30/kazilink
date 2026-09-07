@@ -1,4 +1,4 @@
-import { ArrowLeft, Bookmark, Briefcase, Check, CheckCircle2, Clock3, MapPin, Share2, ShieldCheck, Sparkles } from 'lucide-react'
+import { ArrowLeft, Bookmark, Briefcase, Building2, Calendar, Check, CheckCircle2, Clock3, Coins, MapPin, Share2, ShieldCheck, Sparkles, UserCheck, Zap } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 
@@ -7,6 +7,7 @@ import { Button } from '../../../shared/components/ui/Button'
 import { ConfirmDialog } from '../../../shared/components/ui/ConfirmDialog'
 import { Skeleton } from '../../../shared/components/ui/Skeleton'
 import { Badge } from '../../../shared/components/ui/Badge'
+import { Tabs } from '../../../shared/components/ui/Tabs'
 import { useJob } from '../hooks'
 import { applyForJob } from '../services'
 import { endpoints } from '../../../core/api'
@@ -30,6 +31,7 @@ export function JobDetailPage() {
   const [saved, setSaved] = useState(false)
   const [saving, setSaving] = useState(false)
   const [shared, setShared] = useState(false)
+  const [activeTab, setActiveTab] = useState('overview')
 
   useEffect(() => {
     if (!user || (!isWorker && !isEmployer)) return
@@ -88,8 +90,14 @@ export function JobDetailPage() {
 
   const roleType = job.job_type?.replace(/_/g, ' ') || 'shift'
   const requirements = job.requirements?.length ? job.requirements : ['Previous hospitality experience preferred.', 'Reliable and punctual attendance.', 'Strong customer service and teamwork.']
-  const benefits = job.benefits ?? []
+  const benefits = job.benefits?.length ? job.benefits : ['M-Pesa payment disbursement within 24 hours of shift sign-off', 'Direct employer verification and profile rating boost', 'Staff meal or transport allowance when applicable']
   const premiumActionCost = premiumAction === 'feature' ? 3 : 5
+  const detailTabs = [
+    { id: 'overview', label: 'Overview' },
+    { id: 'requirements', label: 'Requirements', badge: requirements.length },
+    { id: 'benefits', label: 'Benefits', badge: benefits.length },
+    { id: 'venue', label: 'Venue & Details' },
+  ]
   const runPremiumAction = async () => {
     if (!premiumAction) return
     setPremiumActionLoading(true)
@@ -115,18 +123,19 @@ export function JobDetailPage() {
   }
 
   return (
-    <section className="mx-auto max-w-6xl space-y-6 px-4 py-8 sm:px-6 lg:px-8">
-      <Link to="/jobs" className="inline-flex items-center gap-2 text-sm font-bold text-[#0A2540]">
+    <section className="mx-auto max-w-6xl space-y-6 px-3.5 py-6 pb-28 sm:px-6 sm:py-8 sm:pb-8 lg:px-8">
+      <div className="flex items-center justify-between gap-3"><Link to="/jobs" className="inline-flex min-h-[40px] items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-bold text-[#0A2540] shadow-2xs">
         <ArrowLeft className="h-4 w-4" />
-        All jobs
-      </Link>
+        Back to all jobs
+      </Link><div className="flex items-center gap-2">{isWorker && <Button variant="outline" size="sm" onClick={() => void toggleSaved()} disabled={saving} leftIcon={saved ? <Check className="h-3.5 w-3.5" /> : <Bookmark className="h-3.5 w-3.5" />}>{saved ? 'Saved' : 'Save'}</Button>}<Button variant="outline" size="sm" onClick={() => void shareJob()} leftIcon={<Share2 className="h-3.5 w-3.5" />}>{shared ? 'Copied' : 'Share'}</Button></div></div>
 
       <div className="overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-sm">
         <div className="bg-gradient-to-r from-[#0A2540] via-[#123860] to-[#0E2E4E] p-6 text-white sm:p-8">
           <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
             <div>
-              <Badge variant="neutral" size="sm" className="border-white/15 bg-white/10 text-slate-200">{job.category || 'Hospitality'}</Badge>
-              <h1 className="mt-4 text-3xl font-black text-white sm:text-4xl">{job.title}</h1>
+              <div className="flex flex-wrap items-center gap-2"><Badge variant="neutral" size="sm" className="border-white/15 bg-white/10 text-slate-200">{job.category || 'Hospitality'}</Badge>{job.is_urgent && <span className="inline-flex items-center gap-1 rounded-full border border-rose-500/30 bg-rose-500/20 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-rose-300"><Zap className="h-3 w-3" />Urgent shift</span>}{job.is_featured && <span className="inline-flex items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/20 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-amber-300"><Sparkles className="h-3 w-3" />Featured</span>}</div>
+              <h1 className="mt-3 text-2xl font-black tracking-tight text-white sm:text-4xl">{job.title}</h1>
+              {(job.company_name || job.employer_name) && <p className="inline-flex items-center gap-2 text-sm font-semibold text-orange-200"><Building2 className="h-4 w-4 text-[#FF6B00]" />{job.company_name || job.employer_name}</p>}
               <div className="mt-4 flex flex-wrap items-center gap-4 text-sm text-slate-200">
                 <span className="inline-flex items-center gap-2">
                   <MapPin className="h-4 w-4 text-[#FF6B00]" />
@@ -140,21 +149,25 @@ export function JobDetailPage() {
                   <Clock3 className="h-4 w-4 text-[#FF6B00]" />
                   {job.status || 'Open now'}
                 </span>
+                <span className="inline-flex items-center gap-2"><Calendar className="h-4 w-4 text-[#FF6B00]" />{formatRelativeTime(job.posted_date)}</span>
               </div>
             </div>
 
             <div className="rounded-2xl bg-white/10 p-4 backdrop-blur-sm">
-              <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-300">Compensation</p>
+              <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-300">Verified escrow pay</p>
               <p className="mt-2 text-3xl font-black text-white">
                 KSh {job.pay_amount_ksh?.toLocaleString() ?? '0'}
               </p>
               <p className="text-sm text-slate-200">{job.pay_period || 'per shift'}</p>
+              <div className="mt-2 flex items-center gap-1.5 text-[11px] font-medium text-emerald-300"><ShieldCheck className="h-3.5 w-3.5" />Protected by KaziLink Escrow</div>
             </div>
           </div>
           {isWorker && <div className="mt-5 flex flex-wrap gap-2"><Button variant="outline" size="sm" onClick={() => void toggleSaved()} disabled={saving} leftIcon={saved ? <Check className="h-4 w-4" /> : <Bookmark className="h-4 w-4" />}>{saved ? 'Saved' : 'Save job'}</Button><Button variant="outline" size="sm" onClick={() => void shareJob()} leftIcon={<Share2 className="h-4 w-4" />}>{shared ? 'Link copied' : 'Share job'}</Button></div>}
         </div>
 
-        <div className="grid gap-6 p-6 lg:grid-cols-[1.5fr_0.8fr] lg:p-8">
+        <div className="border-b border-slate-200 bg-slate-50/50 px-4 pt-2 sm:px-8"><Tabs tabs={detailTabs} activeTab={activeTab} onChange={setActiveTab} /></div>
+
+        <div className="grid gap-6 p-4 sm:p-8 lg:grid-cols-[1.5fr_0.9fr]">
           <div className="space-y-6">
             <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
               <div className="mb-3 flex items-center gap-2 text-sm font-bold uppercase tracking-[0.18em] text-[#0A2540]">
