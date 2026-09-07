@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react'
-
-import { Badge } from '../../../shared/components/ui/Badge'
+import { Coins, ShieldCheck, Sparkles } from 'lucide-react'
 
 export function AuthPanel({
   eyebrow,
@@ -13,51 +12,20 @@ export function AuthPanel({
   subtitle?: string
   children: ReactNode
 }) {
-  const features = [
-    'Verified workers and employers',
-    'Transparent hiring and job matching',
-    'Safer, faster hiring across Kenya',
-  ]
+  const features = ['Verified workers and employers with identity checks', 'Transparent M-Pesa escrow protection', 'Safer hospitality recruitment across Kenya']
 
   return (
-    <section className="min-h-screen bg-slate-100 px-3 py-4 sm:px-5 lg:px-8 lg:py-6">
-      <div className="mx-auto grid min-h-[calc(100vh-2rem)] max-w-6xl overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-[0_30px_80px_rgba(15,23,42,0.08)] lg:grid-cols-[1.05fr_1.2fr]">
-        <aside className="relative overflow-hidden bg-[#0A2540] px-5 py-6 text-white sm:px-7 lg:px-10 lg:py-8">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(255,107,0,0.24),_transparent_32%),radial-gradient(circle_at_bottom_right,_rgba(255,255,255,0.08),_transparent_25%)]" />
-
-          <div className="relative z-10 flex h-full flex-col">
-            <div className="space-y-4 lg:space-y-5">
-              <span className="inline-flex rounded-full border border-white/20 bg-white/5 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.22em] text-orange-100">
-                {eyebrow}
-              </span>
-
-              <div className="space-y-3">
-                <h1 className="text-2xl font-black tracking-tight text-white sm:text-3xl lg:text-4xl">{title}</h1>
-                {subtitle && <p className="max-w-md text-sm leading-6 text-slate-200">{subtitle}</p>}
-              </div>
+    <section className="min-h-screen bg-slate-100/90 px-3 py-3 sm:px-5 sm:py-6 lg:px-8 lg:py-8">
+      <div className="mx-auto grid max-w-6xl overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl sm:rounded-[28px] lg:min-h-[calc(100vh-4rem)] lg:grid-cols-[1.05fr_1.2fr]">
+        <aside className="relative overflow-hidden bg-[#0A2540] px-4 py-5 text-white sm:px-7 sm:py-8 lg:px-10 lg:py-10">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(255,107,0,0.28),_transparent_36%),radial-gradient(circle_at_bottom_right,_rgba(255,255,255,0.08),_transparent_28%)]" />
+          <div className="relative z-10 flex h-full flex-col justify-between">
+            <div className="space-y-3 sm:space-y-4 lg:space-y-5">
+              <div className="flex items-center justify-between"><span className="inline-flex items-center gap-1.5 rounded-full border border-orange-400/30 bg-orange-500/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-orange-200"><Sparkles className="h-3 w-3 text-[#FF6B00]" />{eyebrow}</span><span className="text-[11px] font-black tracking-wider text-slate-300 lg:hidden">Kazi<span className="text-[#FF6B00]">Link</span></span></div>
+              <div className="space-y-1.5 sm:space-y-2.5"><h1 className="text-xl font-black tracking-tight text-white sm:text-2xl lg:text-4xl">{title}</h1>{subtitle && <p className="max-w-md text-xs leading-relaxed text-slate-300 sm:text-sm">{subtitle}</p>}</div>
+              <div className="flex flex-wrap items-center gap-1.5 pt-1 sm:gap-2 sm:pt-2"><span className="inline-flex items-center gap-1 rounded-full border border-orange-400/30 bg-[#FF6B00]/15 px-2.5 py-1 text-[10px] font-bold text-orange-200 sm:text-xs"><ShieldCheck className="h-3 w-3 text-[#FF6B00]" />Verified talent</span><span className="inline-flex items-center gap-1 rounded-full border border-white/15 bg-white/5 px-2.5 py-1 text-[10px] font-bold text-slate-200 sm:text-xs"><Coins className="h-3 w-3 text-emerald-400" />M-Pesa escrow</span><span className="rounded-full border border-white/15 bg-white/5 px-2.5 py-1 text-[10px] font-bold text-slate-200 sm:text-xs">2,000+ venues</span></div>
             </div>
-
-            <div className="mt-6 flex flex-wrap gap-2 lg:mt-8">
-              <Badge variant="orange" size="sm" className="!rounded-full border-[#FFB980]/60 bg-[#FF6B00]/15 text-orange-100">
-                Verified talent
-              </Badge>
-              <Badge variant="neutral" size="sm" className="!rounded-full border-white/15 bg-white/5 text-slate-100">
-                Fraud checked
-              </Badge>
-              <Badge variant="neutral" size="sm" className="!rounded-full border-white/15 bg-white/5 text-slate-100">
-                2k+ trusted venues
-              </Badge>
-            </div>
-
-            <div className="mt-6 space-y-3 lg:mt-8">
-              {features.map((feature) => (
-                <div key={feature} className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-3 py-2.5 backdrop-blur-sm">
-                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#FF6B00] text-sm font-bold text-white">✓</span>
-                  <span className="text-sm text-slate-100">{feature}</span>
-                </div>
-              ))}
-            </div>
-
+            <div className="mt-4 hidden space-y-2.5 sm:mt-6 sm:block lg:mt-8 lg:space-y-3">{features.map((feature) => <div key={feature} className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 backdrop-blur-sm"><span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#FF6B00] text-xs font-bold text-white">✓</span><span className="text-xs text-slate-200 sm:text-sm">{feature}</span></div>)}</div>
           </div>
         </aside>
 

@@ -185,7 +185,7 @@ export function EstablishmentsPage() {
         {!loading && !error && (
           <div className="mt-6 space-y-5">
             {spotlight.length > 0 && (
-              <div className="grid gap-4 lg:grid-cols-3">
+              <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
                 {spotlight.map((establishment) => (
                   <FeaturedEstablishmentCard key={establishment.id} establishment={establishment} />
                 ))}
@@ -200,7 +200,7 @@ export function EstablishmentsPage() {
                 action={isEmployer ? <Button type="button" onClick={() => setShowCreateForm(true)}><Building2 className="h-4 w-4" />Add establishment</Button> : undefined}
               />
             ) : (
-              <div className="grid min-w-0 gap-3 sm:grid-cols-2 xl:grid-cols-3">
+              <div className="grid min-w-0 grid-cols-2 gap-3 xl:grid-cols-3">
                 {visibleEstablishments.map((establishment) => <EstablishmentCard key={establishment.id} establishment={establishment} />)}
               </div>
             )}

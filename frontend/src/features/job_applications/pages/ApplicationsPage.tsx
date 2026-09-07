@@ -91,7 +91,7 @@ export function ApplicationsPage() {
         )}
 
         {!loading && !error && applications.length > 0 && (
-          <div className="mt-6 grid gap-4 lg:grid-cols-2">
+          <div className="mt-6 grid grid-cols-2 gap-3">
             {visibleApplications.map((application) => (
               <ApplicationCard key={application.id} application={application} />
             ))}

@@ -90,7 +90,7 @@ export function JobsPage() {
       </div>
 
       {loading && (
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3" aria-label="Loading opportunities" aria-busy="true">
+        <div className="grid grid-cols-2 gap-3 xl:grid-cols-3" aria-label="Loading opportunities" aria-busy="true">
           {Array.from({ length: 6 }, (_, index) => <Skeleton key={index} className="h-64 rounded-2xl" />)}
         </div>
       )}
@@ -115,7 +115,7 @@ export function JobsPage() {
           </div>
 
           {jobs.length ? (
-            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            <div className="grid grid-cols-2 gap-3 xl:grid-cols-3">
               {visibleJobs.map((job) => (
                 <JobCard key={job.id} job={job} />
               ))}
