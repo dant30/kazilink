@@ -56,14 +56,21 @@ This roadmap tracks the current repository state as of 2026-09-08. It separates 
 | Location filtering for Nairobi/Mombasa/Kisumu | ✅✅ | Job search supports location filtering through the marketplace query API. |
 | Job matching service | ✅✅ | Worker recommendations use indexed skill matching, location scoring, and ranking. |
 | Frontend marketplace pages | ✅✅ | Public job discovery/detail pages are available; applying requires an authenticated worker with sufficient Kazi Credits. |
+| Shift attendance and punctuality events | ❌❌ | No attendance event model currently records scheduled times, worker check-in/check-out, employer confirmation, grace periods, or attendance outcomes. |
+| Punctuality score calculation | ❌❌ | `WorkerProfile.punctuality_score` is currently a stored value rather than a score derived from completed, confirmed shifts. |
 
 ## Phase 3: Employment History And Payments
 
 | Deliverable | Status | Current state |
 | --- | --- | --- |
 | Employment record schema | ✅✅ | Records include establishment, position, dates, responsibilities, references, and verification fields. |
-| History access audit trail | ✅✅ | `HistoryAccessLog` links employer, worker, and payment transaction with a uniqueness constraint. |
+| Reference verification status and attempts | ✅✅ | Records track per-reference status, attempt count, last/next attempt timestamps, reviewer, and attempt notes through the admin reference endpoint. |
+| Reference and employer verification timestamps | ✅✅ | Reference verification and employer assertion timestamps/actors are stored on each employment record. |
+| History access audit trail | ✅✅ | `HistoryAccessLog` links employer, worker, payment transaction, and auditable revocation metadata without deleting prior access. |
 | Worker consent enforcement | ✅✅ | Unlock service requires worker consent before access. |
+| Worker access revocation | ✅✅ | Workers can revoke future history sharing; active access logs are marked revoked with actor, timestamp, reason, and employer notification. |
+| History verification notifications | ✅✅ | Workers receive in-app notifications when records or reference verification statuses change, and employers are notified when access is revoked. |
+| Worker passport history states | ✅✅ | The worker passport separates verified, pending, and rejected employment records and displays reference progress. |
 | Employment verification queue | ✅✅ | Verification serializers, views, permissions, and routes exist. |
 | Automated reference SMS/email | ❌❌ | Reference data is stored, but outbound verification messaging is not implemented. |
 | M-Pesa STK Push initiation | ✅✅ | Configurable Daraja OAuth/STK request code exists. |
@@ -92,6 +99,7 @@ This roadmap tracks the current repository state as of 2026-09-08. It separates 
 | Review creation after platform hire | ✅✅ | Review service verifies a hired application. |
 | Review author snapshots | ✅✅ | Author name, role, and avatar are denormalized. |
 | Worker rating/review counters | ✅✅ | Review signals recalculate rating and review count. |
+| Punctuality evidence and dispute workflow | ❌❌ | Attendance outcomes need employer/manager confirmation, approved-exception handling, worker disputes, correction review, and an auditable resolution trail before punctuality is public. |
 | Two-sided ratings after completed work | ❌❌ | Current model/service supports employer-to-worker reviews only; no job-completion entity or reciprocal flow exists. |
 | Frontend inbox and review UI | ❌❌ | Routes/API helpers exist, but complete feature pages are not implemented. |
 
@@ -152,7 +160,18 @@ This roadmap tracks the current repository state as of 2026-09-08. It separates 
 1. Run `manage.py check`, migration checks, and the credit/payment test suite locally; fix any runtime failures before adding new payment behavior.
 2. Implement recharge status polling and clear pending/failed/completed feedback so M-Pesa purchases do not require a manual refresh.
 3. Add frontend component tests for transfer validation, insufficient balances, idempotent retries, recharge confirmations, and promotion expiry states.
-4. Add subscription cash-payment coverage, then continue with history-detail rendering, active promotion indicators, Channels, fraud rules, messaging delivery, recurring billing, seed data, and deployment validation.
+4. Complete employment-history verification: reference statuses and attempts, employer/reference timestamps, approval/rejection notifications, access revocation, audit-preserving history access, and separate verified/pending passport sections.
+5. Build the attendance foundation for punctuality: scheduled shift start/end, worker check-in/check-out, employer or manager confirmation, a 10–15 minute grace period, and `on_time`, `late`, `no_show`, and `excused` outcomes.
+6. Derive punctuality only from completed and confirmed shifts, require a minimum sample size before publishing a score, and add worker disputes, approved exceptions, correction review, and an audit trail.
+7. Add subscription cash-payment coverage, then continue with active promotion indicators, Channels, fraud rules, messaging delivery, recurring billing, seed data, and deployment validation.
+
+## Punctuality Rules
+
+Punctuality must be evidence-based rather than manually edited. Each scheduled shift should record its planned start and end, the worker's check-in and check-out, the confirming employer or manager, and the applicable grace period. The attendance result should be calculated as one of `on_time`, `late`, `no_show`, or `excused`.
+
+Only completed shifts with confirmed attendance should affect a worker's public punctuality score. Approved emergencies, employer schedule changes, and platform-side failures should be excluded or marked `excused`. Workers should be able to challenge an attendance result, while employers or administrators resolve the dispute with an immutable decision history.
+
+The public profile should show a score only after the configured minimum number of completed shifts, alongside the sample size and a clear pending state before that threshold. Internal audit views should retain the raw attendance events, timestamps, actor confirmations, exception reasons, disputes, and corrections.
 
 ## Validation Commands
 

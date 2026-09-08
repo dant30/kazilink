@@ -5,8 +5,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from ..models import EmploymentRecord
-from ..serializers import EmploymentRecordSerializer, VerifyEmploymentSerializer
-from ..services import review_record
+from ..serializers import EmploymentRecordSerializer, ReferenceAttemptSerializer, VerifyEmploymentSerializer
+from ..services import record_reference_attempt, review_record
 
 
 class EmploymentVerificationQueueView(ListAPIView):
@@ -29,6 +29,25 @@ class EmploymentVerificationView(APIView):
 		record = review_record(
 			record=record,
 			status=serializer.validated_data['status'],
+			notes=serializer.validated_data.get('notes', ''),
+			reviewer=request.user.get_full_name() or request.user.phone,
+		)
+		return Response(EmploymentRecordSerializer(record).data)
+
+
+class EmploymentReferenceAttemptView(APIView):
+	permission_classes = [IsAdminUser]
+
+	def patch(self, request, pk):
+		record = EmploymentRecord.objects.select_related('worker__user').filter(pk=pk).first()
+		if record is None:
+			return Response({'detail': 'Employment record not found.'}, status=status.HTTP_404_NOT_FOUND)
+		serializer = ReferenceAttemptSerializer(data=request.data)
+		serializer.is_valid(raise_exception=True)
+		record = record_reference_attempt(
+			record=record,
+			status=serializer.validated_data['status'],
+			next_attempt_at=serializer.validated_data.get('next_attempt_at'),
 			notes=serializer.validated_data.get('notes', ''),
 			reviewer=request.user.get_full_name() or request.user.phone,
 		)

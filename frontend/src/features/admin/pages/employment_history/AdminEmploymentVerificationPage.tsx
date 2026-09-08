@@ -1,5 +1,5 @@
-import { ArrowRight, CheckCircle2, Clock3, FileText, ShieldCheck, XCircle } from 'lucide-react'
-import { useMemo } from 'react'
+import { CheckCircle2, Clock3, FileText, ShieldCheck, XCircle } from 'lucide-react'
+import { useMemo, useState } from 'react'
 
 import { useVerificationQueue } from '../../../employment_history/hooks'
 import type { EmploymentRecord } from '../../../employment_history/types'
@@ -8,7 +8,8 @@ import { PageHeader } from '../../../../shared/components/ui/PageHeader'
 import { Skeleton } from '../../../../shared/components/ui/Skeleton'
 
 export function AdminEmploymentVerificationPage() {
-  const { records, loading, error } = useVerificationQueue()
+  const { records, loading, error, updateRecord, updateReference } = useVerificationQueue()
+  const [actionId, setActionId] = useState<number | null>(null)
 
   const summary = useMemo(() => ({
     total: records.length,
@@ -57,7 +58,7 @@ export function AdminEmploymentVerificationPage() {
         {!loading && !error && records.length > 0 && (
           <div className="mt-6 space-y-4">
             {records.map((record) => (
-              <AdminVerificationCard key={record.id} record={record} />
+              <AdminVerificationCard key={record.id} record={record} actionId={actionId} onReview={async (status) => { setActionId(record.id); try { await updateRecord(record.id, status, window.prompt('Review notes', '') || '') } finally { setActionId(null) } }} onReference={async (status) => { setActionId(record.id); try { await updateReference(record.id, status, window.prompt('Reference notes', '') || '') } finally { setActionId(null) } }} />
             ))}
           </div>
         )}
@@ -66,7 +67,7 @@ export function AdminEmploymentVerificationPage() {
   )
 }
 
-function AdminVerificationCard({ record }: { record: EmploymentRecord }) {
+function AdminVerificationCard({ record, actionId, onReview, onReference }: { record: EmploymentRecord; actionId: number | null; onReview: (status: 'verified' | 'rejected') => Promise<void>; onReference: (status: 'contacted' | 'verified' | 'failed') => Promise<void> }) {
   return (
     <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
@@ -82,14 +83,17 @@ function AdminVerificationCard({ record }: { record: EmploymentRecord }) {
         <div className="flex items-center gap-2"><FileText className="h-4 w-4 text-[#FF6B00]" /> {record.worker_name || 'Worker'}</div>
         <div className="flex items-center gap-2"><Clock3 className="h-4 w-4 text-[#FF6B00]" /> {record.start_date} {record.end_date ? `– ${record.end_date}` : ''}</div>
         <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-[#FF6B00]" /> {record.is_current ? 'Current role' : 'Previous role'}</div>
-        <div className="flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-[#FF6B00]" /> {record.reference_contact_name}</div>
+        <div className="flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-[#FF6B00]" /> {record.reference_contact_name} · {record.reference_verification_status || 'pending'} · {record.reference_verification_attempts || 0} attempts</div>
       </div>
 
-      <div className="mt-5 flex items-center justify-between border-t border-slate-100 pt-4">
+      <div className="mt-5 flex flex-col gap-3 border-t border-slate-100 pt-4 sm:flex-row sm:items-center sm:justify-between">
         <span className="text-xs font-medium text-slate-500">Reference contact: {record.reference_contact_phone}</span>
-        <button type="button" className="inline-flex items-center gap-1 text-xs font-bold text-[#FF6B00]">
-          Review record <ArrowRight className="h-3.5 w-3.5" />
-        </button>
+        <div className="flex flex-wrap gap-2">
+          <button type="button" disabled={actionId === record.id} onClick={() => void onReference('contacted')} className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-bold text-slate-700">Log contact</button>
+          <button type="button" disabled={actionId === record.id} onClick={() => void onReference('verified')} className="rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white">Reference verified</button>
+          <button type="button" disabled={actionId === record.id} onClick={() => void onReview('verified')} className="rounded-lg bg-[#0A2540] px-3 py-1.5 text-xs font-bold text-white">Approve record</button>
+          <button type="button" disabled={actionId === record.id} onClick={() => void onReview('rejected')} className="rounded-lg border border-rose-200 px-3 py-1.5 text-xs font-bold text-rose-700">Reject</button>
+        </div>
       </div>
     </article>
   )

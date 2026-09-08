@@ -21,6 +21,14 @@ export type EmploymentRecord = {
   verified_at?: string | null
   verified_by?: string
   verification_notes?: string
+  reference_verification_status?: 'pending' | 'contacted' | 'verified' | 'failed' | 'rejected'
+  reference_verification_attempts?: number
+  reference_last_attempt_at?: string | null
+  reference_next_attempt_at?: string | null
+  reference_verified_at?: string | null
+  reference_verified_by?: string
+  employer_verified_at?: string | null
+  employer_verified_by?: string
 }
 
 export type HistoryAccessLog = {
@@ -31,6 +39,9 @@ export type HistoryAccessLog = {
   employer_name?: string
   transaction?: number | null
   unlocked_at: string
+  revoked_at?: string | null
+  revoked_by?: number | null
+  revocation_reason?: string
 }
 
 export type EmploymentHistoryFilters = {

@@ -73,9 +73,11 @@ export const endpoints = {
     unlock: (data: { worker_id: number; idempotency_key?: string }) => post('/employment-history/unlock/', data),
     access: () => get('/employment-history/access/'),
     consent: (consent_history_sharing: boolean) => patch('/employment-history/consent/', { consent_history_sharing }),
+    revokeAccess: () => post<{ revoked_count: number; consent_history_sharing: boolean }>('/employment-history/access/revoke/', {}),
     worker: (workerId: number) => get(`/employment-history/worker/${workerId}/`),
     verificationQueue: () => get('/employment-history/admin/verification-queue/'),
     verify: (id: number, data: Record<string, unknown>) => patch(`/employment-history/admin/${id}/verify/`, data),
+    referenceAttempt: (id: number, data: Record<string, unknown>) => patch(`/employment-history/admin/${id}/reference/`, data),
   },
   applications: {
     list: (query = '') => get<Paginated<JobApplication> | JobApplication[]>(`/applications/${query ? `?${query}` : ''}`),

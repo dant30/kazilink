@@ -12,7 +12,7 @@ def unlock_history_with_credits(*, employer, worker, idempotency_key):
 		raise PermissionError('Only employers can unlock employment history.')
 	if not worker.consent_history_sharing:
 		raise PermissionError('This worker has not consented to history sharing.')
-	if HistoryAccessLog.objects.filter(employer=employer, worker=worker).exists():
+	if HistoryAccessLog.objects.filter(employer=employer, worker=worker, revoked_at__isnull=True).exists():
 		raise ValueError('This employer already has access to this worker history.')
 	entry = spend_credits(
 		user=employer.user,
@@ -24,8 +24,14 @@ def unlock_history_with_credits(*, employer, worker, idempotency_key):
 	log, _ = HistoryAccessLog.objects.get_or_create(
 		employer=employer,
 		worker=worker,
-		defaults={'transaction': None},
+		defaults={'transaction': None, 'revoked_at': None, 'revoked_by': None, 'revocation_reason': ''},
 	)
+	if log.revoked_at is not None:
+		log.revoked_at = None
+		log.revoked_by = None
+		log.revocation_reason = ''
+		log.transaction = None
+		log.save(update_fields=['revoked_at', 'revoked_by', 'revocation_reason', 'transaction'])
 	AuditLog.objects.get_or_create(
 		actor=employer.user,
 		action='history_unlocked',

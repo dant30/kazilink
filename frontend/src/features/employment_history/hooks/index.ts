@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-import { getEmploymentRecord, getVerificationQueue, listEmploymentHistory, getWorkerEmploymentHistory } from '../services'
+import { getEmploymentRecord, getVerificationQueue, listEmploymentHistory, getWorkerEmploymentHistory, recordReferenceAttempt, verifyEmploymentRecord } from '../services'
 import type { EmploymentHistoryListResponse, EmploymentRecord } from '../types'
 
 function results(value: EmploymentHistoryListResponse) {
@@ -148,6 +148,18 @@ export function useVerificationQueue() {
     }
   }, [])
 
-  return { records, loading, error }
+  const updateRecord = async (id: number, status: 'verified' | 'rejected', notes = '') => {
+    const updated = await verifyEmploymentRecord(id, status, notes)
+    setRecords((current) => current.map((record) => record.id === id ? updated : record))
+    return updated
+  }
+
+  const updateReference = async (id: number, status: 'pending' | 'contacted' | 'verified' | 'failed' | 'rejected', notes = '') => {
+    const updated = await recordReferenceAttempt(id, status, notes)
+    setRecords((current) => current.map((record) => record.id === id ? updated : record))
+    return updated
+  }
+
+  return { records, loading, error, updateRecord, updateReference }
 }
 

@@ -24,6 +24,9 @@ def create_record(*, worker=None, employer=None, validated_data):
 		payload.pop('worker_id', None)
 		payload['employer'] = employer
 		payload['worker'] = worker_obj
+		from django.utils import timezone
+		payload['employer_verified_at'] = timezone.now()
+		payload['employer_verified_by'] = employer.user.full_name or employer.user.phone
 		return EmploymentRecord.objects.create(**payload)
 
 	if worker is None:
@@ -47,8 +50,30 @@ def update_record(*, record, validated_data):
 def can_view_history(*, employer, worker):
 	return bool(
 		worker.consent_history_sharing
-		and HistoryAccessLog.objects.filter(employer=employer, worker=worker).exists()
+		and HistoryAccessLog.objects.filter(employer=employer, worker=worker, revoked_at__isnull=True).exists()
 	)
+
+
+@transaction.atomic
+def revoke_history_access(*, worker, revoked_by, reason='Worker revoked future history access.'):
+	from django.utils import timezone
+	from apps.notifications.services import create_notification
+
+	logs = list(HistoryAccessLog.objects.select_related('employer__user').filter(worker=worker, revoked_at__isnull=True))
+	updated_at = timezone.now()
+	for log in logs:
+		log.revoked_at = updated_at
+		log.revoked_by = revoked_by
+		log.revocation_reason = reason
+		log.save(update_fields=['revoked_at', 'revoked_by', 'revocation_reason'])
+		create_notification(
+			user=log.employer.user,
+			title='Employment history access revoked',
+			message=f'{worker.user.full_name} revoked future access to their employment history.',
+			notification_type='verification',
+			link_tab='employment_history',
+		)
+	return len(logs)
 
 
 @transaction.atomic

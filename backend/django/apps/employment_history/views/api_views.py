@@ -11,7 +11,7 @@ from ..serializers import (
 	HistoryAccessLogSerializer,
 	UnlockHistorySerializer,
 )
-from ..services import can_view_history, create_record, unlock_history_with_credits, update_record
+from ..services import can_view_history, create_record, revoke_history_access, unlock_history_with_credits, update_record
 from apps.accounts.models import WorkerProfile
 
 
@@ -116,4 +116,17 @@ class HistoryConsentView(APIView):
 		worker = request.user.worker_profile
 		worker.consent_history_sharing = serializer.validated_data['consent_history_sharing']
 		worker.save(update_fields=['consent_history_sharing'])
+		if not worker.consent_history_sharing:
+			revoke_history_access(worker=worker, revoked_by=request.user)
 		return Response({'consent_history_sharing': worker.consent_history_sharing})
+
+
+class RevokeHistoryAccessView(APIView):
+	permission_classes = [IsWorkerOwner]
+
+	def post(self, request):
+		worker = request.user.worker_profile
+		worker.consent_history_sharing = False
+		worker.save(update_fields=['consent_history_sharing'])
+		count = revoke_history_access(worker=worker, revoked_by=request.user)
+		return Response({'revoked_count': count, 'consent_history_sharing': worker.consent_history_sharing})

@@ -39,6 +39,10 @@ export function consentToHistorySharing(consent: boolean) {
   return endpoints.employmentHistory.consent(consent)
 }
 
+export function revokeHistoryAccess() {
+  return endpoints.employmentHistory.revokeAccess()
+}
+
 export function getWorkerEmploymentHistory(workerId: number) {
   return endpoints.employmentHistory.worker(workerId)
 }
@@ -49,6 +53,10 @@ export function getVerificationQueue() {
 
 export function verifyEmploymentRecord(id: number, status: 'verified' | 'rejected', notes = '') {
   return endpoints.employmentHistory.verify(id, { status, notes })
+}
+
+export function recordReferenceAttempt(id: number, status: 'pending' | 'contacted' | 'verified' | 'failed' | 'rejected', notes = '') {
+  return endpoints.employmentHistory.referenceAttempt(id, { status, notes })
 }
 
 export function normalizeEmploymentRecords(data: EmploymentHistoryListResponse) {

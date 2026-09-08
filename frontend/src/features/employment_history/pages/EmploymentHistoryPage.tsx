@@ -6,13 +6,15 @@ import { useAuthStore } from '../../auth/store/authStore'
 import { useEstablishments } from '../../establishments/hooks'
 import { useEmploymentHistory } from '../hooks'
 import { createEmploymentRecord } from '../services'
-import type { EmploymentRecordInput } from '../types'
+import { revokeHistoryAccess } from '../services'
+import type { EmploymentRecord, EmploymentRecordInput } from '../types'
 import { DatePicker } from '../../../shared/components/ui/DatePicker'
 import { PageHeader } from '../../../shared/components/ui/PageHeader'
 import { StatCard } from '../../../shared/components/cards/StatCard'
 import { Skeleton } from '../../../shared/components/ui/Skeleton'
 import { EmptyState } from '../../../shared/components/feedback'
 import { Select } from '../../../shared/components/ui/Select'
+import { Button } from '../../../shared/components/ui/Button'
 
 const defaultForm: EmploymentRecordInput = {
   worker_id: undefined,
@@ -30,6 +32,8 @@ const defaultForm: EmploymentRecordInput = {
   reference_role: '',
 }
 
+type EmploymentHistoryPageRecord = EmploymentRecord
+
 export function EmploymentHistoryPage() {
   const { user } = useAuthStore()
   const { records, loading, error, refetch } = useEmploymentHistory()
@@ -39,6 +43,7 @@ export function EmploymentHistoryPage() {
   const [saving, setSaving] = useState(false)
   const [formError, setFormError] = useState('')
   const [successMessage, setSuccessMessage] = useState('')
+  const [revokingAccess, setRevokingAccess] = useState(false)
 
   useEffect(() => {
     if (!user?.is_employer) return
@@ -82,6 +87,27 @@ export function EmploymentHistoryPage() {
     rejected: records.filter((record) => record.verification_status === 'rejected').length,
   }), [records])
 
+  const groupedRecords = useMemo(() => ({
+    verified: records.filter((record) => record.verification_status === 'verified'),
+    pending: records.filter((record) => record.verification_status === 'pending'),
+    rejected: records.filter((record) => record.verification_status === 'rejected'),
+  }), [records])
+
+  const handleRevokeAccess = async () => {
+    if (!window.confirm('Revoke future employer access to your employment history? Previously granted access will remain in the audit history.')) return
+    setRevokingAccess(true)
+    setFormError('')
+    setSuccessMessage('')
+    try {
+      const response = await revokeHistoryAccess()
+      setSuccessMessage(`${response.revoked_count} active history access record${response.revoked_count === 1 ? '' : 's'} revoked.`)
+    } catch (reason) {
+      setFormError(reason instanceof Error ? reason.message : 'Unable to revoke history access.')
+    } finally {
+      setRevokingAccess(false)
+    }
+  }
+
   const handleChange = (key: keyof EmploymentRecordInput, value: string | number | boolean | string[] | undefined | null) => {
     setForm((current) => ({ ...current, [key]: value }))
     setFormError('')
@@ -119,9 +145,32 @@ export function EmploymentHistoryPage() {
     }
   }
 
+  const renderRecord = (record: EmploymentHistoryPageRecord) => (
+    <article key={record.id} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500">{record.establishment_type || 'Hospitality'}</p>
+          <h3 className="mt-2 text-lg font-black text-slate-900">{record.establishment_name}</h3>
+          <p className="mt-1 text-sm text-slate-600">{record.position}</p>
+        </div>
+        <StatusBadge status={record.verification_status} />
+      </div>
+      <div className="mt-4 grid gap-3 text-sm text-slate-600 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="flex items-center gap-2"><UserRound className="h-4 w-4 text-[#FF6B00]" /> {record.worker_name || 'Worker'}</div>
+        <div className="flex items-center gap-2"><Building2 className="h-4 w-4 text-[#FF6B00]" /> {record.location}</div>
+        <div className="flex items-center gap-2"><Clock3 className="h-4 w-4 text-[#FF6B00]" /> {record.start_date} {record.end_date ? `- ${record.end_date}` : ''}</div>
+        <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-[#FF6B00]" /> {record.is_current ? 'Current role' : 'Previous role'}</div>
+      </div>
+      <div className="mt-4 grid gap-2 text-xs text-slate-500 sm:grid-cols-2">
+        <span>Reference: {record.reference_verification_status || 'pending'} ({record.reference_verification_attempts || 0} attempts)</span>
+        {record.verification_notes && <span>Review notes: {record.verification_notes}</span>}
+      </div>
+    </article>
+  )
+
   return (
     <section className="mx-auto max-w-7xl space-y-6 px-4 py-8 sm:px-6 lg:px-8">
-      <PageHeader eyebrow="Employment history" title={user?.is_worker ? 'Your work passport' : user?.is_employer ? 'Employment verification desk' : 'History verification desk'} actions={<div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-2 text-xs text-slate-200"><ShieldCheck className="h-4 w-4 text-[#FF6B00]" />{summary.total} records</div>} />
+      <PageHeader eyebrow="Employment history" title={user?.is_worker ? 'Your work passport' : user?.is_employer ? 'Employment verification desk' : 'History verification desk'} actions={user?.is_worker ? <div className="flex flex-wrap items-center gap-2"><span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-2 text-xs text-slate-200"><ShieldCheck className="h-4 w-4 text-[#FF6B00]" />{summary.total} records</span><Button variant="outline" size="sm" onClick={() => void handleRevokeAccess()} disabled={revokingAccess}>Revoke future access</Button></div> : <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-2 text-xs text-slate-200"><ShieldCheck className="h-4 w-4 text-[#FF6B00]" />{summary.total} records</div>} />
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <StatCard title="Total" value={summary.total} subtitle="Recorded employment entries" icon={<FileText className="h-5 w-5" />} />
@@ -245,26 +294,12 @@ export function EmploymentHistoryPage() {
         )}
 
         {!loading && !error && records.length > 0 && (
-          <div className="mt-6 space-y-4">
-            {records.map((record) => (
-              <article key={record.id} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                  <div>
-                    <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500">{record.establishment_type || 'Hospitality'}</p>
-                    <h3 className="mt-2 text-lg font-black text-slate-900">{record.establishment_name}</h3>
-                    <p className="mt-1 text-sm text-slate-600">{record.position}</p>
-                  </div>
-                  <StatusBadge status={record.verification_status} />
-                </div>
-
-                <div className="mt-4 grid gap-3 text-sm text-slate-600 sm:grid-cols-2 lg:grid-cols-4">
-                  <div className="flex items-center gap-2"><UserRound className="h-4 w-4 text-[#FF6B00]" /> {record.worker_name || 'Worker'}</div>
-                  <div className="flex items-center gap-2"><Building2 className="h-4 w-4 text-[#FF6B00]" /> {record.location}</div>
-                  <div className="flex items-center gap-2"><Clock3 className="h-4 w-4 text-[#FF6B00]" /> {record.start_date} {record.end_date ? `– ${record.end_date}` : ''}</div>
-                  <div className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-[#FF6B00]" /> {record.is_current ? 'Current role' : 'Previous role'}</div>
-                </div>
-              </article>
-            ))}
+          <div className="mt-6 space-y-6">
+            {(['verified', 'pending', 'rejected'] as const).map((status) => {
+              const items = groupedRecords[status]
+              if (!items.length) return null
+              return <section key={status} className="space-y-3"><div className="flex items-center gap-2"><StatusBadge status={status} /><h3 className="text-sm font-black capitalize text-slate-900">{status} records</h3><span className="text-xs text-slate-400">({items.length})</span></div>{items.map(renderRecord)}</section>
+            })}
           </div>
         )}
       </div>

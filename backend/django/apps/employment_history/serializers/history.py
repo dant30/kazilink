@@ -20,10 +20,15 @@ class EmploymentRecordSerializer(serializers.ModelSerializer):
             'establishment_name', 'establishment_type', 'location', 'position', 'start_date', 'end_date', 'is_current',
             'responsibilities', 'reference_contact_name', 'reference_contact_phone', 'reference_role',
             'verification_status', 'verified_at', 'verified_by', 'verification_notes',
+            'reference_verification_status', 'reference_verification_attempts', 'reference_last_attempt_at',
+            'reference_next_attempt_at', 'reference_verified_at', 'reference_verified_by',
+            'employer_verified_at', 'employer_verified_by',
         )
         read_only_fields = (
             'id', 'worker', 'worker_name', 'employer', 'establishment', 'verification_status', 'verified_at',
-            'verified_by', 'verification_notes',
+            'verified_by', 'verification_notes', 'reference_verification_status', 'reference_verification_attempts',
+			'reference_last_attempt_at', 'reference_next_attempt_at', 'reference_verified_at', 'reference_verified_by',
+			'employer_verified_at', 'employer_verified_by',
         )
 
     def validate(self, attrs):
@@ -43,7 +48,7 @@ class HistoryAccessLogSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = HistoryAccessLog
-        fields = ('id', 'worker', 'worker_name', 'employer', 'employer_name', 'transaction', 'unlocked_at')
+        fields = ('id', 'worker', 'worker_name', 'employer', 'employer_name', 'transaction', 'unlocked_at', 'revoked_at', 'revoked_by', 'revocation_reason')
         read_only_fields = fields
 
 
@@ -54,6 +59,12 @@ class UnlockHistorySerializer(serializers.Serializer):
 
 class VerifyEmploymentSerializer(serializers.Serializer):
     status = serializers.ChoiceField(choices=(EmploymentRecord.VerificationStatus.VERIFIED, EmploymentRecord.VerificationStatus.REJECTED))
+    notes = serializers.CharField(required=False, allow_blank=True)
+
+
+class ReferenceAttemptSerializer(serializers.Serializer):
+    status = serializers.ChoiceField(choices=EmploymentRecord.ReferenceVerificationStatus.choices)
+    next_attempt_at = serializers.DateTimeField(required=False, allow_null=True)
     notes = serializers.CharField(required=False, allow_blank=True)
 
 
