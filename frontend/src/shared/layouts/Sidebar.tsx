@@ -39,6 +39,7 @@ const employerNavItems = [
 	{ path: '/workers', label: 'Browse Verified Talent', icon: UserCheck },
 	{ path: '/applications', label: 'Applicants', icon: FileText },
 	{ path: '/establishments', label: 'Establishments', icon: Award },
+	{ path: '/employment-history', label: 'Employment History', icon: FileText },
 	{ path: '/messages', label: 'Messages', icon: MessageSquare },
 	{ path: '/notifications', label: 'Notifications', icon: Bell },
 	{ path: '/payments', label: 'Buy Kazi Credits', icon: CreditCard },

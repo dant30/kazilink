@@ -19,7 +19,7 @@ class WorkerHistoryListCreateView(generics.ListCreateAPIView):
 	permission_classes = [IsWorkerOwner]
 
 	def get_permissions(self):
-		if self.request.method == 'POST' and getattr(self.request.user, 'is_employer', False):
+		if getattr(self.request.user, 'is_employer', False):
 			return [IsEmployerHistoryViewer()]
 		return [IsWorkerOwner()]
 

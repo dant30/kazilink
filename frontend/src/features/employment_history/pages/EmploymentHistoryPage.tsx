@@ -1,4 +1,4 @@
-import { ArrowRight, Building2, CheckCircle2, Clock3, FileText, PlusCircle, ShieldCheck, UserRound } from 'lucide-react'
+import { Building2, CheckCircle2, Clock3, FileText, PlusCircle, ShieldCheck, UserRound } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 
 import { endpoints } from '../../../core/api'
@@ -53,11 +53,16 @@ export function EmploymentHistoryPage() {
     if (!user?.is_employer) return
 
     let active = true
-    endpoints.auth.adminUsers()
+    endpoints.workers.list()
       .then((data) => {
         if (!active) return
-        const allUsers = Array.isArray(data) ? data : data.results ?? []
-        setWorkers(allUsers.filter((candidate) => candidate.is_worker))
+        const profiles = Array.isArray(data) ? data : data.results ?? []
+        setWorkers(profiles.map((profile) => ({
+          id: profile.id,
+          full_name: profile.user.full_name,
+          phone: profile.user.phone,
+          is_worker: profile.user.is_worker,
+        })))
       })
       .catch(() => {
         if (!active) return
@@ -211,7 +216,7 @@ export function EmploymentHistoryPage() {
 
   return (
     <section className="mx-auto max-w-7xl space-y-6 px-4 py-8 sm:px-6 lg:px-8">
-      <PageHeader eyebrow="Employment history" title={user?.is_worker ? 'Your work passport' : user?.is_employer ? 'Employment verification desk' : 'History verification desk'} actions={user?.is_worker ? <div className="flex flex-nowrap items-center gap-2"><Button variant="primary" size="sm" leftIcon={<PlusCircle className="h-4 w-4" />} onClick={openAddEmploymentModal}>Add previous employment</Button><Button variant="outline" size="sm" onClick={() => setRevokeDialogOpen(true)} disabled={revokingAccess}>Revoke future access</Button></div> : undefined} />
+      <PageHeader eyebrow="Employment history" title={user?.is_worker ? 'Your work passport' : user?.is_employer ? 'Employment verification desk' : 'History verification desk'} actions={user?.is_worker ? <div className="flex flex-nowrap items-center gap-2"><Button variant="primary" size="sm" leftIcon={<PlusCircle className="h-4 w-4" />} onClick={openAddEmploymentModal}>Add previous employment</Button><Button variant="outline" size="sm" onClick={() => setRevokeDialogOpen(true)} disabled={revokingAccess}>Revoke future access</Button></div> : user?.is_employer ? <Button variant="primary" size="sm" leftIcon={<PlusCircle className="h-4 w-4" />} onClick={openAddEmploymentModal}>Add a worker record</Button> : undefined} />
 
       <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
         <StatCard title="Total" value={summary.total} subtitle="Recorded employment entries" icon={<FileText className="h-5 w-5" />} />
@@ -257,19 +262,9 @@ export function EmploymentHistoryPage() {
       )}
 
       {user?.is_employer && (
-        <div className="card-kazilink p-5 sm:p-6">
-          <div className="flex items-center justify-between gap-3 border-b border-slate-200 pb-4">
-            <div>
-              <h2 className="text-lg font-black text-slate-900">Add a worker record</h2>
-              <p className="text-xs text-slate-500">Attach verified history to one of your establishments for review.</p>
-            </div>
-            <span className="inline-flex items-center gap-2 rounded-full bg-[#FFF2E8] px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-[#FF6B00]">
-              <PlusCircle className="h-3.5 w-3.5" />
-              Employer action
-            </span>
-          </div>
-
+        <Modal isOpen={addEmploymentModalOpen} onClose={() => setAddEmploymentModalOpen(false)} title="Add a worker record" subtitle="Attach verified history to one of your establishments for review." maxWidth="2xl">
           <form onSubmit={handleSubmit} className="mt-6 space-y-5">
+            <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#FF6B00]">Employer action</p>
             <div className="grid gap-5 md:grid-cols-2">
               <Select label="Worker" required value={String(form.worker_id ?? '')} onChange={(value) => handleChange('worker_id', Number(value))} options={[{ value: '', label: 'Select worker' }, ...workers.map((worker) => ({ value: String(worker.id), label: worker.full_name, sublabel: worker.phone }))]} />
 
@@ -352,7 +347,7 @@ export function EmploymentHistoryPage() {
               </button>
             </div>
           </form>
-        </div>
+        </Modal>
       )}
 
       <div className="card-kazilink p-5 sm:p-6">
