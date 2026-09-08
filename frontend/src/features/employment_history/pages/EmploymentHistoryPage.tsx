@@ -16,6 +16,7 @@ import { EmptyState } from '../../../shared/components/feedback'
 import { Select } from '../../../shared/components/ui/Select'
 import { Button } from '../../../shared/components/ui/Button'
 import { ConfirmDialog } from '../../../shared/components/ui/ConfirmDialog'
+import { Modal } from '../../../shared/components/ui/Modal'
 
 const defaultForm: EmploymentRecordInput = {
   worker_id: undefined,
@@ -46,6 +47,7 @@ export function EmploymentHistoryPage() {
   const [successMessage, setSuccessMessage] = useState('')
   const [revokingAccess, setRevokingAccess] = useState(false)
   const [revokeDialogOpen, setRevokeDialogOpen] = useState(false)
+  const [addEmploymentModalOpen, setAddEmploymentModalOpen] = useState(false)
 
   useEffect(() => {
     if (!user?.is_employer) return
@@ -116,16 +118,23 @@ export function EmploymentHistoryPage() {
     setSuccessMessage('')
   }
 
+  const openAddEmploymentModal = () => {
+    setForm(defaultForm)
+    setFormError('')
+    setSuccessMessage('')
+    setAddEmploymentModalOpen(true)
+  }
+
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
-    if (!user?.is_employer) return
+    if (!user) return
 
     setSaving(true)
     setFormError('')
     setSuccessMessage('')
 
     try {
-      const payload: EmploymentRecordInput = {
+      const payload: EmploymentRecordInput = user.is_employer ? {
         ...form,
         worker_id: Number(form.worker_id),
         establishment_id: Number(form.establishment_id),
@@ -134,6 +143,15 @@ export function EmploymentHistoryPage() {
         location: form.location || selectedEstablishment?.location || '',
         end_date: form.is_current ? null : form.end_date || null,
         responsibilities: form.responsibilities ?? [],
+      } : {
+        ...form,
+        establishment_name: form.establishment_name.trim(),
+        establishment_type: form.establishment_type?.trim() || '',
+        location: form.location?.trim() || '',
+        end_date: form.is_current ? null : form.end_date || null,
+        responsibilities: form.responsibilities ?? [],
+        worker_id: undefined,
+        establishment_id: undefined,
       }
 
       await createEmploymentRecord(payload)
@@ -146,6 +164,27 @@ export function EmploymentHistoryPage() {
       setSaving(false)
     }
   }
+
+  const renderEmploymentDates = () => <>
+    <DatePicker label="Start date" required value={form.start_date} onChange={(value) => handleChange('start_date', value)} maxDate={form.end_date || undefined} />
+    <DatePicker label="End date" value={form.end_date ?? ''} onChange={(value) => handleChange('end_date', value)} minDate={form.start_date || undefined} disabled={Boolean(form.is_current)} />
+  </>
+
+  const renderReferenceFields = () => <div className="grid gap-5 md:grid-cols-2">
+    <label className="space-y-2 text-sm font-semibold text-slate-700">
+      <span>Reference contact name</span>
+      <input required value={form.reference_contact_name} onChange={(event) => handleChange('reference_contact_name', event.target.value)} placeholder="Jane Wambui" className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-700 placeholder:text-slate-400 focus:border-[#FF6B00] focus:bg-white focus:outline-none" />
+    </label>
+    <label className="space-y-2 text-sm font-semibold text-slate-700">
+      <span>Reference phone</span>
+      <input required value={form.reference_contact_phone} onChange={(event) => handleChange('reference_contact_phone', event.target.value)} placeholder="07xx xxx xxx" className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-700 placeholder:text-slate-400 focus:border-[#FF6B00] focus:bg-white focus:outline-none" />
+    </label>
+  </div>
+
+  const renderCurrentRoleToggle = (id: string) => <div className="flex items-center gap-2 text-sm text-slate-700">
+    <input id={id} type="checkbox" checked={Boolean(form.is_current)} onChange={(event) => { const checked = event.target.checked; handleChange('is_current', checked); if (checked) handleChange('end_date', null) }} className="h-4 w-4 rounded border-slate-300 text-[#FF6B00] focus:ring-[#FFB380]" />
+    <label htmlFor={id}>This is their current role</label>
+  </div>
 
   const renderRecord = (record: EmploymentHistoryPageRecord) => (
     <article key={record.id} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
@@ -172,7 +211,7 @@ export function EmploymentHistoryPage() {
 
   return (
     <section className="mx-auto max-w-7xl space-y-6 px-4 py-8 sm:px-6 lg:px-8">
-      <PageHeader eyebrow="Employment history" title={user?.is_worker ? 'Your work passport' : user?.is_employer ? 'Employment verification desk' : 'History verification desk'} actions={user?.is_worker ? <div className="flex flex-wrap items-center gap-2"><span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-2 text-xs text-slate-200"><ShieldCheck className="h-4 w-4 text-[#FF6B00]" />{summary.total} records</span><Button variant="outline" size="sm" onClick={() => setRevokeDialogOpen(true)} disabled={revokingAccess}>Revoke future access</Button></div> : <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-2 text-xs text-slate-200"><ShieldCheck className="h-4 w-4 text-[#FF6B00]" />{summary.total} records</div>} />
+      <PageHeader eyebrow="Employment history" title={user?.is_worker ? 'Your work passport' : user?.is_employer ? 'Employment verification desk' : 'History verification desk'} actions={user?.is_worker ? <div className="flex flex-nowrap items-center gap-2"><Button variant="primary" size="sm" leftIcon={<PlusCircle className="h-4 w-4" />} onClick={openAddEmploymentModal}>Add previous employment</Button><Button variant="outline" size="sm" onClick={() => setRevokeDialogOpen(true)} disabled={revokingAccess}>Revoke future access</Button></div> : undefined} />
 
       <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
         <StatCard title="Total" value={summary.total} subtitle="Recorded employment entries" icon={<FileText className="h-5 w-5" />} />
@@ -180,6 +219,42 @@ export function EmploymentHistoryPage() {
         <StatCard title="Pending" value={summary.pending} subtitle="Awaiting review" icon={<Clock3 className="h-5 w-5" />} iconBg="bg-amber-50 text-amber-600" />
         <StatCard title="Rejected" value={summary.rejected} subtitle="Need attention" icon={<ShieldCheck className="h-5 w-5" />} iconBg="bg-rose-50 text-rose-600" />
       </div>
+
+      {user?.is_worker && (
+        <Modal isOpen={addEmploymentModalOpen} onClose={() => setAddEmploymentModalOpen(false)} title="Add previous employment" subtitle="Tell us where you worked. A reference and the KaziLink verification team will review it before it appears as verified." maxWidth="2xl">
+          <form onSubmit={handleSubmit} className="mt-6 space-y-5">
+            <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#FF6B00]">Worker submission</p>
+            <div className="grid gap-5 md:grid-cols-2">
+              <label className="space-y-2 text-sm font-semibold text-slate-700">
+                <span>Establishment name</span>
+                <input required value={form.establishment_name} onChange={(event) => handleChange('establishment_name', event.target.value)} placeholder="Sunrise Hotel" className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-700 placeholder:text-slate-400 focus:border-[#FF6B00] focus:bg-white focus:outline-none" />
+              </label>
+              <label className="space-y-2 text-sm font-semibold text-slate-700">
+                <span>Establishment type</span>
+                <input value={form.establishment_type} onChange={(event) => handleChange('establishment_type', event.target.value)} placeholder="Hotel, restaurant, shop" className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-700 placeholder:text-slate-400 focus:border-[#FF6B00] focus:bg-white focus:outline-none" />
+              </label>
+              <label className="space-y-2 text-sm font-semibold text-slate-700">
+                <span>Location</span>
+                <input value={form.location} onChange={(event) => handleChange('location', event.target.value)} placeholder="Nairobi, Kenya" className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-700 placeholder:text-slate-400 focus:border-[#FF6B00] focus:bg-white focus:outline-none" />
+              </label>
+              <label className="space-y-2 text-sm font-semibold text-slate-700">
+                <span>Position</span>
+                <input required value={form.position} onChange={(event) => handleChange('position', event.target.value)} placeholder="Cook, waiter, driver" className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-700 placeholder:text-slate-400 focus:border-[#FF6B00] focus:bg-white focus:outline-none" />
+              </label>
+              <label className="space-y-2 text-sm font-semibold text-slate-700">
+                <span>Reference role</span>
+                <input value={form.reference_role} onChange={(event) => handleChange('reference_role', event.target.value)} placeholder="Manager / Head chef" className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-700 placeholder:text-slate-400 focus:border-[#FF6B00] focus:bg-white focus:outline-none" />
+              </label>
+              {renderEmploymentDates()}
+            </div>
+            {renderCurrentRoleToggle('worker_is_current')}
+            {renderReferenceFields()}
+            {formError && <p className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">{formError}</p>}
+            {successMessage && <p className="rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">{successMessage}</p>}
+            <div className="flex justify-end"><button type="submit" disabled={saving} className="inline-flex items-center justify-center rounded-xl bg-[#FF6B00] px-5 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-[#E55F00] disabled:cursor-not-allowed disabled:opacity-70">{saving ? 'Submitting...' : 'Submit for verification'}</button></div>
+          </form>
+        </Modal>
+      )}
 
       {user?.is_employer && (
         <div className="card-kazilink p-5 sm:p-6">

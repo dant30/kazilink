@@ -64,6 +64,8 @@ This roadmap tracks the current repository state as of 2026-09-08. It separates 
 | Deliverable | Status | Current state |
 | --- | --- | --- |
 | Employment record schema | ✅✅ | Records include establishment, position, dates, responsibilities, references, and verification fields. |
+| Worker self-submitted history | ✅✅ | Workers can submit previous employment with establishment details and a reference; records remain pending and unlinked to an employer until verification. |
+| Employer-submitted history ownership | ✅✅ | Employers can submit records only for workers and establishments associated with their account; employer assertions are timestamped but do not replace admin verification. |
 | Reference verification status and attempts | ✅✅ | Records track per-reference status, attempt count, last/next attempt timestamps, reviewer, and attempt notes through the admin reference endpoint. |
 | Reference and employer verification timestamps | ✅✅ | Reference verification and employer assertion timestamps/actors are stored on each employment record. |
 | History access audit trail | ✅✅ | `HistoryAccessLog` links employer, worker, payment transaction, and auditable revocation metadata without deleting prior access. |
@@ -72,6 +74,7 @@ This roadmap tracks the current repository state as of 2026-09-08. It separates 
 | History verification notifications | ✅✅ | Workers receive in-app notifications when records or reference verification statuses change, and employers are notified when access is revoked. |
 | Worker passport history states | ✅✅ | The worker passport separates verified, pending, and rejected employment records and displays reference progress. |
 | Employment verification queue | ✅✅ | Verification serializers, views, permissions, and routes exist. |
+| Automatic platform-shift history drafts | ❌❌ | Hiring does not yet create history automatically; a confirmed shift-completion workflow is still needed before generating worker-reviewed draft records. |
 | Automated reference SMS/email | ❌❌ | Reference data is stored, but outbound verification messaging is not implemented. |
 | M-Pesa STK Push initiation | ✅✅ | Configurable Daraja OAuth/STK request code exists. |
 | M-Pesa STK Push retry handling | ✅✅ | Bounded retries cover transient provider/network failures without retrying 4xx requests. |

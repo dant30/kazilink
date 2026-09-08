@@ -31,7 +31,13 @@ def create_record(*, worker=None, employer=None, validated_data):
 
 	if worker is None:
 		raise PermissionError('A worker is required to add employment history.')
-	return EmploymentRecord.objects.create(worker=worker, **validated_data)
+	payload = dict(validated_data)
+	payload.pop('worker', None)
+	payload.pop('worker_id', None)
+	payload.pop('employer', None)
+	payload.pop('employer_id', None)
+	payload['verification_status'] = EmploymentRecord.VerificationStatus.PENDING
+	return EmploymentRecord.objects.create(worker=worker, **payload)
 
 
 @transaction.atomic
