@@ -8,6 +8,11 @@ from django.core.exceptions import ValidationError
 KENYAN_MOBILE_PATTERN = re.compile(r'^(?:\+254|254|0)7\d{8}$')
 
 
+def normalize_person_name(value):
+	name = ' '.join(str(value or '').split()).lower()
+	return re.sub(r"(^|[\s'-])([a-z])", lambda match: f'{match.group(1)}{match.group(2).upper()}', name)
+
+
 def normalize_kenyan_phone(value):
 	phone = str(value or '').replace(' ', '').replace('-', '').replace('(', '').replace(')', '')
 	if not KENYAN_MOBILE_PATTERN.fullmatch(phone):

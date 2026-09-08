@@ -2,12 +2,14 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Permis
 from django.db import models
 from django.utils import timezone
 
+from core.utils.validators import normalize_person_name
+
 
 class UserManager(BaseUserManager):
 	def create_user(self, phone, full_name, password=None, **extra_fields):
 		if not phone:
 			raise ValueError('A phone number is required.')
-		user = self.model(phone=phone, full_name=full_name, **extra_fields)
+		user = self.model(phone=phone, full_name=normalize_person_name(full_name), **extra_fields)
 		user.set_password(password)
 		user.save(using=self._db)
 		return user
