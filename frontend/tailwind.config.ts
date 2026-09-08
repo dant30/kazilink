@@ -36,8 +36,8 @@ export default {
 				},
 			},
 			fontFamily: {
-				display: ['Georgia', 'serif'],
-				sans: ['ui-sans-serif', 'system-ui', 'sans-serif'],
+				sans: ['Space Grotesk', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'sans-serif'],
+        		mono: ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
 			},
 		},
 	},
