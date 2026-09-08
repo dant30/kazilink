@@ -4,20 +4,22 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
 from ..models import Review
-from ..permissions import CanManageReview, IsEmployerReviewer
+from ..permissions import CanManageReview, IsEmployerReviewer, IsWorkerReviewer
 from ..serializers import ReviewCreateSerializer, ReviewSerializer, ReviewUpdateSerializer
 from ..services import create_review, update_review
 
 
 class ReviewListCreateView(generics.ListCreateAPIView):
 	def get_permissions(self):
-		return [IsEmployerReviewer()] if self.request.method == 'POST' else []
+		if self.request.method != 'POST':
+			return []
+		return [IsEmployerReviewer() if self.request.user.is_employer else IsWorkerReviewer()]
 
 	def get_serializer_class(self):
 		return ReviewCreateSerializer if self.request.method == 'POST' else ReviewSerializer
 
 	def get_queryset(self):
-		queryset = Review.objects.select_related('target_worker__user', 'author__user', 'job').order_by('-date')
+		queryset = Review.objects.select_related('target_worker__user', 'target_employer__user', 'author__user', 'author_worker__user', 'job').order_by('-date')
 		worker_id = self.request.query_params.get('worker_id')
 		if worker_id:
 			queryset = queryset.filter(target_worker_id=worker_id)
@@ -27,7 +29,11 @@ class ReviewListCreateView(generics.ListCreateAPIView):
 		serializer = self.get_serializer(data=request.data)
 		serializer.is_valid(raise_exception=True)
 		try:
-			review = create_review(author=request.user.employer_profile, validated_data=serializer.validated_data)
+			review = create_review(
+				author=request.user.employer_profile if request.user.is_employer else None,
+				author_worker=request.user.worker_profile if request.user.is_worker else None,
+				validated_data=serializer.validated_data,
+			)
 		except PermissionError as exc:
 			return Response({'detail': str(exc)}, status=status.HTTP_403_FORBIDDEN)
 		except ValueError as exc:

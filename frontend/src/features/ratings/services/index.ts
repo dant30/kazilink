@@ -8,5 +8,5 @@ const results = <T>(value: T[] | { results: T[] }) => Array.isArray(value) ? val
 export const ratingServices = {
 	async listReviews(): Promise<Review[]> { return results(await endpoints.ratings.list() as ReviewListResponse) },
 	createReview: (data: ReviewInput): Promise<Review> => endpoints.ratings.create(data),
-	async listEligibleHires(): Promise<JobApplication[]> { return results(await listApplications('employer', { status: 'hired' })) },
+	async listEligibleHires(isWorker = false): Promise<JobApplication[]> { return results(await listApplications(isWorker ? 'mine' : 'employer', { status: 'hired' })) },
 }

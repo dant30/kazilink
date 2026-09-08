@@ -7,13 +7,14 @@ from ..models import JobApplication
 class JobApplicationSerializer(serializers.ModelSerializer):
     job_title = serializers.CharField(source='job.title', read_only=True)
     employer_name = serializers.CharField(source='job.employer.user.full_name', read_only=True)
+    employer = serializers.IntegerField(source='job.employer_id', read_only=True)
     worker_name = serializers.CharField(source='worker.user.full_name', read_only=True)
     worker_phone = serializers.CharField(source='worker.user.phone', read_only=True)
 
     class Meta:
         model = JobApplication
         fields = (
-            'id', 'job', 'job_title', 'employer_name', 'worker', 'worker_name',
+            'id', 'job', 'job_title', 'employer', 'employer_name', 'worker', 'worker_name',
             'worker_phone', 'cover_note', 'applied_date', 'status',
             'reviewed_by_employer', 'interview_date', 'interview_note',
         )

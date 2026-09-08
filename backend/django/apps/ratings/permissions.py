@@ -6,6 +6,11 @@ class IsEmployerReviewer(BasePermission):
 		return bool(request.user and request.user.is_authenticated and request.user.is_employer)
 
 
+class IsWorkerReviewer(BasePermission):
+	def has_permission(self, request, view):
+		return bool(request.user and request.user.is_authenticated and request.user.is_worker)
+
+
 class CanManageReview(BasePermission):
 	def has_permission(self, request, view):
 		return bool(request.user and request.user.is_authenticated)

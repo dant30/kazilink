@@ -20,7 +20,7 @@ export const ratingStore = {
 		request = ratingServices.listReviews().then((reviews) => { state = { ...state, reviews, loading: false, initialized: true }; notify(); return reviews }).catch((error) => { state = { ...state, loading: false, initialized: true, error: errorMessage(error) }; notify(); throw error }).finally(() => { request = null })
 		return request
 	},
-	async fetchEligibleHires() { try { const eligibleHires = await ratingServices.listEligibleHires(); state = { ...state, eligibleHires, eligibleInitialized: true }; notify(); return eligibleHires } catch (error) { state = { ...state, eligibleInitialized: true, error: errorMessage(error) }; notify(); throw error } },
+	async fetchEligibleHires(isWorker = false) { try { const eligibleHires = await ratingServices.listEligibleHires(isWorker); state = { ...state, eligibleHires, eligibleInitialized: true }; notify(); return eligibleHires } catch (error) { state = { ...state, eligibleInitialized: true, error: errorMessage(error) }; notify(); throw error } },
 	async create(data: ReviewInput) { state = { ...state, submitting: true, error: null }; notify(); try { const review = await ratingServices.createReview(data); state = { ...state, reviews: [review, ...state.reviews], submitting: false, eligibleHires: state.eligibleHires.filter((application) => !(application.worker === data.target_worker && application.job === data.job)) }; notify(); return review } catch (error) { state = { ...state, submitting: false, error: errorMessage(error) }; notify(); throw error } },
 }
 

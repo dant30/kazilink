@@ -3,6 +3,7 @@ export type JobApplicationStatus = 'applied' | 'shortlisted' | 'interview_schedu
 export type JobApplication = {
   id: number
   job: number
+  employer?: number
   job_title?: string
   employer_name?: string
   worker: number

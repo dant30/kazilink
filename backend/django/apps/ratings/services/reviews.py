@@ -6,30 +6,41 @@ from ..models import Review
 
 
 @transaction.atomic
-def create_review(*, author, validated_data):
-    target_worker = validated_data['target_worker']
+def create_review(*, author=None, author_worker=None, validated_data):
     job = validated_data['job']
-    application = JobApplication.objects.filter(
-        job=job,
-        worker=target_worker,
-        job__employer=author,
-        status=JobApplication.Status.HIRED,
-    ).first()
+    target_worker = validated_data.get('target_worker')
+    target_employer = validated_data.get('target_employer')
+
+    if author is not None:
+        if target_worker is None or target_employer is not None:
+            raise ValueError('Employers must select a worker to review.')
+        application = JobApplication.objects.filter(job=job, worker=target_worker, job__employer=author, status=JobApplication.Status.HIRED).first()
+        duplicate = Review.objects.filter(author=author, target_worker=target_worker, job=job).exists()
+        author_fields = {'author': author, 'target_worker': target_worker}
+        author_name = author.user.full_name
+        author_role = author.contact_person
+    else:
+        if author_worker is None or target_employer is None or target_worker is not None:
+            raise ValueError('Workers must select an employer to review.')
+        application = JobApplication.objects.filter(job=job, worker=author_worker, job__employer=target_employer, status=JobApplication.Status.HIRED).first()
+        duplicate = Review.objects.filter(author_worker=author_worker, target_employer=target_employer, job=job).exists()
+        author_fields = {'author_worker': author_worker, 'target_employer': target_employer}
+        author_name = author_worker.user.full_name
+        author_role = author_worker.primary_role
+
     if application is None:
         raise PermissionError('Reviews are only available after a completed platform hire.')
-    if Review.objects.filter(author=author, target_worker=target_worker, job=job).exists():
+    if duplicate:
         raise ValueError('A review has already been submitted for this hire.')
     establishment = job.establishment
     return Review.objects.create(
-        author=author,
-        target_worker=target_worker,
+        **author_fields,
         job=job,
-        author_name=author.user.full_name,
-        author_role=author.contact_person,
-        author_avatar=author.user.profile.avatar if hasattr(author.user, 'profile') else None,
+        author_name=author_name,
+        author_role=author_role,
         establishment_name=establishment.name if establishment else '',
         is_verified_hire=True,
-        **{key: value for key, value in validated_data.items() if key not in {'target_worker', 'job'}},
+        **{key: value for key, value in validated_data.items() if key not in {'target_worker', 'target_employer', 'job'}},
     )
 
 
@@ -42,6 +53,8 @@ def update_review(*, review, validated_data):
 
 
 def recalculate_worker_rating(worker_id):
+    if not worker_id:
+        return
     from django.db.models import Avg, Count
     from apps.accounts.models import WorkerProfile
 

@@ -10,11 +10,11 @@ export function ReviewCard({ review }: { review: Review }) {
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
         <div className="flex items-start gap-3.5">
           <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-orange-50 text-[#FF6B00] font-black text-sm border border-orange-100">
-            {review.target_worker_name ? review.target_worker_name.charAt(0).toUpperCase() : <User className="h-5 w-5" />}
+            {(review.target_worker_name || review.target_employer_name) ? (review.target_worker_name || review.target_employer_name || '').charAt(0).toUpperCase() : <User className="h-5 w-5" />}
           </div>
           <div>
             <h3 className="text-sm sm:text-base font-black text-slate-900 group-hover:text-[#FF6B00] transition-colors">
-              {review.target_worker_name}
+              {review.target_worker_name || review.target_employer_name}
             </h3>
             <div className="flex flex-wrap items-center gap-2 mt-0.5 text-xs text-slate-500 font-medium">
               <span>{review.role_performed}</span>

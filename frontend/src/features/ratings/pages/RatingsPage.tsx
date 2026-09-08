@@ -26,7 +26,8 @@ export function RatingsPage() {
   const [starFilter, setStarFilter] = useState<number | 'all'>('all')
   const [searchQuery, setSearchQuery] = useState('')
   const isEmployer = Boolean(user?.is_employer)
-  const { reviews, eligibleHires, loading, submitting, error, refresh, createReview } = useRatings({ isEmployer })
+  const isWorker = Boolean(user?.is_worker)
+  const { reviews, eligibleHires, loading, submitting, error, refresh, createReview } = useRatings({ isEmployer, isWorker })
 
   const pageSize = 6
 
@@ -53,6 +54,7 @@ export function RatingsPage() {
       const matchesSearch =
         !query ||
         review.target_worker_name?.toLowerCase().includes(query) ||
+        review.target_employer_name?.toLowerCase().includes(query) ||
         review.role_performed?.toLowerCase().includes(query) ||
         review.establishment_name?.toLowerCase().includes(query) ||
         review.comment?.toLowerCase().includes(query)
@@ -76,13 +78,13 @@ export function RatingsPage() {
         description="Transparent, authenticated performance ratings from completed hospitality shifts across Kenya."
         icon={<Star className="h-4 w-4" />}
         actions={
-          isEmployer ? (
+          isEmployer || isWorker ? (
             <Button
               onClick={() => setReviewOpen(true)}
               leftIcon={<PenSquare className="h-4 w-4" />}
               className="rounded-xl text-xs font-bold min-h-[40px]"
             >
-              Leave a review
+              {isWorker ? 'Review an employer' : 'Leave a review'}
             </Button>
           ) : undefined
         }
@@ -222,7 +224,7 @@ export function RatingsPage() {
         subtitle="Reviews can be submitted for your completed shifts and hires."
         maxWidth="lg"
       >
-        <ReviewForm hires={eligibleHires} onSubmit={submitReview} submitting={submitting} />
+        <ReviewForm hires={eligibleHires} onSubmit={submitReview} submitting={submitting} isWorker={isWorker} />
       </Modal>
     </section>
   )

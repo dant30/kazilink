@@ -13,10 +13,12 @@ def snapshot_review_author(sender, instance, **kwargs):
 
 @receiver(post_save, sender=Review)
 def update_worker_rating(sender, instance, **kwargs):
-	recalculate_worker_rating(instance.target_worker_id)
+	if instance.target_worker_id:
+		recalculate_worker_rating(instance.target_worker_id)
 	
 
 
 @receiver(post_delete, sender=Review)
 def update_worker_rating_after_delete(sender, instance, **kwargs):
-	recalculate_worker_rating(instance.target_worker_id)
+	if instance.target_worker_id:
+		recalculate_worker_rating(instance.target_worker_id)
