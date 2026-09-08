@@ -73,7 +73,7 @@ export function JobsPage() {
         }
       />
 
-      <div className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-3 sm:gap-4">
+      <div className="grid grid-cols-2 gap-3.5 lg:grid-cols-3 sm:gap-4">
         {loading ? Array.from({ length: 3 }, (_, index) => <Skeleton key={index} className="h-24 rounded-2xl" />) : <>
           <StatCard title="Live roles" value={jobs.length} subtitle="Marketplace listings" sparkline={[4, 6, 5, 8, 10, 12, Math.max(jobs.length, 6)]} metadata={[{ label: 'M-Pesa Verified', value: '100%' }]} icon={<Briefcase className="h-5 w-5" />} />
           <StatCard title="Employers" value={employerCount} subtitle="Venues hiring actively" badge={{ text: 'Verified', variant: 'blue' }} sparkline={{ data: [2, 3, 4, 3, 5, 6, Math.max(employerCount, 2)], type: 'bar', color: '#0A2540' }} icon={<Building2 className="h-5 w-5" />} iconBg="bg-orange-50 text-[#FF6B00]" />
