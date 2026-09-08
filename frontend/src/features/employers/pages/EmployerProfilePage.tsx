@@ -30,7 +30,7 @@ export function EmployerProfilePage() {
   const [locations, setLocations] = useState<Array<{ value: string; label: string }>>([])
 
   useEffect(() => {
-    if (profile) setForm({ email: profile.user.email, business_name: profile.business_name, location: profile.location, business_type: profile.business_type, contact_person: profile.contact_person, avatar: profile.avatar })
+    if (profile) setForm({ email: profile.user.email, gender: profile.user.gender, date_of_birth: profile.user.date_of_birth, business_name: profile.business_name, location: profile.location, business_type: profile.business_type, contact_person: profile.contact_person, avatar: profile.avatar })
   }, [profile])
 
   useEffect(() => () => { if (avatarPreview) URL.revokeObjectURL(avatarPreview) }, [avatarPreview])
@@ -52,9 +52,9 @@ export function EmployerProfilePage() {
     clearError()
   }
   const changeSetting = async (field: 'auto_shortlist' | 'verified_only', value: boolean) => { await updateProfile({ [field]: value }) }
-  const save = async () => { const { email, ...profileData } = form; if (email !== profile?.user.email) await endpoints.auth.updateMe({ email: email || null }); await updateProfile(profileData) }
-  const isDirty = useMemo(() => Boolean(profile && ((form.business_name ?? '') !== (profile.business_name ?? '') || (form.location ?? '') !== (profile.location ?? '') || (form.business_type ?? '') !== (profile.business_type ?? '') || (form.contact_person ?? '') !== (profile.contact_person ?? '') || form.avatar instanceof File)), [form, profile])
-  const discard = () => { if (!profile) return; setForm({ business_name: profile.business_name, location: profile.location, business_type: profile.business_type, contact_person: profile.contact_person, avatar: profile.avatar }); if (avatarPreview) { URL.revokeObjectURL(avatarPreview); setAvatarPreview(null) }; clearError() }
+  const save = async () => { const { email, gender, date_of_birth, ...profileData } = form; if (email !== profile?.user.email || gender !== profile?.user.gender || date_of_birth !== profile?.user.date_of_birth) await endpoints.auth.updateMe({ email: email || null, gender: gender || '', date_of_birth: date_of_birth || null }); await updateProfile(profileData) }
+  const isDirty = useMemo(() => Boolean(profile && ((form.email ?? '') !== (profile.user.email ?? '') || (form.gender ?? '') !== (profile.user.gender ?? '') || (form.date_of_birth ?? '') !== (profile.user.date_of_birth ?? '') || (form.business_name ?? '') !== (profile.business_name ?? '') || (form.location ?? '') !== (profile.location ?? '') || (form.business_type ?? '') !== (profile.business_type ?? '') || (form.contact_person ?? '') !== (profile.contact_person ?? '') || form.avatar instanceof File)), [form, profile])
+  const discard = () => { if (!profile) return; setForm({ email: profile.user.email, gender: profile.user.gender, date_of_birth: profile.user.date_of_birth, business_name: profile.business_name, location: profile.location, business_type: profile.business_type, contact_person: profile.contact_person, avatar: profile.avatar }); if (avatarPreview) { URL.revokeObjectURL(avatarPreview); setAvatarPreview(null) }; clearError() }
   const criteria = [
     ['business_name', 'Registered business name', Boolean(form.business_name?.trim() || profile?.business_name?.trim())],
     ['location', 'Primary operating location', Boolean(form.location?.trim() || profile?.location?.trim())],

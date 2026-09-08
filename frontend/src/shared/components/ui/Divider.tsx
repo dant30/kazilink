@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { cn } from '@/shared/utils/classnames';
+import { cn } from '../../../core/utils/cn';
 
-interface DividerProps extends React.HTMLAttributes<HTMLHRElement> {
+export interface DividerProps extends React.HTMLAttributes<HTMLHRElement> {
   orientation?: 'horizontal' | 'vertical';
   variant?: 'solid' | 'dashed' | 'dotted';
 }

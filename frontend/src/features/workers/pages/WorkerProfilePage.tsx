@@ -43,6 +43,8 @@ export function WorkerProfilePage() {
 		if (!profile) return
 		setForm({
 			email: profile.user.email,
+			gender: profile.user.gender,
+			date_of_birth: profile.user.date_of_birth,
 			primary_role: profile.primary_role,
 			location: profile.location,
 			years_of_experience: profile.years_of_experience,
@@ -78,9 +80,9 @@ export function WorkerProfilePage() {
 	const profileStrength = Math.round((workerCriteria.filter((item) => item[2]).length / workerCriteria.length) * 100)
 	const strengthColor: 'rose' | 'amber' | 'orange' | 'emerald' = profileStrength < 40 ? 'rose' : profileStrength < 70 ? 'amber' : profileStrength < 90 ? 'orange' : 'emerald'
 	const strengthTier = profileStrength < 40 ? 'Incomplete' : profileStrength < 70 ? 'Basic Candidate' : profileStrength < 90 ? 'High Demand' : 'All-Star Verified'
-	const isDirty = useMemo(() => Boolean(profile && ((form.primary_role ?? '') !== (profile.primary_role ?? '') || (form.location ?? '') !== (profile.location ?? '') || Number(form.years_of_experience ?? 0) !== Number(profile.years_of_experience ?? 0) || Number(form.expected_daily_rate_ksh ?? 0) !== Number(profile.expected_daily_rate_ksh ?? 0) || (form.availability ?? '') !== (profile.availability ?? '') || (form.bio ?? '') !== (profile.bio ?? '') || JSON.stringify(form.skills || []) !== JSON.stringify(profile.skills || []) || JSON.stringify(form.languages || []) !== JSON.stringify(profile.languages || []) || form.avatar instanceof File)), [form, profile])
+	const isDirty = useMemo(() => Boolean(profile && ((form.email ?? '') !== (profile.user.email ?? '') || (form.gender ?? '') !== (profile.user.gender ?? '') || (form.date_of_birth ?? '') !== (profile.user.date_of_birth ?? '') || (form.primary_role ?? '') !== (profile.primary_role ?? '') || (form.location ?? '') !== (profile.location ?? '') || Number(form.years_of_experience ?? 0) !== Number(profile.years_of_experience ?? 0) || Number(form.expected_daily_rate_ksh ?? 0) !== Number(profile.expected_daily_rate_ksh ?? 0) || (form.availability ?? '') !== (profile.availability ?? '') || (form.bio ?? '') !== (profile.bio ?? '') || JSON.stringify(form.skills || []) !== JSON.stringify(profile.skills || []) || JSON.stringify(form.languages || []) !== JSON.stringify(profile.languages || []) || form.avatar instanceof File)), [form, profile])
 	const avatarSrc = avatarPreview || (form.avatar instanceof File ? URL.createObjectURL(form.avatar) : profile?.avatar || profile?.user.avatar)
-	const discardChanges = () => { if (!profile) return; setForm({ email: profile.user.email, primary_role: profile.primary_role, location: profile.location, years_of_experience: profile.years_of_experience, expected_daily_rate_ksh: profile.expected_daily_rate_ksh, expected_monthly_salary_ksh: profile.expected_monthly_salary_ksh, availability: profile.availability, bio: profile.bio, skills: profile.skills, languages: profile.languages, secondary_roles: profile.secondary_roles, last_employer: profile.last_employer }); if (avatarPreview) { URL.revokeObjectURL(avatarPreview); setAvatarPreview(null) }; clearError() }
+	const discardChanges = () => { if (!profile) return; setForm({ email: profile.user.email, gender: profile.user.gender, date_of_birth: profile.user.date_of_birth, primary_role: profile.primary_role, location: profile.location, years_of_experience: profile.years_of_experience, expected_daily_rate_ksh: profile.expected_daily_rate_ksh, expected_monthly_salary_ksh: profile.expected_monthly_salary_ksh, availability: profile.availability, bio: profile.bio, skills: profile.skills, languages: profile.languages, secondary_roles: profile.secondary_roles, last_employer: profile.last_employer }); if (avatarPreview) { URL.revokeObjectURL(avatarPreview); setAvatarPreview(null) }; clearError() }
 	const copyProfileLink = async () => { try { await navigator.clipboard.writeText(window.location.href) } finally { setCopiedLink(true); window.setTimeout(() => setCopiedLink(false), 2000) } }
 
 	const handleStatusChange = async (field: 'open_to_work', value: boolean) => {
@@ -101,8 +103,8 @@ export function WorkerProfilePage() {
 	const saveProfile = async () => {
 		try {
 			clearError()
-			const { email, ...profileData } = form
-			if (email !== profile?.user.email) await endpoints.auth.updateMe({ email: email || null })
+			const { email, gender, date_of_birth, ...profileData } = form
+			if (email !== profile?.user.email || gender !== profile?.user.gender || date_of_birth !== profile?.user.date_of_birth) await endpoints.auth.updateMe({ email: email || null, gender: gender || '', date_of_birth: date_of_birth || null })
 			await updateProfile(profileData)
 		} catch {
 			// The update hook exposes the error state to the page.

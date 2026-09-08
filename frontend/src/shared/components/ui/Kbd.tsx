@@ -1,7 +1,9 @@
 import * as React from 'react';
-import { cn } from '@/shared/utils/classnames';
+import { cn } from '../../../core/utils/cn';
 
-export const Kbd = React.forwardRef<HTMLSpanElement, React.HTMLAttributes<HTMLSpanElement>>(
+export interface KbdProps extends React.HTMLAttributes<HTMLSpanElement> {}
+
+export const Kbd = React.forwardRef<HTMLSpanElement, KbdProps>(
   ({ className, ...props }, ref) => {
     return (
       <kbd

@@ -1,6 +1,6 @@
 from django.contrib.auth import authenticate
 from rest_framework import serializers
-from core.utils.validators import normalize_kenyan_phone, normalize_person_name, validate_password_strength
+from core.utils.validators import normalize_kenyan_phone, normalize_person_name, validate_adult_date_of_birth, validate_password_strength
 
 from ..models import EmployerProfile, IdentityDocument, Profile, User, UserRole, WorkerProfile
 from ..services.occupations import WORKER_AVAILABILITIES
@@ -10,10 +10,13 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = (
-            'id', 'phone', 'email', 'full_name', 'is_worker', 'is_employer',
+            'id', 'phone', 'email', 'full_name', 'gender', 'date_of_birth', 'is_worker', 'is_employer',
             'is_staff', 'is_superuser', 'is_phone_verified', 'is_id_verified', 'joined_date',
         )
         read_only_fields = ('id', 'is_staff', 'is_superuser', 'is_phone_verified', 'is_id_verified', 'joined_date')
+
+    def validate_date_of_birth(self, value):
+        return validate_adult_date_of_birth(value)
 
 
 class IdentityDocumentSerializer(serializers.ModelSerializer):

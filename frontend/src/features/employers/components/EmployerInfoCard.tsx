@@ -3,6 +3,7 @@ import { FormField, FormSection } from '../../../shared/components/forms'
 import { Input } from '../../../shared/components/ui/Input'
 import { Select } from '../../../shared/components/ui/Select'
 import type { UpdateEmployerProfilePayload } from '../types'
+import { getAdultDateOfBirthMax } from '../../../core/utils/date'
 
 type Props = { values: UpdateEmployerProfilePayload; onChange: (field: keyof UpdateEmployerProfilePayload, value: string) => void; businessTypes?: Array<{ value: string; label: string }>; locations?: Array<{ value: string; label: string }> }
 
@@ -12,6 +13,8 @@ export function EmployerInfoCard({ values, onChange, businessTypes = [], locatio
       <FormField label="Business name" required><Input value={values.business_name || ''} onChange={(event) => onChange('business_name', event.target.value)} /></FormField>
       <FormField label="Contact person" required><Input value={values.contact_person || ''} onChange={(event) => onChange('contact_person', event.target.value)} /></FormField>
       <FormField label="Email address" required><Input type="email" value={values.email || ''} onChange={(event) => onChange('email', event.target.value)} placeholder="you@example.com" /></FormField>
+      <FormField label="Gender"><Select value={values.gender || ''} onChange={(value) => onChange('gender', value)} options={[{ value: '', label: 'Select gender' }, { value: 'female', label: 'Female' }, { value: 'male', label: 'Male' }, { value: 'non_binary', label: 'Non-binary' }, { value: 'prefer_not_to_say', label: 'Prefer not to say' }]} /></FormField>
+      <FormField label="Date of birth"><Input type="date" value={values.date_of_birth || ''} max={getAdultDateOfBirthMax()} onChange={(event) => onChange('date_of_birth', event.target.value)} /></FormField>
       <FormField label="Location"><Select searchable value={values.location || ''} onChange={(value) => onChange('location', value)} options={[{ value: '', label: 'Select location' }, ...locations]} /></FormField>
       <FormField label="Business type"><Select searchable value={values.business_type || ''} onChange={(value) => onChange('business_type', value)} options={[{ value: '', label: 'Select business type' }, ...businessTypes]} /></FormField>
     </div>

@@ -1,11 +1,13 @@
 // frontend/src/features/workers/components/WorkerInfoCard.tsx
-import { BriefcaseBusiness, X } from 'lucide-react'
+import { BriefcaseBusiness } from 'lucide-react'
 import { useState } from 'react'
 import type { UpdateWorkerProfilePayload, WorkerAvailability, WorkerProfile } from '../types'
 import { FormField, FormSection } from '../../../shared/components/forms'
 import { Input } from '../../../shared/components/ui/Input'
 import { Select } from '../../../shared/components/ui/Select'
 import { Skeleton } from '../../../shared/components/ui/Skeleton'
+import { Chip } from '../../../shared/components/ui/Chip'
+import { getAdultDateOfBirthMax } from '../../../core/utils/date'
 
 interface WorkerInfoCardProps {
 	profile: WorkerProfile | null
@@ -77,6 +79,12 @@ export function WorkerInfoCard({ profile, loading = false, values, onChange, ski
 				<FormField label="Email address" required>
 					<Input type="email" value={values?.email ?? profile?.user.email ?? ''} onChange={(event) => onChange?.('email', event.target.value)} placeholder="you@example.com" readOnly={!onChange} />
 				</FormField>
+				<FormField label="Gender">
+					<Select value={values?.gender ?? profile?.user.gender ?? ''} onChange={(value) => onChange?.('gender', value)} options={[{ value: '', label: 'Select gender' }, { value: 'female', label: 'Female' }, { value: 'male', label: 'Male' }, { value: 'non_binary', label: 'Non-binary' }, { value: 'prefer_not_to_say', label: 'Prefer not to say' }]} disabled={!onChange} />
+				</FormField>
+				<FormField label="Date of birth">
+					<Input type="date" value={values?.date_of_birth ?? profile?.user.date_of_birth ?? ''} max={getAdultDateOfBirthMax()} onChange={(event) => onChange?.('date_of_birth', event.target.value)} readOnly={!onChange} />
+				</FormField>
 				<FormField label="Preferred role">
 					<Input value={values?.primary_role ?? profile?.primary_role ?? ''} onChange={(event) => onChange?.('primary_role', event.target.value)} placeholder="Preferred role" readOnly={!onChange} />
 				</FormField>
@@ -100,17 +108,17 @@ export function WorkerInfoCard({ profile, loading = false, values, onChange, ski
 					</FormField>
 					<FormField label="Secondary roles" helperText="Choose other roles you can perform.">
 						{onChange && <Select searchable value={selectedRole} onChange={addRole} options={[{ value: '', label: 'Add a secondary role' }, ...availableRoleOptions]} />}
-						<div className="mt-2 flex flex-wrap gap-2">{currentRoles.map((role) => <span key={role} className="inline-flex items-center gap-1 rounded-full border border-blue-200 bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-800">{role}{onChange && <button type="button" onClick={() => removeRole(role)} className="rounded-full p-0.5 hover:bg-blue-200" aria-label={`Remove ${role}`}><X className="h-3 w-3" /></button>}</span>)}</div>
+						<div className="mt-2 flex flex-wrap gap-2">{currentRoles.map((role) => <Chip key={role} color="blue" onRemove={onChange ? () => removeRole(role) : undefined} removeLabel={`Remove ${role}`}>{role}</Chip>)}</div>
 					</FormField>
 					<FormField label="Skills" helperText="Choose skills from the searchable suggestions.">
 						{onChange && <Select searchable value={selectedSkill} onChange={addSkill} options={[{ value: '', label: 'Add a skill' }, ...availableSkillOptions]} />}
 						<div className="mt-2 flex flex-wrap gap-2">
-							{currentSkills.map((skill) => <span key={skill} className="inline-flex items-center gap-1 rounded-full border border-orange-200 bg-orange-50 px-2.5 py-1 text-xs font-semibold text-orange-800">{skill}{onChange && <button type="button" onClick={() => removeSkill(skill)} className="rounded-full p-0.5 hover:bg-orange-200" aria-label={`Remove ${skill}`}><X className="h-3 w-3" /></button>}</span>)}
+							{currentSkills.map((skill) => <Chip key={skill} color="orange" onRemove={onChange ? () => removeSkill(skill) : undefined} removeLabel={`Remove ${skill}`}>{skill}</Chip>)}
 						</div>
 					</FormField>
 					<FormField label="Languages" helperText="Choose languages from the searchable suggestions.">
 						{onChange && <Select searchable value={selectedLanguage} onChange={addLanguage} options={[{ value: '', label: 'Add a language' }, ...availableLanguageOptions]} />}
-						<div className="mt-2 flex flex-wrap gap-2">{currentLanguages.map((language) => <span key={language} className="inline-flex items-center gap-1 rounded-full border border-purple-200 bg-purple-50 px-2.5 py-1 text-xs font-semibold text-purple-800">{language}{onChange && <button type="button" onClick={() => removeLanguage(language)} className="rounded-full p-0.5 hover:bg-purple-200" aria-label={`Remove ${language}`}><X className="h-3 w-3" /></button>}</span>)}</div>
+						<div className="mt-2 flex flex-wrap gap-2">{currentLanguages.map((language) => <Chip key={language} color="blue" onRemove={onChange ? () => removeLanguage(language) : undefined} removeLabel={`Remove ${language}`}>{language}</Chip>)}</div>
 				</FormField>
 			</div>
 				<FormField label="Bio">

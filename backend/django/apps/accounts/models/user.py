@@ -2,7 +2,7 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Permis
 from django.db import models
 from django.utils import timezone
 
-from core.utils.validators import normalize_person_name
+from core.utils.validators import normalize_person_name, validate_adult_date_of_birth
 
 
 class UserManager(BaseUserManager):
@@ -24,6 +24,8 @@ class User(AbstractBaseUser, PermissionsMixin):
 	phone = models.CharField(max_length=15, unique=True)
 	email = models.EmailField(blank=True, null=True)
 	full_name = models.CharField(max_length=255)
+	gender = models.CharField(max_length=30, blank=True)
+	date_of_birth = models.DateField(null=True, blank=True, validators=[validate_adult_date_of_birth])
 	is_worker = models.BooleanField(default=False)
 	is_employer = models.BooleanField(default=False)
 	is_phone_verified = models.BooleanField(default=False)

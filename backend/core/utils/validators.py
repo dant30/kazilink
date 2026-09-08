@@ -1,4 +1,5 @@
 import re
+from datetime import date
 from decimal import Decimal
 from pathlib import Path
 
@@ -39,6 +40,18 @@ def validate_password_strength(value):
 	if not re.search(r'\d', password):
 		raise ValidationError('Password must contain a number.')
 	return password
+
+
+def validate_adult_date_of_birth(value):
+	if value is None:
+		return
+	if value > date.today():
+		raise ValidationError('Date of birth cannot be in the future.')
+	today = date.today()
+	age = today.year - value.year - ((today.month, today.day) < (value.month, value.day))
+	if age < 18:
+		raise ValidationError('You must be at least 18 years old.')
+	return value
 
 
 def file_size_validator(max_bytes):

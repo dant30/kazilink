@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { cn } from '@/shared/utils/classnames';
+import { cn } from '../../../core/utils/cn';
 
-interface StatusDotProps extends React.HTMLAttributes<HTMLSpanElement> {
+export interface StatusDotProps extends React.HTMLAttributes<HTMLSpanElement> {
   status: 'success' | 'warning' | 'danger' | 'info' | 'neutral';
   size?: 'sm' | 'md' | 'lg';
   label?: string;

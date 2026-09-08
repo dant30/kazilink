@@ -6,6 +6,8 @@ export interface WorkerUser {
 	id: number
 	phone: string
 	email: string | null
+	gender?: string
+	date_of_birth?: string | null
 	full_name: string
 	is_worker: boolean
 	is_employer: boolean
@@ -47,6 +49,8 @@ export interface WorkerProfile {
 
 export interface UpdateWorkerProfilePayload {
 	email?: string | null
+	gender?: string
+	date_of_birth?: string | null
 	primary_role?: string
 	secondary_roles?: string[]
 	location?: string

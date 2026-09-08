@@ -21,3 +21,9 @@ export function getTimeGreeting(date = new Date()) {
   if (hour < 18) return '🌤️ Afternoon'
   return '🌛 Evening'
 }
+
+export function getAdultDateOfBirthMax(date = new Date()) {
+  const maximum = new Date(date)
+  maximum.setFullYear(maximum.getFullYear() - 18)
+  return maximum.toISOString().slice(0, 10)
+}

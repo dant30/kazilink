@@ -4,6 +4,8 @@ export type EmployerUser = {
 	id: number
 	phone: string
 	email: string | null
+	gender?: string
+	date_of_birth?: string | null
 	full_name: string
 	is_employer: boolean
 	is_phone_verified: boolean
@@ -37,7 +39,7 @@ export type Employer = EmployerProfile
 
 export type UpdateEmployerProfilePayload = Partial<Pick<EmployerProfile,
 	'business_name' | 'location' | 'business_type' | 'contact_person' | 'auto_shortlist' | 'verified_only'
->> & { email?: string | null; avatar?: File | string | null }
+>> & { email?: string | null; gender?: string; date_of_birth?: string | null; avatar?: File | string | null }
 
 export type EmployerDashboardData = {
 	profile: EmployerProfile
