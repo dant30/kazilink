@@ -10,14 +10,14 @@ const results = <T>(value: T[] | { results: T[] }) => Array.isArray(value) ? val
 
 export const dashboardServices = {
 	async loadEmployer(): Promise<DashboardSnapshot> {
-		const [jobs, applications, establishments] = await Promise.all([
-			endpoints.jobs.list(), endpoints.applications.employer(), endpoints.establishments.mine(),
+		const [jobs, applications, establishments, employerProfile] = await Promise.all([
+			endpoints.jobs.list(), endpoints.applications.employer(), endpoints.establishments.mine(), endpoints.auth.employerProfile(),
 		])
 		return {
 			jobs: results(jobs as JobListResponse),
 			applications: results(applications as JobApplicationListResponse),
 			establishments: results(establishments as Establishment[] | { results: Establishment[] }),
-			workerProfile: null, unreadNotifications: 0, activeConversations: 0,
+			workerProfile: null, employerProfile, unreadNotifications: 0, activeConversations: 0,
 		}
 	},
 	async loadWorker(): Promise<DashboardSnapshot> {
@@ -28,7 +28,7 @@ export const dashboardServices = {
 		return {
 			jobs: results(jobs as JobListResponse),
 			applications: results(applications as JobApplicationListResponse),
-			establishments: [], workerProfile,
+			establishments: [], workerProfile, employerProfile: null,
 			unreadNotifications: results(notifications as NotificationListResponse).length,
 			activeConversations: results(conversations as Conversation[] | { results: Conversation[] }).length,
 		}
