@@ -3,6 +3,7 @@ from ..models import CreditEconomyConfig
 
 CREDIT_ACTIONS = {
 	'history_unlock': {'credits': 1, 'roles': ('employer',), 'label': 'Unlock employment history'},
+	'message_worker': {'credits': 1, 'roles': ('employer',), 'label': 'Message a worker'},
 	'application': {'credits': 1, 'roles': ('worker',), 'label': 'Apply to a job'},
 	'featured_job_24h': {'credits': 3, 'roles': ('employer',), 'label': 'Feature a job for 24 hours'},
 	'job_boost_7d': {'credits': 5, 'roles': ('employer',), 'label': 'Boost a job for 7 days'},

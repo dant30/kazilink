@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ArrowLeft, MessageCircle, RefreshCw, User } from 'lucide-react'
+import { useLocation } from 'react-router-dom'
 import { Button } from '../../../shared/components/ui/Button'
 import { useAuthStore } from '../../auth/store'
 import { ConversationList, MessageComposer, MessageThread } from '../components'
@@ -7,11 +8,19 @@ import { useMessaging } from '../hooks/useMessaging'
 
 export function MessagingPage() {
   const { user } = useAuthStore()
+  const location = useLocation()
   const { conversations, activeConversationId, messages, loading, messagesLoading, sending, error, refresh, selectConversation, sendMessage } = useMessaging()
   const active = conversations.find((conversation) => conversation.id === activeConversationId)
   const [mobileView, setMobileView] = useState<'list' | 'thread'>('list')
   const participant = active ? (active.worker === user?.id ? active.employer_name : active.worker_name) : null
   const handleSelectConversation = async (id: number) => { try { await selectConversation(id); setMobileView('thread') } catch { /* hook exposes the error state */ } }
+
+  useEffect(() => {
+    const conversationId = (location.state as { conversationId?: number } | null)?.conversationId
+    if (!conversationId) return
+
+    void handleSelectConversation(conversationId)
+  }, [location.state])
 
   return <section className="mx-auto max-w-7xl space-y-5 px-3 py-5 sm:px-6 sm:py-7 lg:px-8">
     <div className="flex items-center justify-between gap-4"><div><p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#FF6B00]">Direct messages</p><h1 className="mt-1 text-3xl font-black text-[#0A2540]">Hospitality chat</h1><p className="mt-1 text-sm text-slate-500">Communicate with shift workers and venue managers in real time.</p></div><Button variant="outline" size="sm" onClick={() => refresh()} disabled={loading} aria-label="Refresh conversations" leftIcon={<RefreshCw className={`h-3.5 w-3.5 ${loading ? 'animate-spin' : ''}`} />}>Refresh</Button></div>

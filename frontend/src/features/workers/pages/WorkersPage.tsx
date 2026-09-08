@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import {
   Briefcase,
+  CreditCard,
   MapPin,
   MessageSquare,
   Search,
@@ -10,7 +11,7 @@ import {
   UserRound,
   X,
 } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 import { endpoints } from '../../../core/api'
 import { useAuthStore } from '../../auth/store/authStore'
@@ -40,6 +41,7 @@ const roleFilters = [
 export function WorkersPage() {
   const { user } = useAuthStore()
   const isEmployer = Boolean(user?.is_employer && !user?.is_worker)
+  const navigate = useNavigate()
 
   const [workers, setWorkers] = useState<WorkerProfile[]>([])
   const [query, setQuery] = useState('')
@@ -108,6 +110,25 @@ export function WorkersPage() {
       )
     } finally {
       setUnlocking(false)
+    }
+  }
+
+  const handleMessageWorker = async (worker: WorkerProfile) => {
+    if (!isEmployer) return
+
+    setSelectedWorker(null)
+
+    if ((creditBalance ?? 0) < 1) {
+      navigate('/payments', { state: { openRecharge: true } })
+      return
+    }
+
+    try {
+      const conversation = await endpoints.messaging.createConversation({ worker_id: worker.id })
+      navigate('/messages', { state: { conversationId: conversation.id } })
+    } catch (reason) {
+      setActionError(true)
+      setActionMessage(reason instanceof Error ? reason.message : 'Unable to start a chat with this worker.')
     }
   }
 
@@ -357,6 +378,10 @@ export function WorkersPage() {
                       {creditBalance === 0 ? (
                         <Link
                           to="/payments"
+                          onClick={(event) => {
+                            event.preventDefault()
+                            navigate('/payments', { state: { openRecharge: true } })
+                          }}
                           className="inline-flex items-center gap-1.5 rounded-xl bg-[#0A2540] px-3 py-2 text-[11px] font-bold text-white transition hover:bg-[#123860]"
                         >
                           Buy Kazi Credits
@@ -466,12 +491,24 @@ export function WorkersPage() {
                   Close
                 </Button>
                 <Link
-                  to="/messages"
-                  onClick={() => setSelectedWorker(null)}
+                  to={creditBalance && creditBalance > 0 ? '/messages' : '/payments'}
+                  onClick={(event) => {
+                    event.preventDefault()
+                    if ((creditBalance ?? 0) < 1) {
+                      navigate('/payments', { state: { openRecharge: true } })
+                      return
+                    }
+
+                    void handleMessageWorker(selectedWorker)
+                  }}
                   className="inline-flex min-h-[38px] items-center justify-center gap-1.5 rounded-xl bg-[#FF6B00] px-4 py-2 text-xs font-bold text-white transition hover:bg-[#E55F00]"
                 >
-                  <MessageSquare className="h-3.5 w-3.5" />
-                  Message Worker
+                  {creditBalance && creditBalance > 0 ? (
+                    <MessageSquare className="h-3.5 w-3.5" />
+                  ) : (
+                    <CreditCard className="h-3.5 w-3.5" />
+                  )}
+                  {creditBalance && creditBalance > 0 ? 'Message Worker' : 'Buy Kazi Credit'}
                 </Link>
               </div>
             </div>

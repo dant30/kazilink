@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { ArrowDownLeft, ArrowUpRight, Briefcase, CreditCard, History, RefreshCw, Send, TrendingUp } from 'lucide-react'
 import { useEffect } from 'react'
+import { useLocation } from 'react-router-dom'
 import { Button } from '../../../shared/components/ui/Button'
 import { Modal } from '../../../shared/components/ui/Modal'
 import { PageHeader } from '../../../shared/components/ui/PageHeader'
@@ -16,6 +17,7 @@ import type { CreditLedgerEntry } from '../types'
 
 export function PaymentsPage() {
   const { user } = useAuthStore()
+  const location = useLocation()
   const isEmployer = Boolean(user?.is_employer && !user?.is_worker)
   const { transactions, loading, initialized, error, notice, refresh, refundPayment } = usePayments({ enabled: isEmployer })
   const [refundingId, setRefundingId] = useState<number | null>(null)
@@ -27,6 +29,12 @@ export function PaymentsPage() {
   const [page, setPage] = useState(1)
   const pageSize = 8
   const visibleTransactions = transactions.slice((page - 1) * pageSize, page * pageSize)
+
+  useEffect(() => {
+    if ((location.state as { openRecharge?: boolean } | null)?.openRecharge) {
+      setPaymentOpen(true)
+    }
+  }, [location.state])
 
   useEffect(() => {
     if (isEmployer) return

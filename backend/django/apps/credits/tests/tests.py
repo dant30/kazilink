@@ -45,12 +45,22 @@ class CreditWalletTests(TestCase):
 		self.assertEqual(credits_for_amount(100), 2)
 		self.assertEqual({key: item['credits'] for key, item in CREDIT_ACTIONS.items()}, {
 			'history_unlock': 1,
+			'message_worker': 1,
 			'application': 1,
 			'featured_job_24h': 3,
 			'job_boost_7d': 5,
 			'premium_job_details': 1,
 			'profile_boost_7d': 3,
 		})
+
+	def test_message_worker_requires_one_credit(self):
+		wallet = get_or_create_wallet(user=self.user)
+		wallet.balance = 1
+		wallet.save(update_fields=('balance',))
+		entry = spend_credits(user=self.user, action='message_worker', idempotency_key='message-worker-1')
+		wallet.refresh_from_db()
+		self.assertEqual(entry.amount, -1)
+		self.assertEqual(wallet.balance, 0)
 
 	def test_recharge_below_minimum_is_rejected(self):
 		with self.assertRaisesMessage(ValueError, 'Recharge amount must be at least KSh 100'):

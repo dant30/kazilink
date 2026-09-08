@@ -6,7 +6,7 @@ from rest_framework.views import APIView
 from ..models import Conversation, Message
 from ..permissions import IsConversationParticipant, IsMessagingUser
 from ..serializers import ConversationCreateSerializer, ConversationSerializer, MessageCreateSerializer, MessageSerializer
-from ..services import conversations_for_user, get_or_create_conversation, send_message
+from ..services import conversations_for_user, get_or_create_conversation_for_user, send_message
 from apps.accounts.models import EmployerProfile, WorkerProfile
 from apps.jobs.models import Job
 
@@ -35,9 +35,11 @@ class ConversationListCreateView(generics.ListCreateAPIView):
 		else:
 			employer = request.user.employer_profile
 		try:
-			conversation = get_or_create_conversation(worker=worker, employer=employer, job=job)
+			conversation = get_or_create_conversation_for_user(worker=worker, employer=employer, user=request.user, job=job)
 		except PermissionError as exc:
 			return Response({'detail': str(exc)}, status=status.HTTP_403_FORBIDDEN)
+		except ValueError as exc:
+			return Response({'detail': str(exc)}, status=status.HTTP_400_BAD_REQUEST)
 		return Response(ConversationSerializer(conversation).data, status=status.HTTP_201_CREATED)
 
 
