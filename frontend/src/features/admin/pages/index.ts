@@ -1,4 +1,4 @@
-export { AdminDashboardPage } from './AdminDashboardPage'
+export { AdminDashboardPage } from './dashboard/AdminDashboardPage'
 export * from './accounts'
 export { AdminApplicationsPage } from './applications'
 export { AdminPaymentsPage } from './payments/AdminPaymentsPage'
