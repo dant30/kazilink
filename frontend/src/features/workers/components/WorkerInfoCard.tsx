@@ -5,6 +5,7 @@ import type { UpdateWorkerProfilePayload, WorkerAvailability, WorkerProfile } fr
 import { FormField, FormSection } from '../../../shared/components/forms'
 import { Input } from '../../../shared/components/ui/Input'
 import { Select } from '../../../shared/components/ui/Select'
+import { DatePicker } from '../../../shared/components/ui/DatePicker'
 import { Skeleton } from '../../../shared/components/ui/Skeleton'
 import { Chip } from '../../../shared/components/ui/Chip'
 import { getAdultDateOfBirthMax } from '../../../core/utils/date'
@@ -83,7 +84,7 @@ export function WorkerInfoCard({ profile, loading = false, values, onChange, ski
 					<Select value={values?.gender ?? profile?.user.gender ?? ''} onChange={(value) => onChange?.('gender', value)} options={[{ value: '', label: 'Select gender' }, { value: 'female', label: 'Female' }, { value: 'male', label: 'Male' }, { value: 'non_binary', label: 'Non-binary' }, { value: 'prefer_not_to_say', label: 'Prefer not to say' }]} disabled={!onChange} />
 				</FormField>
 				<FormField label="Date of birth">
-					<Input type="date" value={values?.date_of_birth ?? profile?.user.date_of_birth ?? ''} max={getAdultDateOfBirthMax()} onChange={(event) => onChange?.('date_of_birth', event.target.value)} readOnly={!onChange} />
+					<DatePicker value={values?.date_of_birth ?? profile?.user.date_of_birth ?? ''} onChange={(value) => onChange?.('date_of_birth', value)} maxDate={getAdultDateOfBirthMax()} quickPresets={false} disabled={!onChange} />
 				</FormField>
 				<FormField label="Preferred role">
 					<Input value={values?.primary_role ?? profile?.primary_role ?? ''} onChange={(event) => onChange?.('primary_role', event.target.value)} placeholder="Preferred role" readOnly={!onChange} />

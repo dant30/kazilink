@@ -113,7 +113,7 @@ export function Header() {
 	const unreadNotifications = notifications.filter((notification) => !notification.is_read)
 
 	return (
-		<header className="sticky top-0 z-40 border-b border-slate-200 bg-white shadow-[0_4px_16px_-6px_rgba(10,37,64,0.22)]">
+		<header className={`sticky top-0 ${mobileMenuOpen ? 'z-[60]' : 'z-40'} border-b border-slate-200 bg-white shadow-[0_4px_16px_-6px_rgba(10,37,64,0.22)]`}>
 			{/* Top Banner */}
 			<div className="bg-[#0A2540] text-slate-200 text-xs px-4 py-1.5 flex flex-wrap items-center justify-between gap-2">
 				<div className="flex items-center gap-2">
@@ -326,7 +326,7 @@ export function Header() {
 			{/* Mobile Drawer (Slide-out on small devices) */}
 			{mobileMenuOpen && (
 				<div
-					className="md:hidden fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex justify-end"
+					className="md:hidden fixed inset-0 z-[70] bg-slate-950/60 backdrop-blur-xs flex justify-end"
 					onClick={() => setMobileMenuOpen(false)}
 				>
 						<div
