@@ -1,12 +1,12 @@
 import { useState } from 'react'
-import { ArrowRight, BadgeCheck, Briefcase, Building2, CheckCircle2, PlusCircle, Star, Users } from 'lucide-react'
+import { ArrowRight, BadgeCheck, Briefcase, Building2, CheckCircle2, PlusCircle, Users } from 'lucide-react'
 import { Link, Navigate } from 'react-router-dom'
 import { useAuthStore } from '../../auth'
 import { StatCard } from '../../../shared/components/cards/StatCard'
 import { EmptyState } from '../../../shared/components/feedback'
 import { PieChart } from '../../../shared/components/charts'
 import { DataTable } from '../../../shared/components/tables'
-import { Skeleton, Tabs } from '../../../shared/components/ui'
+import { RatingStars, Skeleton, Tabs } from '../../../shared/components/ui'
 import { PageHeader } from '../../../shared/components/ui/PageHeader'
 import { useDashboard } from '../hooks'
 import { getTimeGreeting } from '../../../core/utils'
@@ -39,6 +39,5 @@ export function EmployerDashboardPage() {
 }
 
 function RatingRow({ rating, reviews }: { rating?: number | string; reviews?: number }) {
-  const score = Number(rating || 0)
-  return <div className="flex items-center justify-end gap-2 text-xs text-slate-300" aria-label={`${score.toFixed(1)} out of 5 stars from ${reviews || 0} reviews`}><span className="flex items-center gap-0.5">{Array.from({ length: 5 }, (_, index) => <Star key={index} className={`h-3.5 w-3.5 ${index < Math.round(score) ? 'fill-amber-400 text-amber-400' : 'text-slate-500'}`} />)}</span><span>{score.toFixed(1)} · {reviews || 0} reviews</span></div>
+  return <RatingStars rating={rating} reviews={reviews} className="justify-end text-xs text-slate-300" />
 }

@@ -18,6 +18,7 @@ import { Briefcase, Check, CheckCircle2, ChevronDown, ChevronUp, Clock, Edit3, E
 import type { UpdateWorkerProfilePayload } from '../types'
 import { ReferralCard } from '../../accounts/components/ReferralCard'
 import { VerificationPanel } from '../../accounts/components/VerificationPanel'
+import { RatingStars } from '../../../shared/components/ui/RatingStars'
 
 export function WorkerProfilePage() {
 	const { user } = useAuthStore()
@@ -165,12 +166,7 @@ export function WorkerProfilePage() {
 						</div>
 						<p className="text-xs text-slate-300"><strong className="text-white">{form.primary_role || profile?.primary_role || 'Hospitality specialist'}</strong> · {form.location || profile?.location || 'Kenya'}</p>
 						<p className="text-xs text-slate-300">Daily rate: <strong className="text-white">KSh {form.expected_daily_rate_ksh || profile?.expected_daily_rate_ksh || 0}</strong> · <span className="capitalize">{(form.availability || profile?.availability || 'immediate').replace(/_/g, ' ')}</span></p>
-						<div className="flex items-center gap-2 text-xs text-slate-300" aria-label={`${Number(profile.rating).toFixed(1)} out of 5 stars from ${profile.reviews_count} reviews`}>
-							<span className="flex items-center gap-0.5">
-								{Array.from({ length: 5 }, (_, index) => <Star key={index} className={`h-3.5 w-3.5 ${index < Math.round(Number(profile.rating)) ? 'fill-amber-400 text-amber-400' : 'text-slate-500'}`} />)}
-							</span>
-							<span>{Number(profile.rating).toFixed(1)} · {profile.reviews_count} reviews</span>
-						</div>
+						<RatingStars rating={profile.rating} reviews={profile.reviews_count} className="text-xs text-slate-300" />
 					</div>
 				</div>
 			</PageHeader>

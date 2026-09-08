@@ -1,6 +1,7 @@
-import { Star, ShieldCheck, Building2, User } from 'lucide-react'
+import { ShieldCheck, Building2, User } from 'lucide-react'
 import type { Review } from '../types'
 import { formatRelativeTime } from '../../../core/utils'
+import { RatingStars } from '../../../shared/components/ui/RatingStars'
 
 export function ReviewCard({ review }: { review: Review }) {
   const rating = Number(review.rating)
@@ -33,16 +34,7 @@ export function ReviewCard({ review }: { review: Review }) {
 
         <div className="flex flex-wrap items-center gap-2">
           <div className="flex items-center gap-1 rounded-xl bg-orange-50/70 px-2.5 py-1" aria-label={`${rating} out of 5 stars`}>
-            <div className="flex items-center gap-0.5">
-              {Array.from({ length: 5 }, (_, index) => (
-                <Star
-                  key={index}
-                  className={`h-3.5 w-3.5 ${
-                    index < rating ? 'fill-[#FF6B00] text-[#FF6B00]' : 'text-slate-300'
-                  }`}
-                />
-              ))}
-            </div>
+            <RatingStars rating={rating} reviews={0} showValue={false} emptyClassName="text-slate-300" />
             <span className="text-xs font-black text-[#FF6B00] ml-1">{rating.toFixed(1)}</span>
           </div>
 

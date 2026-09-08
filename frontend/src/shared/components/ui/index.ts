@@ -30,6 +30,8 @@ export type { PaginationProps } from './Pagination'
 export { PageHeader } from './PageHeader'
 export type { PageHeaderProps } from './PageHeader'
 export { ProgressBar } from './ProgressBar'
+export { RatingStars } from './RatingStars'
+export type { RatingStarsProps } from './RatingStars'
 
 export { Select } from './Select.tsx'
 export type { SelectProps, SelectOption } from './Select.tsx'
