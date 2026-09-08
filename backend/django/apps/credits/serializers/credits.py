@@ -13,18 +13,26 @@ class CreditWalletSerializer(serializers.ModelSerializer):
 
 class CreditLedgerEntrySerializer(serializers.ModelSerializer):
 	counterparty_name = serializers.SerializerMethodField()
+	counterparty_phone = serializers.SerializerMethodField()
 
 	class Meta:
 		model = CreditLedgerEntry
-		fields = ('id', 'entry_type', 'amount', 'balance_before', 'balance_after', 'action', 'reference', 'metadata', 'counterparty_name', 'created_at')
+		fields = ('id', 'entry_type', 'amount', 'balance_before', 'balance_after', 'action', 'reference', 'metadata', 'counterparty_name', 'counterparty_phone', 'created_at')
 
 	def get_counterparty_name(self, entry):
+		user = self._get_counterparty(entry)
+		return user.full_name if user else ''
+
+	def get_counterparty_phone(self, entry):
+		user = self._get_counterparty(entry)
+		return user.phone if user else ''
+
+	def _get_counterparty(self, entry):
 		metadata = entry.metadata or {}
 		user_id = metadata.get('recipient_user_id') if entry.action == 'credit_transfer_sent' else metadata.get('sender_user_id')
 		if not user_id:
-			return ''
-		user = get_user_model().objects.filter(pk=user_id).only('full_name').first()
-		return user.full_name if user else ''
+			return None
+		return get_user_model().objects.filter(pk=user_id).only('full_name', 'phone').first()
 
 
 class CreditRechargeSerializer(serializers.ModelSerializer):

@@ -1,5 +1,5 @@
 export type CreditWallet = { balance: number; updated_at: string }
-export type CreditLedgerEntry = { id: number; entry_type: string; amount: number; balance_before: number; balance_after: number; action: string; reference: string; metadata: Record<string, unknown>; counterparty_name?: string; created_at: string }
+export type CreditLedgerEntry = { id: number; entry_type: string; amount: number; balance_before: number; balance_after: number; action: string; reference: string; metadata: Record<string, unknown>; counterparty_name?: string; counterparty_phone?: string; created_at: string }
 export type CreditTransferResponse = { sent: CreditLedgerEntry; received: CreditLedgerEntry | null; recipient: { id: number; full_name: string; phone: string }; recipient_wallet: { balance: number } }
 export type CreditWalletResponse = { wallet: CreditWallet; ledger: CreditLedgerEntry[] }
 export type CreditAction = { key: string; label: string; credits: number; roles: string[] }
