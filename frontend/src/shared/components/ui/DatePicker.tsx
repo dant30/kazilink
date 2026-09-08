@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, X, Clock } from 'lucide-react';
+import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, X } from 'lucide-react';
 
 interface DatePickerProps {
   label?: string;
@@ -29,16 +29,22 @@ export const DatePicker: React.FC<DatePickerProps> = ({
   disabled = false,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [viewMode, setViewMode] = useState<'month' | 'monthSelect' | 'year' | 'decade'>('month');
   const containerRef = useRef<HTMLDivElement>(null);
 
+  const parseDate = (dateStr: string) => {
+    const [year, month, day] = dateStr.split('-').map(Number);
+    return new Date(year, month - 1, day);
+  };
+
   // Parse current date or value
-  const initialDate = value ? new Date(value) : new Date();
+  const initialDate = value ? parseDate(value) : new Date();
   const [viewYear, setViewYear] = useState(initialDate.getFullYear());
   const [viewMonth, setViewMonth] = useState(initialDate.getMonth()); // 0-indexed
 
   useEffect(() => {
     if (value) {
-      const d = new Date(value);
+      const d = parseDate(value);
       if (!isNaN(d.getTime())) {
         setViewYear(d.getFullYear());
         setViewMonth(d.getMonth());
@@ -71,18 +77,29 @@ export const DatePicker: React.FC<DatePickerProps> = ({
   const currentYear = new Date().getFullYear();
   const minimumYear = minDate ? Number(minDate.slice(0, 4)) : currentYear - 100;
   const maximumYear = maxDate ? Number(maxDate.slice(0, 4)) : currentYear + 10;
-  const years = Array.from(
-    { length: Math.max(1, maximumYear - minimumYear + 1) },
-    (_, index) => minimumYear + index,
-  );
-
   // Days calculations
   const firstDayIndex = new Date(viewYear, viewMonth, 1).getDay();
   const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
   const daysInPrevMonth = new Date(viewYear, viewMonth, 0).getDate();
 
+  const formatDateString = (year: number, month: number, day: number) => {
+    const mm = String(month + 1).padStart(2, '0');
+    const dd = String(day).padStart(2, '0');
+    return `${year}-${mm}-${dd}`;
+  };
+
+  const monthStart = formatDateString(viewYear, viewMonth, 1);
+  const monthEnd = formatDateString(viewYear, viewMonth, daysInMonth);
+  const canGoPrevMonth = !minDate || monthEnd > minDate;
+  const canGoNextMonth = !maxDate || monthStart < maxDate;
+  const decadeStart = Math.floor(viewYear / 10) * 10;
+  const decadeYears = Array.from({ length: 12 }, (_, index) => decadeStart - 1 + index);
+  const yearWindowStart = Math.floor(viewYear / 12) * 12;
+  const yearWindow = Array.from({ length: 12 }, (_, index) => yearWindowStart + index);
+
   const handlePrevMonth = (e: React.MouseEvent) => {
     e.stopPropagation();
+    if (!canGoPrevMonth) return;
     if (viewMonth === 0) {
       setViewMonth(11);
       setViewYear(prev => prev - 1);
@@ -93,18 +110,13 @@ export const DatePicker: React.FC<DatePickerProps> = ({
 
   const handleNextMonth = (e: React.MouseEvent) => {
     e.stopPropagation();
+    if (!canGoNextMonth) return;
     if (viewMonth === 11) {
       setViewMonth(0);
       setViewYear(prev => prev + 1);
     } else {
       setViewMonth(prev => prev + 1);
     }
-  };
-
-  const formatDateString = (year: number, month: number, day: number) => {
-    const mm = String(month + 1).padStart(2, '0');
-    const dd = String(day).padStart(2, '0');
-    return `${year}-${mm}-${dd}`;
   };
 
   const handleSelectDay = (day: number) => {
@@ -121,9 +133,9 @@ export const DatePicker: React.FC<DatePickerProps> = ({
     } else if (preset === 'tomorrow') {
       target.setDate(today.getDate() + 1);
     } else if (preset === 'weekend') {
-      // Find upcoming Friday / Saturday
+      // Select the next Saturday.
       const day = today.getDay();
-      const diff = day <= 5 ? 5 - day : (5 - day + 7);
+      const diff = day === 6 ? 7 : 6 - day;
       target.setDate(today.getDate() + diff);
     } else if (preset === 'nextMonth') {
       target = new Date(today.getFullYear(), today.getMonth() + 1, 1);
@@ -135,7 +147,25 @@ export const DatePicker: React.FC<DatePickerProps> = ({
     onChange(formatDateString(y, m, d));
     setViewYear(y);
     setViewMonth(m);
+    setViewMode('month');
     setIsOpen(false);
+  };
+
+  const selectYear = (year: number) => {
+    setViewYear(year);
+    setViewMode('month');
+  };
+
+  const selectDecade = (year: number) => {
+    setViewYear(year);
+    setViewMode('year');
+  };
+
+  const goToToday = () => {
+    const today = new Date();
+    setViewYear(today.getFullYear());
+    setViewMonth(today.getMonth());
+    setViewMode('month');
   };
 
   const displayFormatted = value ? new Date(value + 'T00:00:00').toLocaleDateString('en-KE', {
@@ -238,48 +268,50 @@ export const DatePicker: React.FC<DatePickerProps> = ({
             </div>
           )}
 
-          {/* Month and year navigation */}
+          {/* Month, year, and decade navigation */}
           <div className="flex items-center justify-between mb-3 px-1">
             <button
               type="button"
-              onClick={handlePrevMonth}
-              className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-600 transition"
-              aria-label="Previous month"
+              onClick={(event) => {
+                event.stopPropagation();
+                if (viewMode === 'month') handlePrevMonth(event);
+                else if (viewMode === 'monthSelect') setViewYear((year) => year - 1);
+                else if (viewMode === 'year') setViewYear((year) => year - 12);
+                else setViewYear((year) => year - 100);
+              }}
+              disabled={viewMode === 'month' ? !canGoPrevMonth : false}
+              className="p-1.5 rounded-lg text-slate-600 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-30"
+              aria-label={viewMode === 'month' ? 'Previous month' : 'Previous period'}
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
 
-            <div className="flex items-center gap-1">
-              <select
-                value={viewMonth}
-                onChange={(event) => setViewMonth(Number(event.target.value))}
-                className="rounded-lg border border-slate-200 bg-white px-1.5 py-1 text-xs font-black text-slate-900 focus:border-[#FF6B00] focus:outline-none"
-                aria-label="Select month"
-              >
-                {monthNames.map((month, index) => <option key={month} value={index}>{month}</option>)}
-              </select>
-              <select
-                value={viewYear}
-                onChange={(event) => setViewYear(Number(event.target.value))}
-                className="rounded-lg border border-slate-200 bg-white px-1.5 py-1 text-xs font-black text-slate-900 focus:border-[#FF6B00] focus:outline-none"
-                aria-label="Select year"
-              >
-                {years.map((year) => <option key={year} value={year}>{year}</option>)}
-              </select>
-            </div>
+            {viewMode === 'month' && <div className="flex items-center gap-1">
+              <button type="button" onClick={() => setViewMode('monthSelect')} className="rounded-lg px-1.5 py-1 text-xs font-black text-slate-900 hover:bg-slate-100">{monthNames[viewMonth]}</button>
+              <button type="button" onClick={() => setViewMode('year')} className="rounded-lg px-1.5 py-1 text-xs font-black text-slate-900 hover:bg-slate-100">{viewYear}</button>
+            </div>}
+            {viewMode === 'monthSelect' && <span className="text-xs font-black text-slate-900">Select month</span>}
+            {viewMode === 'year' && <button type="button" onClick={() => setViewMode('decade')} className="rounded-lg px-2 py-1 text-xs font-black text-slate-900 hover:bg-slate-100">Select year</button>}
+            {viewMode === 'decade' && <span className="text-xs font-black text-slate-900">Select decade</span>}
 
             <button
               type="button"
-              onClick={handleNextMonth}
-              className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-600 transition"
-              aria-label="Next month"
+              onClick={(event) => {
+                event.stopPropagation();
+                if (viewMode === 'month') handleNextMonth(event);
+                else if (viewMode === 'monthSelect') setViewYear((year) => year + 1);
+                else if (viewMode === 'year') setViewYear((year) => year + 12);
+                else setViewYear((year) => year + 100);
+              }}
+              disabled={viewMode === 'month' ? !canGoNextMonth : false}
+              className="p-1.5 rounded-lg text-slate-600 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-30"
+              aria-label={viewMode === 'month' ? 'Next month' : 'Next period'}
             >
               <ChevronRight className="w-4 h-4" />
             </button>
           </div>
 
-          {/* Days of Week Header */}
-          <div className="grid grid-cols-7 gap-1 text-center mb-1">
+          {viewMode === 'month' && <><div className="grid grid-cols-7 gap-1 text-center mb-1">
             {daysOfWeek.map((day, i) => (
               <span key={i} className="text-[10px] font-bold text-slate-400 uppercase">
                 {day}
@@ -330,6 +362,21 @@ export const DatePicker: React.FC<DatePickerProps> = ({
               );
             })}
           </div>
+          </>}
+
+          {viewMode === 'year' && <div className="grid grid-cols-3 gap-2">
+            {yearWindow.map((year) => <button key={year} type="button" onClick={() => selectYear(year)} disabled={year < minimumYear || year > maximumYear} className="rounded-xl px-2 py-3 text-xs font-bold text-slate-700 transition hover:bg-orange-50 hover:text-[#FF6B00] disabled:cursor-not-allowed disabled:opacity-30">{year}</button>)}
+          </div>}
+
+          {viewMode === 'monthSelect' && <div className="grid grid-cols-3 gap-2">
+            {monthNames.map((month, monthIndex) => <button key={month} type="button" onClick={() => { setViewMonth(monthIndex); setViewMode('month'); }} disabled={Boolean((minDate && formatDateString(viewYear, monthIndex, 31) < minDate) || (maxDate && formatDateString(viewYear, monthIndex, 1) > maxDate))} className="rounded-xl px-2 py-3 text-xs font-bold text-slate-700 transition hover:bg-orange-50 hover:text-[#FF6B00] disabled:cursor-not-allowed disabled:opacity-30">{month.slice(0, 3)}</button>)}
+          </div>}
+
+          {viewMode === 'decade' && <div className="grid grid-cols-3 gap-2">
+            {decadeYears.map((year) => <button key={year} type="button" onClick={() => selectDecade(year)} disabled={year < minimumYear || year > maximumYear} className="rounded-xl px-2 py-3 text-xs font-bold text-slate-700 transition hover:bg-orange-50 hover:text-[#FF6B00] disabled:cursor-not-allowed disabled:opacity-30">{year}s</button>)}
+          </div>}
+
+          {viewMode === 'month' && <button type="button" onClick={goToToday} className="mt-3 w-full border-t border-slate-100 pt-3 text-center text-xs font-bold text-[#FF6B00] hover:text-[#E55F00]">Today</button>}
 
         </div>
       )}
