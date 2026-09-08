@@ -1,6 +1,6 @@
 # KaziLink Implementation Plan
 
-This roadmap tracks the current repository state as of 2026-09-06. It separates verified implementation from work that is still incomplete or not yet validated.
+This roadmap tracks the current repository state as of 2026-09-08. It separates verified implementation from work that is still incomplete or not yet validated.
 
 ## Status Legend
 
@@ -46,6 +46,7 @@ This roadmap tracks the current repository state as of 2026-09-06. It separates 
 | Deliverable | Status | Current state |
 | --- | --- | --- |
 | Establishment model and employer/job links | ✅✅ | Establishment is normalized and referenced by employers and jobs. |
+| Employer establishment editing | ✅✅ | Authorized employers can open an establishment detail page, edit venue details, and save changes through the protected update route. |
 | Job CRUD and status actions | ✅✅ | Job list/create/detail/close APIs and services exist. |
 | Job type and status choices | ✅✅ | Current migrations enforce documented job types and statuses. |
 | Application creation and duplicate protection | ✅✅ | Application API and unique job/worker constraint exist; applications require an authenticated worker and consume one Kazi Credit atomically. |
@@ -85,7 +86,7 @@ This roadmap tracks the current repository state as of 2026-09-06. It separates 
 | Deliverable | Status | Current state |
 | --- | --- | --- |
 | Conversation and message schema | ✅✅ | Participant relationships, direct-chat uniqueness, ordering, and read state exist. |
-| Messaging access control | ✅✅ | Messaging requires an application or unlocked history. |
+| Messaging access control | ✅✅ | Messaging supports application/history access and charges one Kazi Credit for a new employer-to-worker conversation without prior access. |
 | REST messaging endpoints | ✅✅ | Conversation, message, and read-state routes exist. |
 | Real-time Channels/WebSocket chat | ❌❌ | Channels dependencies/configuration exist, but consumers and routing remain incomplete. |
 | Review creation after platform hire | ✅✅ | Review service verifies a hired application. |
@@ -128,6 +129,7 @@ This roadmap tracks the current repository state as of 2026-09-06. It separates 
 | --- | --- | --- |
 | Public routes and auth navigation | ✅✅ | Public routes include landing, jobs, job details, terms, privacy, and auth flows; protected actions redirect guests to login with their intended destination. |
 | Landing page | ✅✅ | Public landing experience includes backend-fed role search, live jobs, worker profile positioning, trust education, FAQ, calculator, and role-aware calls to action. |
+| Payment language consistency | ✅✅ | Auth, dashboard, marketplace, support, rating, notification, and establishment surfaces use consistent payment and payout language. |
 | Worker/employer onboarding funnels | ❌❌ | Registration APIs exist, but role-specific onboarding UI is incomplete. |
 | Testimonials and feature presentation | ❌❌ | Not implemented. |
 

@@ -112,7 +112,7 @@ export function RatingsPage() {
         <StatCard
           title="Verified hires"
           value={stats.verified}
-          subtitle="M-Pesa Escrow audited"
+          subtitle="M-Pesa payment records"
           icon={<ShieldCheck className="h-4 w-4 text-emerald-600" />}
           iconBg="bg-emerald-50"
         />

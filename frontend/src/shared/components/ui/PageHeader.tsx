@@ -22,7 +22,7 @@ export interface PageHeaderBadge {
 
 export interface PageHeaderStatus {
   label: string
-  indicator?: 'online' | 'busy' | 'verified' | 'escrow' | 'neutral'
+  indicator?: 'online' | 'busy' | 'verified' | 'neutral'
 }
 
 export interface PageHeaderProps {
@@ -121,7 +121,6 @@ export function PageHeader({
       online: 'bg-emerald-400 ring-emerald-400/30',
       busy: 'bg-rose-400 ring-rose-400/30',
       verified: 'bg-[#FF6B00] ring-[#FF6B00]/30',
-      escrow: 'bg-teal-400 ring-teal-400/30',
       neutral: 'bg-slate-400 ring-slate-400/30',
     }[status.indicator || 'online']
 

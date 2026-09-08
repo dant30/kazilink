@@ -154,12 +154,12 @@ export function JobDetailPage() {
             </div>
 
             <div className="rounded-2xl bg-white/10 p-4 backdrop-blur-sm">
-              <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-300">Verified escrow pay</p>
+              <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-300">Verified shift pay</p>
               <p className="mt-2 text-3xl font-black text-white">
                 KSh {job.pay_amount_ksh?.toLocaleString() ?? '0'}
               </p>
               <p className="text-sm text-slate-200">{job.pay_period || 'per shift'}</p>
-              <div className="mt-2 flex items-center gap-1.5 text-[11px] font-medium text-emerald-300"><ShieldCheck className="h-3.5 w-3.5" />Protected by KaziLink Escrow</div>
+              <div className="mt-2 flex items-center gap-1.5 text-[11px] font-medium text-emerald-300"><ShieldCheck className="h-3.5 w-3.5" />M-Pesa payout ready</div>
             </div>
           </div>
           {isWorker && <div className="mt-5 flex flex-wrap gap-2"><Button variant="outline" size="sm" onClick={() => void toggleSaved()} disabled={saving} leftIcon={saved ? <Check className="h-4 w-4" /> : <Bookmark className="h-4 w-4" />}>{saved ? 'Saved' : 'Save job'}</Button><Button variant="outline" size="sm" onClick={() => void shareJob()} leftIcon={<Share2 className="h-4 w-4" />}>{shared ? 'Link copied' : 'Share job'}</Button></div>}

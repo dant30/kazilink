@@ -12,7 +12,7 @@ export function AuthPanel({
   subtitle?: string
   children: ReactNode
 }) {
-  const features = ['Verified workers and employers with identity checks', 'Transparent M-Pesa escrow protection', 'Safer hospitality recruitment across Kenya']
+  const features = ['Verified workers and employers with identity checks', 'Clear M-Pesa payment tracking', 'Safer hospitality recruitment across Kenya']
 
   return (
     <section className="min-h-screen bg-slate-100/90 px-3 py-3 sm:px-5 sm:py-6 lg:px-8 lg:py-8">
@@ -23,7 +23,7 @@ export function AuthPanel({
             <div className="space-y-3 sm:space-y-4 lg:space-y-5">
               <div className="flex items-center justify-between"><span className="inline-flex items-center gap-1.5 rounded-full border border-orange-400/30 bg-orange-500/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-orange-200"><Sparkles className="h-3 w-3 text-[#FF6B00]" />{eyebrow}</span><span className="text-[11px] font-black tracking-wider text-slate-300 lg:hidden">Kazi<span className="text-[#FF6B00]">Link</span></span></div>
               <div className="space-y-1.5 sm:space-y-2.5"><h1 className="text-xl font-black tracking-tight text-white sm:text-2xl lg:text-4xl">{title}</h1>{subtitle && <p className="max-w-md text-xs leading-relaxed text-slate-300 sm:text-sm">{subtitle}</p>}</div>
-              <div className="flex flex-wrap items-center gap-1.5 pt-1 sm:gap-2 sm:pt-2"><span className="inline-flex items-center gap-1 rounded-full border border-orange-400/30 bg-[#FF6B00]/15 px-2.5 py-1 text-[10px] font-bold text-orange-200 sm:text-xs"><ShieldCheck className="h-3 w-3 text-[#FF6B00]" />Verified talent</span><span className="inline-flex items-center gap-1 rounded-full border border-white/15 bg-white/5 px-2.5 py-1 text-[10px] font-bold text-slate-200 sm:text-xs"><Coins className="h-3 w-3 text-emerald-400" />M-Pesa escrow</span><span className="rounded-full border border-white/15 bg-white/5 px-2.5 py-1 text-[10px] font-bold text-slate-200 sm:text-xs">2,000+ venues</span></div>
+              <div className="flex flex-wrap items-center gap-1.5 pt-1 sm:gap-2 sm:pt-2"><span className="inline-flex items-center gap-1 rounded-full border border-orange-400/30 bg-[#FF6B00]/15 px-2.5 py-1 text-[10px] font-bold text-orange-200 sm:text-xs"><ShieldCheck className="h-3 w-3 text-[#FF6B00]" />Verified talent</span><span className="inline-flex items-center gap-1 rounded-full border border-white/15 bg-white/5 px-2.5 py-1 text-[10px] font-bold text-slate-200 sm:text-xs"><Coins className="h-3 w-3 text-emerald-400" />M-Pesa payments</span><span className="rounded-full border border-white/15 bg-white/5 px-2.5 py-1 text-[10px] font-bold text-slate-200 sm:text-xs">2,000+ venues</span></div>
             </div>
             <div className="mt-4 hidden space-y-2.5 sm:mt-6 sm:block lg:mt-8 lg:space-y-3">{features.map((feature) => <div key={feature} className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 backdrop-blur-sm"><span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#FF6B00] text-xs font-bold text-white">✓</span><span className="text-xs text-slate-200 sm:text-sm">{feature}</span></div>)}</div>
           </div>

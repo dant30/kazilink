@@ -195,7 +195,7 @@ export function EstablishmentDetailPage() {
               <div>
                 <h3 className="text-base font-black text-slate-900 mb-2">Venue Overview</h3>
                 <p className="text-xs sm:text-sm leading-relaxed text-slate-600">
-                  {establishment.name} is a premier hospitality destination located in {establishment.location}. Partnered with KaziLink, this venue hires reference-verified bartenders, baristas, waitstaff, chefs, and event crews backed by instant M-Pesa escrow guarantees.
+                  {establishment.name} is a premier hospitality destination located in {establishment.location}. Partnered with KaziLink, this venue hires reference-verified bartenders, baristas, waitstaff, chefs, and event crews with clear M-Pesa payment records.
                 </p>
               </div>
 
@@ -213,10 +213,10 @@ export function EstablishmentDetailPage() {
                 <div className="rounded-2xl border border-slate-100 bg-slate-50/70 p-4">
                   <div className="flex items-center gap-2.5 text-emerald-600 mb-1.5">
                     <CheckCircle2 className="h-5 w-5" />
-                    <h4 className="text-xs font-black uppercase tracking-wider text-slate-900">Escrow Protected</h4>
+                    <h4 className="text-xs font-black uppercase tracking-wider text-slate-900">Payment Ready</h4>
                   </div>
                   <p className="text-xs text-slate-500">
-                    Shift compensation is locked before shift start and disbursed immediately after sign-off.
+                    Shift compensation details are confirmed before work begins and recorded after sign-off.
                   </p>
                 </div>
 
@@ -326,8 +326,8 @@ export function EstablishmentDetailPage() {
                 <div className="flex items-start gap-3 rounded-2xl border border-slate-100 bg-slate-50/70 p-4">
                   <CheckCircle2 className="h-5 w-5 text-blue-600 shrink-0 mt-0.5" />
                   <div className="text-xs leading-relaxed text-slate-600">
-                    <strong className="text-slate-900 block mb-0.5">Escrow Wage Protection</strong>
-                    Shift commitments are financially guaranteed through automated M-Pesa B2C escrow disbursement.
+                    <strong className="text-slate-900 block mb-0.5">Wage Payment Standards</strong>
+                    Shift commitments include clear compensation details and M-Pesa payout records.
                   </div>
                 </div>
 

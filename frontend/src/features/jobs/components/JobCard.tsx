@@ -25,7 +25,7 @@ export function JobCard({ job }: { job: Job }) {
             <span className="ml-1 text-[11px] font-semibold text-slate-500">/{job.pay_period || 'shift'}</span>
           </p>
         </div>
-        <div className="shrink-0 text-right text-[11px] text-slate-500"><p className="flex items-center justify-end gap-1 whitespace-nowrap font-medium"><TimerReset className="h-3.5 w-3.5 shrink-0 text-[#FF6B00]" /><span>{job.applicant_count ?? 0} applicants</span></p><p className="mt-0.5 whitespace-nowrap text-[10px] font-semibold text-emerald-600">M-Pesa Escrow</p></div>
+        <div className="shrink-0 text-right text-[11px] text-slate-500"><p className="flex items-center justify-end gap-1 whitespace-nowrap font-medium"><TimerReset className="h-3.5 w-3.5 shrink-0 text-[#FF6B00]" /><span>{job.applicant_count ?? 0} applicants</span></p><p className="mt-0.5 whitespace-nowrap text-[10px] font-semibold text-emerald-600">M-Pesa payouts</p></div>
       </div>
       <div className="mt-3.5 flex min-w-0 items-center justify-between gap-2 border-t border-slate-100/80 pt-3"><div className="truncate text-xs font-semibold text-slate-500">{job.status || 'Open'} role</div>
         <Link

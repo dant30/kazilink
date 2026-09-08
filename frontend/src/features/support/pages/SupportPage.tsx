@@ -22,8 +22,8 @@ import { useSupport } from '../hooks/useSupport'
 
 const hospitalityFaqs = [
   {
-    q: 'How does M-Pesa Escrow protect casual shift wages?',
-    a: 'When an employer books a worker for a shift, the agreed wage is locked in verified escrow. Once the worker checks in and concludes the shift satisfactorily, funds are instantly released directly to the worker’s M-Pesa phone number.',
+    q: 'How are casual shift wages paid?',
+    a: 'When an employer books a worker for a shift, the agreed wage and payment details are recorded. After the shift is completed and confirmed, the payout is sent to the worker’s M-Pesa phone number.',
   },
   {
     q: 'How are worker employment histories and references verified?',
@@ -78,7 +78,7 @@ export function SupportPage() {
       <PageHeader
         eyebrow="Help & Resolutions"
         title="Support Desk"
-        description="Get rapid help with shift disputes, M-Pesa escrow releases, account verifications, or casual worker attendance."
+        description="Get rapid help with shift disputes, M-Pesa payments, account verifications, or casual worker attendance."
         icon={<HelpCircle className="h-4 w-4" />}
         actions={
           <Button
