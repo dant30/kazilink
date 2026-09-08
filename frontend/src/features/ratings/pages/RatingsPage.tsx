@@ -28,27 +28,31 @@ export function RatingsPage() {
   const isEmployer = Boolean(user?.is_employer)
   const isWorker = Boolean(user?.is_worker)
   const { reviews, eligibleHires, loading, submitting, error, refresh, createReview } = useRatings({ isEmployer, isWorker })
+  const relevantReviews = useMemo(
+    () => reviews.filter((review) => (isWorker ? Boolean(review.target_employer) : Boolean(review.target_worker))),
+    [reviews, isWorker],
+  )
 
   const pageSize = 6
 
   const stats = useMemo(() => {
-    if (!reviews.length) {
-      return { average: 5.0, total: 0, fiveStar: 0, verified: 0 }
+    if (!relevantReviews.length) {
+      return { average: null, total: 0, fiveStar: 0, verified: 0 }
     }
-    const sum = reviews.reduce((acc, curr) => acc + Number(curr.rating || 5), 0)
-    const avg = sum / reviews.length
-    const fiveStar = reviews.filter((r) => Number(r.rating) === 5).length
-    const verified = reviews.filter((r) => r.is_verified_hire).length
+    const sum = relevantReviews.reduce((acc, curr) => acc + Number(curr.rating), 0)
+    const avg = sum / relevantReviews.length
+    const fiveStar = relevantReviews.filter((r) => Number(r.rating) === 5).length
+    const verified = relevantReviews.filter((r) => r.is_verified_hire).length
     return {
       average: Math.round(avg * 10) / 10,
       total: reviews.length,
       fiveStar,
       verified,
     }
-  }, [reviews])
+  }, [relevantReviews])
 
   const filteredReviews = useMemo(() => {
-    return reviews.filter((review) => {
+    return relevantReviews.filter((review) => {
       const matchesStars = starFilter === 'all' || Math.floor(Number(review.rating)) === starFilter
       const query = searchQuery.trim().toLowerCase()
       const matchesSearch =
@@ -61,7 +65,7 @@ export function RatingsPage() {
 
       return matchesStars && matchesSearch
     })
-  }, [reviews, starFilter, searchQuery])
+  }, [relevantReviews, starFilter, searchQuery])
 
   const visibleReviews = filteredReviews.slice((page - 1) * pageSize, page * pageSize)
 
@@ -92,29 +96,29 @@ export function RatingsPage() {
 
       <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         <StatCard
-          title="Average score"
-          value={`${stats.average} / 5.0`}
-          subtitle="Across all shifts"
+          title={isWorker ? 'Average employer rating' : 'Average worker rating'}
+          value={stats.average === null ? '—' : `${stats.average} / 5.0`}
+          subtitle={isWorker ? 'Across your completed hires' : 'Across your hired workers'}
           icon={<Star className="h-4 w-4 fill-amber-400 text-amber-400" />}
           iconBg="bg-amber-50"
         />
         <StatCard
-          title="Total reviews"
+          title={isWorker ? 'Employer reviews' : 'Worker reviews'}
           value={stats.total}
-          subtitle="Submitted feedback"
+          subtitle={isWorker ? 'Feedback about employers' : 'Feedback about workers'}
           icon={<Users className="h-4 w-4" />}
         />
         <StatCard
-          title="5-Star ratings"
+          title={isWorker ? '5-Star employers' : '5-Star workers'}
           value={stats.fiveStar}
-          subtitle="Exemplary service"
+          subtitle="Top-rated completed hires"
           icon={<Award className="h-4 w-4 text-[#FF6B00]" />}
           iconBg="bg-orange-50"
         />
         <StatCard
           title="Verified hires"
           value={stats.verified}
-          subtitle="M-Pesa payment records"
+          subtitle="Completed platform hires"
           icon={<ShieldCheck className="h-4 w-4 text-emerald-600" />}
           iconBg="bg-emerald-50"
         />
