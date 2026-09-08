@@ -76,8 +76,8 @@ export const endpoints = {
     revokeAccess: () => post<{ revoked_count: number; consent_history_sharing: boolean }>('/employment-history/access/revoke/', {}),
     worker: (workerId: number) => get(`/employment-history/worker/${workerId}/`),
     verificationQueue: () => get('/employment-history/admin/verification-queue/'),
-    verify: (id: number, data: Record<string, unknown>) => patch(`/employment-history/admin/${id}/verify/`, data),
-    referenceAttempt: (id: number, data: Record<string, unknown>) => patch(`/employment-history/admin/${id}/reference/`, data),
+    verify: (id: number, data: Record<string, unknown>) => patch<EmploymentRecord>(`/employment-history/admin/${id}/verify/`, data),
+    referenceAttempt: (id: number, data: Record<string, unknown>) => patch<EmploymentRecord>(`/employment-history/admin/${id}/reference/`, data),
   },
   applications: {
     list: (query = '') => get<Paginated<JobApplication> | JobApplication[]>(`/applications/${query ? `?${query}` : ''}`),
