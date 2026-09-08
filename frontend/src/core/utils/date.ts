@@ -14,3 +14,10 @@ export function formatRelativeTime(value?: string) {
   if (elapsedWeeks < 5) return `${elapsedWeeks} week${elapsedWeeks === 1 ? '' : 's'} ago`
   return new Intl.DateTimeFormat(undefined, { dateStyle: 'medium' }).format(new Date(timestamp))
 }
+
+export function getTimeGreeting(date = new Date()) {
+  const hour = date.getHours()
+  if (hour < 12) return 'Morning'
+  if (hour < 18) return 'Afternoon'
+  return 'Evening'
+}

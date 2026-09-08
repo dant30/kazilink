@@ -8,6 +8,8 @@ import { useAdminUsers } from '../hooks'
 import { useJobs } from '../../jobs/hooks'
 import { useEstablishments } from '../../establishments/hooks'
 import { useVerificationQueue } from '../../employment_history/hooks'
+import { useAuthStore } from '../../auth'
+import { getTimeGreeting } from '../../../core/utils'
 
 const managementLinks = [
 	['/admin/users', 'Manage users', 'Review worker and employer accounts', Users],
@@ -17,6 +19,7 @@ const managementLinks = [
 ] as const
 
 export function AdminDashboardPage() {
+	const { user } = useAuthStore()
 	const { users } = useAdminUsers()
 	const { jobs } = useJobs({})
 	const { establishments } = useEstablishments()
@@ -24,7 +27,7 @@ export function AdminDashboardPage() {
 	return (
 		<section className="mx-auto max-w-7xl space-y-8 p-4 sm:p-6">
 			<PageHeader
-				title="Keep KaziLink reliable."
+				title={`${getTimeGreeting()}, ${user?.full_name || 'Admin'}!`}
 				description="Manage users, verify work histories, monitor jobs, and respond to marketplace risks from one operational workspace."
 				actions={
 					<span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-slate-100">
