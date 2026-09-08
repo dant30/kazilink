@@ -68,6 +68,14 @@ export const DatePicker: React.FC<DatePickerProps> = ({
 
   const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
+  const currentYear = new Date().getFullYear();
+  const minimumYear = minDate ? Number(minDate.slice(0, 4)) : currentYear - 100;
+  const maximumYear = maxDate ? Number(maxDate.slice(0, 4)) : currentYear + 10;
+  const years = Array.from(
+    { length: Math.max(1, maximumYear - minimumYear + 1) },
+    (_, index) => minimumYear + index,
+  );
+
   // Days calculations
   const firstDayIndex = new Date(viewYear, viewMonth, 1).getDay();
   const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
@@ -230,7 +238,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
             </div>
           )}
 
-          {/* Month Header Navigation */}
+          {/* Month and year navigation */}
           <div className="flex items-center justify-between mb-3 px-1">
             <button
               type="button"
@@ -241,9 +249,24 @@ export const DatePicker: React.FC<DatePickerProps> = ({
               <ChevronLeft className="w-4 h-4" />
             </button>
 
-            <span className="text-xs font-black text-slate-900">
-              {monthNames[viewMonth]} {viewYear}
-            </span>
+            <div className="flex items-center gap-1">
+              <select
+                value={viewMonth}
+                onChange={(event) => setViewMonth(Number(event.target.value))}
+                className="rounded-lg border border-slate-200 bg-white px-1.5 py-1 text-xs font-black text-slate-900 focus:border-[#FF6B00] focus:outline-none"
+                aria-label="Select month"
+              >
+                {monthNames.map((month, index) => <option key={month} value={index}>{month}</option>)}
+              </select>
+              <select
+                value={viewYear}
+                onChange={(event) => setViewYear(Number(event.target.value))}
+                className="rounded-lg border border-slate-200 bg-white px-1.5 py-1 text-xs font-black text-slate-900 focus:border-[#FF6B00] focus:outline-none"
+                aria-label="Select year"
+              >
+                {years.map((year) => <option key={year} value={year}>{year}</option>)}
+              </select>
+            </div>
 
             <button
               type="button"
