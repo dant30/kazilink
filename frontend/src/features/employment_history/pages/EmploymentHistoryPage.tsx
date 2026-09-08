@@ -15,6 +15,7 @@ import { Skeleton } from '../../../shared/components/ui/Skeleton'
 import { EmptyState } from '../../../shared/components/feedback'
 import { Select } from '../../../shared/components/ui/Select'
 import { Button } from '../../../shared/components/ui/Button'
+import { ConfirmDialog } from '../../../shared/components/ui/ConfirmDialog'
 
 const defaultForm: EmploymentRecordInput = {
   worker_id: undefined,
@@ -44,6 +45,7 @@ export function EmploymentHistoryPage() {
   const [formError, setFormError] = useState('')
   const [successMessage, setSuccessMessage] = useState('')
   const [revokingAccess, setRevokingAccess] = useState(false)
+  const [revokeDialogOpen, setRevokeDialogOpen] = useState(false)
 
   useEffect(() => {
     if (!user?.is_employer) return
@@ -94,13 +96,13 @@ export function EmploymentHistoryPage() {
   }), [records])
 
   const handleRevokeAccess = async () => {
-    if (!window.confirm('Revoke future employer access to your employment history? Previously granted access will remain in the audit history.')) return
     setRevokingAccess(true)
     setFormError('')
     setSuccessMessage('')
     try {
       const response = await revokeHistoryAccess()
       setSuccessMessage(`${response.revoked_count} active history access record${response.revoked_count === 1 ? '' : 's'} revoked.`)
+      setRevokeDialogOpen(false)
     } catch (reason) {
       setFormError(reason instanceof Error ? reason.message : 'Unable to revoke history access.')
     } finally {
@@ -170,7 +172,7 @@ export function EmploymentHistoryPage() {
 
   return (
     <section className="mx-auto max-w-7xl space-y-6 px-4 py-8 sm:px-6 lg:px-8">
-      <PageHeader eyebrow="Employment history" title={user?.is_worker ? 'Your work passport' : user?.is_employer ? 'Employment verification desk' : 'History verification desk'} actions={user?.is_worker ? <div className="flex flex-wrap items-center gap-2"><span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-2 text-xs text-slate-200"><ShieldCheck className="h-4 w-4 text-[#FF6B00]" />{summary.total} records</span><Button variant="outline" size="sm" onClick={() => void handleRevokeAccess()} disabled={revokingAccess}>Revoke future access</Button></div> : <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-2 text-xs text-slate-200"><ShieldCheck className="h-4 w-4 text-[#FF6B00]" />{summary.total} records</div>} />
+      <PageHeader eyebrow="Employment history" title={user?.is_worker ? 'Your work passport' : user?.is_employer ? 'Employment verification desk' : 'History verification desk'} actions={user?.is_worker ? <div className="flex flex-wrap items-center gap-2"><span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-2 text-xs text-slate-200"><ShieldCheck className="h-4 w-4 text-[#FF6B00]" />{summary.total} records</span><Button variant="outline" size="sm" onClick={() => setRevokeDialogOpen(true)} disabled={revokingAccess}>Revoke future access</Button></div> : <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-2 text-xs text-slate-200"><ShieldCheck className="h-4 w-4 text-[#FF6B00]" />{summary.total} records</div>} />
 
       <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
         <StatCard title="Total" value={summary.total} subtitle="Recorded employment entries" icon={<FileText className="h-5 w-5" />} />
@@ -303,6 +305,18 @@ export function EmploymentHistoryPage() {
           </div>
         )}
       </div>
+
+      <ConfirmDialog
+        isOpen={revokeDialogOpen}
+        title="Revoke future history access?"
+        message="Employers will no longer be able to access your employment history. Previously granted access will remain preserved in the audit history."
+        confirmLabel="Revoke access"
+        cancelLabel="Keep access"
+        variant="warning"
+        loading={revokingAccess}
+        onConfirm={() => void handleRevokeAccess()}
+        onCancel={() => setRevokeDialogOpen(false)}
+      />
     </section>
   )
 }
