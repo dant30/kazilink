@@ -345,7 +345,7 @@ export function PageHeader({
         </div>
 
         {/* Action Buttons Slot */}
-        {actions && <div className="relative z-10 shrink-0 self-start sm:self-end">{actions}</div>}
+        {actions && <div className="relative z-10 w-full shrink-0 self-start sm:w-auto sm:self-end [&>div]:flex-nowrap [&>div]:w-full [&>div>button]:min-w-0 [&>div>button]:flex-1 [&>div>button]:whitespace-nowrap [&>div>a]:min-w-0 [&>div>a]:flex-1 [&>div>a]:whitespace-nowrap sm:[&>div>button]:flex-none sm:[&>div>a]:flex-none">{actions}</div>}
       </div>
 
       {/* Bottom Tabs Slot */}

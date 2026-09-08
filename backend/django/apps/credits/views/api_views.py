@@ -101,7 +101,12 @@ class CreditTransferView(APIView):
 		if recipient is None:
 			return Response({'detail': 'Recipient account was not found.'}, status=status.HTTP_404_NOT_FOUND)
 		try:
-			entry = transfer_credits(sender=request.user, recipient=recipient, amount=serializer.validated_data['amount'], idempotency_key=serializer.validated_data['idempotency_key'])
+			transfer = transfer_credits(sender=request.user, recipient=recipient, amount=serializer.validated_data['amount'], idempotency_key=serializer.validated_data['idempotency_key'])
 		except ValueError as exc:
 			return Response({'detail': str(exc)}, status=status.HTTP_400_BAD_REQUEST)
-		return Response(CreditLedgerEntrySerializer(entry).data, status=status.HTTP_201_CREATED)
+		return Response({
+			'sent': CreditLedgerEntrySerializer(transfer['sent']).data,
+			'received': CreditLedgerEntrySerializer(transfer['received']).data if transfer['received'] else None,
+			'recipient': {'id': recipient.id, 'full_name': recipient.full_name, 'phone': recipient.phone},
+			'recipient_wallet': {'balance': transfer['received'].balance_after},
+		}, status=status.HTTP_201_CREATED)

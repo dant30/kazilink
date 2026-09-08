@@ -36,8 +36,8 @@ export function CreditTransferForm({ balance, onComplete }: { balance: number; o
     setSubmitting(true)
     setValidationError('')
     try {
-      await endpoints.credits.transfer({ recipient_phone: normalizedPhone, amount: transferAmount, idempotency_key: createIdempotencyKey() })
-      toast.success('Credits transferred', `${transferAmount} credit${transferAmount === 1 ? '' : 's'} sent successfully.`)
+      const transfer = await endpoints.credits.transfer({ recipient_phone: normalizedPhone, amount: transferAmount, idempotency_key: createIdempotencyKey() })
+      toast.success('Credits transferred', `${transferAmount} credit${transferAmount === 1 ? '' : 's'} sent to ${transfer.recipient.full_name}. Recipient wallet balance: ${transfer.recipient_wallet.balance}.`)
       onComplete()
     } catch (error) {
       toast.error('Transfer failed', error instanceof Error ? error.message : 'Unable to transfer credits.')
