@@ -7,6 +7,7 @@ import {
   ExternalLink,
   Heart,
   MapPin,
+  Pencil,
   Phone,
   Share2,
   ShieldCheck,
@@ -118,14 +119,25 @@ export function EstablishmentDetailPage() {
           <ArrowLeft className="h-4 w-4 text-[#FF6B00]" /> All establishments
         </Link>
 
-        <button
-          type="button"
-          onClick={handleShare}
-          className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 transition shadow-2xs"
-        >
-          <Share2 className="h-3.5 w-3.5 text-[#FF6B00]" />
-          <span>{copied ? 'Copied!' : 'Share'}</span>
-        </button>
+        <div className="flex items-center gap-2">
+          {isEmployer && (
+            <Link
+              to={`/establishments/${establishment.id}/edit`}
+              className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-bold text-slate-700 transition hover:bg-slate-50 shadow-2xs"
+            >
+              <Pencil className="h-3.5 w-3.5 text-[#FF6B00]" />
+              Edit establishment
+            </Link>
+          )}
+          <button
+            type="button"
+            onClick={handleShare}
+            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 transition shadow-2xs"
+          >
+            <Share2 className="h-3.5 w-3.5 text-[#FF6B00]" />
+            <span>{copied ? 'Copied!' : 'Share'}</span>
+          </button>
+        </div>
       </div>
 
       <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xs">
