@@ -94,7 +94,19 @@ export function RatingsPage() {
       <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         <StatCard
           title="Your average rating"
-          value={stats.average === null ? '—' : `${stats.average} / 5.0`}
+          value={
+            <div
+              className="flex items-center gap-0.5"
+              aria-label={stats.average === null ? 'No ratings yet' : `${stats.average} out of 5 stars`}
+            >
+              {Array.from({ length: 5 }, (_, index) => (
+                <Star
+                  key={index}
+                  className={`h-5 w-5 ${stats.average !== null && index < Math.round(stats.average) ? 'fill-amber-400 text-amber-400' : 'text-slate-300'}`}
+                />
+              ))}
+            </div>
+          }
           subtitle="From completed hires"
           icon={<Star className="h-4 w-4 fill-amber-400 text-amber-400" />}
           iconBg="bg-amber-50"

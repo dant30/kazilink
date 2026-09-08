@@ -111,6 +111,19 @@ class WorkerProfileSerializer(serializers.ModelSerializer):
 
 class EmployerProfileSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
+    average_rating = serializers.SerializerMethodField()
+    reviews_count = serializers.SerializerMethodField()
+
+    def get_average_rating(self, obj):
+        from django.db.models import Avg
+        from apps.ratings.models import Review
+
+        return Review.objects.filter(target_employer=obj).aggregate(average=Avg('rating'))['average'] or 0
+
+    def get_reviews_count(self, obj):
+        from apps.ratings.models import Review
+
+        return Review.objects.filter(target_employer=obj).count()
 
     class Meta:
         model = EmployerProfile

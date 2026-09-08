@@ -29,6 +29,8 @@ export type EmployerProfile = {
 	auto_shortlist: boolean
 	verified_only: boolean
 	verified_business: boolean
+	average_rating: number | string
+	reviews_count: number
 }
 
 export type Employer = EmployerProfile

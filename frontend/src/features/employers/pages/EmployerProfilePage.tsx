@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Building2, Check, CheckCircle2, ChevronDown, ChevronUp, Edit3, Eye, Plus, Share2, ShieldAlert, ShieldCheck, Users, Zap } from 'lucide-react'
+import { Building2, Check, CheckCircle2, ChevronDown, ChevronUp, Edit3, Eye, Plus, Share2, ShieldAlert, ShieldCheck, Star, Users, Zap } from 'lucide-react'
 import { Avatar } from '../../../shared/components/ui/Avatar'
 import { Badge } from '../../../shared/components/ui/Badge'
 import { Button } from '../../../shared/components/ui/Button'
@@ -92,6 +92,12 @@ export function EmployerProfilePage() {
           </div>
           <p className="text-xs text-slate-300"><strong className="text-white">{form.business_type || profile.business_type || 'Hospitality business'}</strong> · {form.location || profile.location || 'Kenya'}</p>
           <p className="text-xs text-slate-300">Hiring contact: <strong className="text-white">{form.contact_person || profile.contact_person || profile.user.full_name}</strong> · {establishments.length} {establishments.length === 1 ? 'venue' : 'venues'}</p>
+          <div className="flex items-center gap-2 text-xs text-slate-300" aria-label={`${Number(profile.average_rating).toFixed(1)} out of 5 stars from ${profile.reviews_count} reviews`}>
+            <span className="flex items-center gap-0.5">
+              {Array.from({ length: 5 }, (_, index) => <Star key={index} className={`h-3.5 w-3.5 ${index < Math.round(Number(profile.average_rating)) ? 'fill-amber-400 text-amber-400' : 'text-slate-500'}`} />)}
+            </span>
+            <span>{Number(profile.average_rating).toFixed(1)} · {profile.reviews_count} reviews</span>
+          </div>
         </div>
       </div>
     </PageHeader>

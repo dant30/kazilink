@@ -29,7 +29,7 @@ export interface StatCardBadge {
 
 export interface StatCardProps {
   title: string
-  value: string | number
+  value: React.ReactNode
   subtitle?: string
   change?: string
   changeType?: 'positive' | 'negative' | 'neutral'
