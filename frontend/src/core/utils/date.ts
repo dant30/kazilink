@@ -17,7 +17,7 @@ export function formatRelativeTime(value?: string) {
 
 export function getTimeGreeting(date = new Date()) {
   const hour = date.getHours()
-  if (hour < 12) return 'Morning'
-  if (hour < 18) return 'Afternoon'
-  return 'Evening'
+  if (hour < 12) return '🌄 Morning'
+  if (hour < 18) return '🌤️ Afternoon'
+  return '🌛 Evening'
 }
