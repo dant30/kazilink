@@ -20,6 +20,11 @@ class ReviewListCreateView(generics.ListCreateAPIView):
 
 	def get_queryset(self):
 		queryset = Review.objects.select_related('target_worker__user', 'target_employer__user', 'author__user', 'author_worker__user', 'job').order_by('-date')
+		if self.request.user.is_authenticated:
+			if self.request.user.is_worker:
+				queryset = queryset.filter(target_worker__user=self.request.user)
+			elif self.request.user.is_employer:
+				queryset = queryset.filter(target_employer__user=self.request.user)
 		worker_id = self.request.query_params.get('worker_id')
 		if worker_id:
 			queryset = queryset.filter(target_worker_id=worker_id)

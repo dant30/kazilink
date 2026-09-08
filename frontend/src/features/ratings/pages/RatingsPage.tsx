@@ -28,10 +28,7 @@ export function RatingsPage() {
   const isEmployer = Boolean(user?.is_employer)
   const isWorker = Boolean(user?.is_worker)
   const { reviews, eligibleHires, loading, submitting, error, refresh, createReview } = useRatings({ isEmployer, isWorker })
-  const relevantReviews = useMemo(
-    () => reviews.filter((review) => (isWorker ? Boolean(review.target_employer) : Boolean(review.target_worker))),
-    [reviews, isWorker],
-  )
+  const relevantReviews = reviews
 
   const pageSize = 6
 
@@ -45,7 +42,7 @@ export function RatingsPage() {
     const verified = relevantReviews.filter((r) => r.is_verified_hire).length
     return {
       average: Math.round(avg * 10) / 10,
-      total: reviews.length,
+      total: relevantReviews.length,
       fiveStar,
       verified,
     }
@@ -96,20 +93,20 @@ export function RatingsPage() {
 
       <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         <StatCard
-          title={isWorker ? 'Average employer rating' : 'Average worker rating'}
+          title="Your average rating"
           value={stats.average === null ? '—' : `${stats.average} / 5.0`}
-          subtitle={isWorker ? 'Across your completed hires' : 'Across your hired workers'}
+          subtitle="From completed hires"
           icon={<Star className="h-4 w-4 fill-amber-400 text-amber-400" />}
           iconBg="bg-amber-50"
         />
         <StatCard
-          title={isWorker ? 'Employer reviews' : 'Worker reviews'}
+          title="Reviews received"
           value={stats.total}
-          subtitle={isWorker ? 'Feedback about employers' : 'Feedback about workers'}
+          subtitle="Feedback about your work"
           icon={<Users className="h-4 w-4" />}
         />
         <StatCard
-          title={isWorker ? '5-Star employers' : '5-Star workers'}
+          title="5-Star reviews"
           value={stats.fiveStar}
           subtitle="Top-rated completed hires"
           icon={<Award className="h-4 w-4 text-[#FF6B00]" />}
