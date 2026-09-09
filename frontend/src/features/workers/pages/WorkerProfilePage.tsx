@@ -18,13 +18,11 @@ import type { UpdateWorkerProfilePayload } from '../types'
 import { ReferralCard } from '../../accounts/components/ReferralCard'
 import { VerificationPanel } from '../../accounts/components/VerificationPanel'
 import { RatingStars } from '../../../shared/components/ui/RatingStars'
-import { useEmploymentHistory } from '../../employment_history/hooks'
 
 export function WorkerProfilePage() {
 	const { user } = useAuthStore()
 	const { profile, loading, error, refresh } = useWorkerProfile()
 	const { updating, error: updateError, success, updateProfile, clearError, clearSuccess } = useUpdateWorkerProfile()
-	const { records: employmentRecords } = useEmploymentHistory()
 	const [form, setForm] = useState<UpdateWorkerProfilePayload>({})
 	const [creditBalance, setCreditBalance] = useState<number | null>(null)
 	const [confirmBoost, setConfirmBoost] = useState(false)
@@ -171,6 +169,7 @@ export function WorkerProfilePage() {
 				</div>
 			</PageHeader>
 
+			<WorkerStatsCard profile={profile} loading={loading} />
 			<div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><ProgressBar value={profileStrength} color={strengthColor} showPercentage={false} barHeightClassName="h-3" label={<span className="flex items-center gap-2 font-bold text-slate-900">{profileStrength >= 80 ? <ShieldCheck className="h-4 w-4 text-emerald-600" /> : <ShieldAlert className="h-4 w-4 text-amber-600" />}Candidate profile strength</span>} rightLabel={<span className="flex items-center gap-2"><Badge variant={profileStrength >= 90 ? 'success' : 'warning'} size="sm">{profileStrength}% · {strengthTier}</Badge><button type="button" className="text-xs font-bold text-[#FF6B00]" onClick={() => setShowChecklist((value) => !value)}>{showChecklist ? 'Hide details' : 'View checklist'} {showChecklist ? <ChevronUp className="inline h-3.5 w-3.5" /> : <ChevronDown className="inline h-3.5 w-3.5" />}</button></span>} />{showChecklist && <div className="mt-4 grid gap-2 border-t border-slate-100 pt-4 sm:grid-cols-2 lg:grid-cols-3">{workerCriteria.map(([id, label, met]) => <button key={id} type="button" onClick={() => { setFocusField(id); document.getElementById('professional-details-trigger')?.click() }} className={`flex items-center gap-2 rounded-xl p-2.5 text-left text-xs transition ${met ? 'bg-emerald-50 text-emerald-800' : 'bg-slate-50 text-slate-600 hover:bg-slate-100'}`}>{met ? <CheckCircle2 className="h-4 w-4 text-emerald-600" /> : <span className="h-2 w-2 rounded-full bg-slate-300" />}{label}</button>)}</div>}</div>
 			<div className="flex rounded-2xl border border-slate-200 bg-slate-100 p-1"><button type="button" onClick={() => setActiveTab('edit')} className={`flex flex-1 items-center justify-center gap-2 rounded-xl py-2.5 text-xs font-bold ${activeTab === 'edit' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600'}`}>Professional details</button><button type="button" onClick={() => setActiveTab('preview')} className={`flex flex-1 items-center justify-center gap-2 rounded-xl py-2.5 text-xs font-bold ${activeTab === 'preview' ? 'bg-[#0A2540] text-white shadow-sm' : 'text-slate-600'}`}>Employer live view</button></div>
 
@@ -190,10 +189,6 @@ export function WorkerProfilePage() {
 					<WorkerInfoCard profile={profile} loading={loading} values={form} onChange={updateForm} skillOptions={skillOptions} availabilityOptions={availabilityOptions} occupationOptions={occupationOptions} languageOptions={languageOptions} locationOptions={locationOptions} isDirty={isDirty} saving={updating} onSave={saveProfile} onDiscard={discardChanges} focusField={focusField} />
 
 					<VerificationPanel email={form.email ?? profile.user.email} phoneVerified={profile.user.is_phone_verified} idVerified={profile.user.is_id_verified} />
-					<div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-						<div className="flex items-center justify-between gap-3"><div><h3 className="text-sm font-black text-slate-900">Employment history</h3><p className="mt-0.5 text-xs text-slate-500">Your most recent verified and pending roles.</p></div><div className="flex items-center gap-2"><Link to="/employment-history" className="text-xs font-bold text-[#FF6B00]">View all</Link><Link to="/employment-history" className="rounded-lg bg-[#FF6B00] px-2.5 py-1.5 text-xs font-bold text-white">+ Add experience</Link></div></div>
-						{employmentRecords.length ? <div className="mt-4 space-y-2">{employmentRecords.slice(0, 2).map((record) => <div key={record.id} className="rounded-xl bg-slate-50 p-3"><div className="flex items-center justify-between gap-3"><strong className="text-sm text-slate-900">{record.position}</strong><Badge variant={record.verification_status === 'verified' ? 'success' : record.verification_status === 'rejected' ? 'danger' : 'warning'} size="sm">{record.verification_status}</Badge></div><p className="mt-1 text-xs text-slate-500">{record.establishment_name} · {record.start_date} {record.end_date ? `- ${record.end_date}` : '- Present'}</p></div>)}</div> : <p className="mt-4 rounded-xl bg-slate-50 p-3 text-xs text-slate-500">Add your previous roles to strengthen your work passport.</p>}
-					</div>
 				</div>
 
 				{/* Sidebar */}
@@ -201,8 +196,6 @@ export function WorkerProfilePage() {
 					{/* Status Card */}
 					<WorkerStatusCard profile={profile} loading={loading} onStatusChange={handleStatusChange} />
 
-					{/* Stats Card */}
-					<WorkerStatsCard profile={profile} loading={loading} />
 					<ReferralCard />
 
 					<div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">

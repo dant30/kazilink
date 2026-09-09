@@ -72,10 +72,10 @@ export const Avatar: React.FC<AvatarProps> = ({
 
       {isVerified && (
         <span
-          className={`absolute rounded-full bg-[#0A2540] text-white border-2 border-white flex items-center justify-center ${badgeSizeClasses[size]}`}
+          className={`absolute rounded-full bg-emerald-500 text-white border-2 border-white flex items-center justify-center ${badgeSizeClasses[size]}`}
           title="Verified Profile"
         >
-          <CheckCircle2 className="w-full h-full text-[#FF6B00]" />
+          <CheckCircle2 className="w-full h-full text-white" />
         </span>
       )}
 

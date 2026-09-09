@@ -22,6 +22,7 @@ import { useNotifications } from '../../features/notifications/hooks/useNotifica
 import { ACCESS_TOKEN_KEY } from '../../core/api'
 import { localStorageStore } from '../../core/storage'
 import { endpoints } from '../../core/api/endpoints'
+import { Avatar } from '../components/ui/Avatar'
 
 export function Header() {
 	const navigate = useNavigate()
@@ -31,6 +32,7 @@ export function Header() {
 	const [userMenuOpen, setUserMenuOpen] = useState(false)
 	const [creditBalance, setCreditBalance] = useState<number | null>(null)
 	const [profileImage, setProfileImage] = useState<string | null>(null)
+	const [profileVerified, setProfileVerified] = useState(false)
 	const notificationRef = useRef<HTMLDivElement>(null)
 	const userMenuRef = useRef<HTMLDivElement>(null)
 
@@ -50,6 +52,7 @@ export function Header() {
 		email?: string | null
 		phone?: string | null
 		avatar?: string | null
+		is_id_verified?: boolean
 	} | null = user ?? null
 
 	if (!storedUser) {
@@ -71,13 +74,21 @@ export function Header() {
 	useEffect(() => {
 		if (!signedIn) {
 			setProfileImage(null)
+			setProfileVerified(false)
 			return
 		}
 		setProfileImage(storedUser?.avatar || null)
+		setProfileVerified(Boolean(storedUser?.is_id_verified))
 		if (storedUser?.is_worker) {
-			endpoints.workers.me().then((profile) => setProfileImage(profile.avatar || profile.user.avatar || null)).catch(() => undefined)
+			endpoints.workers.me().then((profile) => {
+				setProfileImage(profile.avatar || profile.user.avatar || null)
+				setProfileVerified(Boolean(profile.is_reference_checked || profile.user.is_id_verified))
+			}).catch(() => undefined)
 		} else if (storedUser?.is_employer) {
-			endpoints.auth.employerProfile().then((profile) => setProfileImage(profile.avatar || null)).catch(() => undefined)
+			endpoints.auth.employerProfile().then((profile) => {
+				setProfileImage(profile.avatar || null)
+				setProfileVerified(Boolean(profile.verified_business || profile.user.is_id_verified))
+			}).catch(() => undefined)
 		}
 	}, [signedIn, user?.id, user?.is_worker, user?.is_employer])
 	useEffect(() => {
@@ -102,13 +113,6 @@ export function Header() {
 	const messagePath = isAdmin ? '/admin' : '/messages'
 
 	const fullName = storedUser?.full_name?.trim() || 'User'
-	const initials =
-		fullName
-			.split(/\s+/)
-			.filter(Boolean)
-			.slice(0, 2)
-			.map((part) => part[0]?.toUpperCase() ?? '')
-			.join('') || 'U'
 	const { notifications, markRead } = useNotifications({ enabled: signedIn })
 	const unreadNotifications = notifications.filter((notification) => !notification.is_read)
 
@@ -226,17 +230,7 @@ export function Header() {
 										className="flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 p-1 text-left transition hover:bg-slate-100"
 										aria-label="Open user menu"
 									>
-										{profileImage ? (
-											<img
-												src={profileImage}
-												alt={fullName}
-												className="h-8 w-8 rounded-full object-cover"
-											/>
-										) : (
-											<span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#FF6B00] text-xs font-bold text-white shadow-xs">
-												{initials}
-											</span>
-										)}
+										<Avatar src={profileImage} name={fullName} size="sm" isVerified={profileVerified} />
 									</button>
 
 									{userMenuOpen && (
@@ -337,17 +331,7 @@ export function Header() {
 						<div className="flex items-center justify-between border-b border-slate-800 p-4">
 							{signedIn ? (
 								<div className="flex items-center gap-3">
-									{profileImage ? (
-										<img
-											src={profileImage}
-											alt={fullName}
-											className="h-10 w-10 rounded-full object-cover"
-										/>
-									) : (
-										<span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#FF6B00] text-sm font-bold text-white shadow-xs">
-											{initials}
-										</span>
-									)}
+									<Avatar src={profileImage} name={fullName} size="lg" isVerified={profileVerified} />
 									<div>
 										<p className="text-sm font-bold text-white">{fullName}</p>
 										<p className="text-[11px] text-slate-400">

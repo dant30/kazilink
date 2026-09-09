@@ -82,8 +82,8 @@ export function WorkerInfoCard({ profile, loading = false, values, onChange, ski
 
 	return (
 		<>
-			<div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-				<div className="flex items-center justify-between gap-3 border-b border-slate-100 pb-4">
+			<div className="rounded-2xl border border-orange-100 bg-gradient-to-br from-white via-white to-orange-50/40 p-5 shadow-sm">
+				<div className="flex items-center justify-between gap-3 border-b border-orange-100 pb-4">
 					<div>
 						<h2 className="text-sm font-black text-slate-900">Professional details</h2>
 						<p className="mt-0.5 text-xs text-slate-500">Share the information employers use to assess your fit for roles.</p>
