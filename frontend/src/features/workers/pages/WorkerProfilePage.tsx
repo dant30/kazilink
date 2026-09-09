@@ -9,21 +9,22 @@ import { useAuthStore } from '../../auth/store'
 import { useWorkerProfile } from '../hooks/useWorkerProfile'
 import { useUpdateWorkerProfile } from '../hooks/useUpdateWorkerProfile'
 import { WorkerInfoCard, WorkerStatusCard, WorkerStatsCard } from '../components'
-import { FormSection } from '../../../shared/components/forms'
 import { ErrorBoundary } from '../../../shared/components/ui/ErrorBoundary'
 import { ConfirmDialog } from '../../../shared/components/ui/ConfirmDialog'
 import { endpoints } from '../../../core/api'
 import { Link } from 'react-router-dom'
-import { Briefcase, Check, CheckCircle2, ChevronDown, ChevronUp, Clock, Edit3, Eye, Languages, Search, Share2, ShieldAlert, ShieldCheck, Star, UserCheck, Zap } from 'lucide-react'
+import { Briefcase, Check, CheckCircle2, ChevronDown, ChevronUp, Clock, Info, Languages, Search, Share2, ShieldAlert, ShieldCheck, Star, UserCheck, Zap } from 'lucide-react'
 import type { UpdateWorkerProfilePayload } from '../types'
 import { ReferralCard } from '../../accounts/components/ReferralCard'
 import { VerificationPanel } from '../../accounts/components/VerificationPanel'
 import { RatingStars } from '../../../shared/components/ui/RatingStars'
+import { useEmploymentHistory } from '../../employment_history/hooks'
 
 export function WorkerProfilePage() {
 	const { user } = useAuthStore()
 	const { profile, loading, error, refresh } = useWorkerProfile()
 	const { updating, error: updateError, success, updateProfile, clearError, clearSuccess } = useUpdateWorkerProfile()
+	const { records: employmentRecords } = useEmploymentHistory()
 	const [form, setForm] = useState<UpdateWorkerProfilePayload>({})
 	const [creditBalance, setCreditBalance] = useState<number | null>(null)
 	const [confirmBoost, setConfirmBoost] = useState(false)
@@ -38,6 +39,7 @@ export function WorkerProfilePage() {
 	const [occupationOptions, setOccupationOptions] = useState<Array<{ value: string; label: string }>>([])
 	const [languageOptions, setLanguageOptions] = useState<Array<{ value: string; label: string }>>([])
 	const [locationOptions, setLocationOptions] = useState<Array<{ value: string; label: string }>>([])
+	const [focusField, setFocusField] = useState<string | undefined>()
 
 	useEffect(() => {
 		if (!profile) return
@@ -121,7 +123,7 @@ export function WorkerProfilePage() {
 			setForm((current) => ({ ...current, ...profileResponse }))
 			await refresh()
 			setConfirmBoost(false)
-			setBoostFeedback('Profile boosted for 7 days.')
+			setBoostFeedback(profileResponse.profile_boost_until ? `Profile boosted until ${new Date(profileResponse.profile_boost_until).toLocaleDateString('en-KE', { day: 'numeric', month: 'short', year: 'numeric' })}.` : 'Profile boosted for 7 days.')
 		} catch (error) {
 			setBoostFeedback(error instanceof Error ? error.message : 'The profile boost failed. Your credits were not charged.')
 		} finally {
@@ -157,32 +159,27 @@ export function WorkerProfilePage() {
 			>
 				<div className="mt-3 flex items-center gap-3">
 					<label className="group relative cursor-pointer rounded-full" title="Change profile photo">
-						<Avatar src={avatarSrc} name={user?.full_name || 'Worker'} size="lg" isVerified={Boolean(profile?.is_reference_checked || profile?.user.is_id_verified)} />
+						<div className={profile?.profile_boost_until && new Date(profile.profile_boost_until) > new Date() ? 'rounded-full ring-2 ring-amber-400 ring-offset-2' : ''}><Avatar src={avatarSrc} name={user?.full_name || 'Worker'} size="lg" isVerified={Boolean(profile?.is_reference_checked || profile?.user.is_id_verified)} /></div>
 						<span className="absolute inset-0 flex items-center justify-center rounded-full bg-slate-950/65 text-[10px] font-bold text-white opacity-0 transition group-hover:opacity-100 group-focus-within:opacity-100">Change</span>
 						<input type="file" accept="image/png,image/jpeg,image/webp" className="sr-only" onChange={(event) => { const file = event.target.files?.[0]; if (file) updateForm('avatar', file) }} />
 					</label>
 					<div className="space-y-1">
-						<div className="flex flex-wrap gap-2">
-							<Badge variant={profile?.is_reference_checked || profile?.user.is_id_verified ? 'verified' : 'neutral'}>{profile?.is_reference_checked || profile?.user.is_id_verified ? 'Verified profile' : 'Verification in progress'}</Badge>
-							<Badge variant={profile?.open_to_work ? 'success' : 'neutral'}>{profile?.open_to_work ? 'Available for work' : 'Not seeking shifts'}</Badge>
-						</div>
 						<p className="text-xs text-slate-300"><strong className="text-white">{form.primary_role || profile?.primary_role || 'Hospitality specialist'}</strong> · {form.location || profile?.location || 'Kenya'}</p>
-						<Badge variant="info" size="sm">{(form.availability || profile?.availability || 'immediate').replace(/_/g, ' ')}</Badge>
-						<p className="text-xs text-slate-300">Daily rate: <strong className="text-white">KSh {form.expected_daily_rate_ksh || profile?.expected_daily_rate_ksh || 0}</strong> · <span className="capitalize">{(form.availability || profile?.availability || 'immediate').replace(/_/g, ' ')}</span></p>
+						<p className="text-xs text-slate-300">Daily rate: <strong className="text-white">KSh {form.expected_daily_rate_ksh || profile?.expected_daily_rate_ksh || 0}</strong></p>
 						<RatingStars rating={profile.rating} reviews={profile.reviews_count} className="text-xs text-slate-300" />
 					</div>
 				</div>
 			</PageHeader>
 
-			<div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><ProgressBar value={profileStrength} color={strengthColor} showPercentage={false} barHeightClassName="h-3" label={<span className="flex items-center gap-2 font-bold text-slate-900">{profileStrength >= 80 ? <ShieldCheck className="h-4 w-4 text-emerald-600" /> : <ShieldAlert className="h-4 w-4 text-amber-600" />}Candidate profile strength</span>} rightLabel={<span className="flex items-center gap-2"><Badge variant={profileStrength >= 90 ? 'success' : 'warning'} size="sm">{profileStrength}% · {strengthTier}</Badge><button type="button" className="text-xs font-bold text-[#FF6B00]" onClick={() => setShowChecklist((value) => !value)}>{showChecklist ? 'Hide details' : 'View checklist'} {showChecklist ? <ChevronUp className="inline h-3.5 w-3.5" /> : <ChevronDown className="inline h-3.5 w-3.5" />}</button></span>} />{showChecklist && <div className="mt-4 grid gap-2 border-t border-slate-100 pt-4 sm:grid-cols-2 lg:grid-cols-3">{workerCriteria.map(([id, label, met]) => <button key={id} type="button" onClick={() => document.getElementById('professional-details-trigger')?.click()} className={`flex items-center gap-2 rounded-xl p-2.5 text-left text-xs transition ${met ? 'bg-emerald-50 text-emerald-800' : 'bg-slate-50 text-slate-600 hover:bg-slate-100'}`}>{met ? <CheckCircle2 className="h-4 w-4 text-emerald-600" /> : <span className="h-2 w-2 rounded-full bg-slate-300" />}{label}</button>)}</div>}</div>
-			<div className="flex rounded-2xl border border-slate-200 bg-slate-100 p-1"><button type="button" onClick={() => setActiveTab('edit')} className={`flex flex-1 items-center justify-center gap-2 rounded-xl py-2.5 text-xs font-bold ${activeTab === 'edit' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600'}`}><Edit3 className="h-3.5 w-3.5" />Edit profile and details</button><button type="button" onClick={() => setActiveTab('preview')} className={`flex flex-1 items-center justify-center gap-2 rounded-xl py-2.5 text-xs font-bold ${activeTab === 'preview' ? 'bg-[#0A2540] text-white shadow-sm' : 'text-slate-600'}`}><Eye className="h-3.5 w-3.5 text-[#FF6B00]" />Employer live view</button></div>
+			<div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><ProgressBar value={profileStrength} color={strengthColor} showPercentage={false} barHeightClassName="h-3" label={<span className="flex items-center gap-2 font-bold text-slate-900">{profileStrength >= 80 ? <ShieldCheck className="h-4 w-4 text-emerald-600" /> : <ShieldAlert className="h-4 w-4 text-amber-600" />}Candidate profile strength</span>} rightLabel={<span className="flex items-center gap-2"><Badge variant={profileStrength >= 90 ? 'success' : 'warning'} size="sm">{profileStrength}% · {strengthTier}</Badge><button type="button" className="text-xs font-bold text-[#FF6B00]" onClick={() => setShowChecklist((value) => !value)}>{showChecklist ? 'Hide details' : 'View checklist'} {showChecklist ? <ChevronUp className="inline h-3.5 w-3.5" /> : <ChevronDown className="inline h-3.5 w-3.5" />}</button></span>} />{showChecklist && <div className="mt-4 grid gap-2 border-t border-slate-100 pt-4 sm:grid-cols-2 lg:grid-cols-3">{workerCriteria.map(([id, label, met]) => <button key={id} type="button" onClick={() => { setFocusField(id); document.getElementById('professional-details-trigger')?.click() }} className={`flex items-center gap-2 rounded-xl p-2.5 text-left text-xs transition ${met ? 'bg-emerald-50 text-emerald-800' : 'bg-slate-50 text-slate-600 hover:bg-slate-100'}`}>{met ? <CheckCircle2 className="h-4 w-4 text-emerald-600" /> : <span className="h-2 w-2 rounded-full bg-slate-300" />}{label}</button>)}</div>}</div>
+			<div className="flex rounded-2xl border border-slate-200 bg-slate-100 p-1"><button type="button" onClick={() => setActiveTab('edit')} className={`flex flex-1 items-center justify-center gap-2 rounded-xl py-2.5 text-xs font-bold ${activeTab === 'edit' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600'}`}>Professional details</button><button type="button" onClick={() => setActiveTab('preview')} className={`flex flex-1 items-center justify-center gap-2 rounded-xl py-2.5 text-xs font-bold ${activeTab === 'preview' ? 'bg-[#0A2540] text-white shadow-sm' : 'text-slate-600'}`}>Employer live view</button></div>
 
 			{/* Success Message */}
-			{success && <div className="flex items-center justify-between rounded-2xl border border-green-200 bg-green-50 p-4"><span className="flex items-center gap-2 font-semibold text-green-700"><CheckCircle2 className="h-5 w-5" />Profile updated successfully.</span><button type="button" className="text-xs font-bold text-green-700" onClick={clearSuccess}>Dismiss</button></div>}
+			{success && <div role="status" aria-live="polite" className="flex items-center justify-between rounded-2xl border border-green-200 bg-green-50 p-4"><span className="flex items-center gap-2 font-semibold text-green-700"><CheckCircle2 className="h-5 w-5" />Profile updated successfully.</span><button type="button" className="text-xs font-bold text-green-700" onClick={clearSuccess}>Dismiss</button></div>}
 
 			{/* Error Message */}
 			{updateError && (
-				<div className="rounded-2xl border border-red-200 bg-red-50 p-4">
+				<div role="alert" aria-live="assertive" className="rounded-2xl border border-red-200 bg-red-50 p-4">
 					<p className="text-red-700 font-semibold">{updateError}</p>
 				</div>
 			)}
@@ -190,45 +187,13 @@ export function WorkerProfilePage() {
 			{activeTab === 'edit' && <div className="grid gap-6 xl:grid-cols-[1.3fr_0.7fr]">
 				<div className="space-y-6">
 					{/* Professional Details */}
-					<WorkerInfoCard profile={profile} loading={loading} values={form} onChange={updateForm} skillOptions={skillOptions} availabilityOptions={availabilityOptions} occupationOptions={occupationOptions} languageOptions={languageOptions} locationOptions={locationOptions} isDirty={isDirty} saving={updating} onSave={saveProfile} onDiscard={discardChanges} />
+					<WorkerInfoCard profile={profile} loading={loading} values={form} onChange={updateForm} skillOptions={skillOptions} availabilityOptions={availabilityOptions} occupationOptions={occupationOptions} languageOptions={languageOptions} locationOptions={locationOptions} isDirty={isDirty} saving={updating} onSave={saveProfile} onDiscard={discardChanges} focusField={focusField} />
+
 					<VerificationPanel email={form.email ?? profile.user.email} phoneVerified={profile.user.is_phone_verified} idVerified={profile.user.is_id_verified} />
-
-					{/* Experience & Skills */}
-					<FormSection title="Experience & skills" description="Highlight the strengths employers can validate quickly.">
-						<div className="space-y-4">
-							{/* Skills */}
-							{profile?.skills && profile.skills.length > 0 && (
-								<div className="flex flex-wrap gap-2">
-								{profile.skills.map((skill: string) => (
-										<span key={skill} className="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700">
-											{skill}
-										</span>
-									))}
-								</div>
-							)}
-
-							{/* Languages */}
-							{profile?.languages && profile.languages.length > 0 && (
-								<div>
-									<p className="text-sm font-semibold text-slate-700 mb-2">Languages</p>
-									<div className="flex flex-wrap gap-2">
-									{profile.languages.map((lang: string) => (
-											<span key={lang} className="inline-flex items-center rounded-full border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-700">
-												{lang}
-											</span>
-										))}
-									</div>
-								</div>
-							)}
-
-							{/* Bio */}
-							{profile?.bio && (
-								<div className="rounded-xl bg-slate-50 p-4">
-									<p className="text-sm text-slate-700">{profile.bio}</p>
-								</div>
-							)}
-						</div>
-					</FormSection>
+					<div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+						<div className="flex items-center justify-between gap-3"><div><h3 className="text-sm font-black text-slate-900">Employment history</h3><p className="mt-0.5 text-xs text-slate-500">Your most recent verified and pending roles.</p></div><div className="flex items-center gap-2"><Link to="/employment-history" className="text-xs font-bold text-[#FF6B00]">View all</Link><Link to="/employment-history" className="rounded-lg bg-[#FF6B00] px-2.5 py-1.5 text-xs font-bold text-white">+ Add experience</Link></div></div>
+						{employmentRecords.length ? <div className="mt-4 space-y-2">{employmentRecords.slice(0, 2).map((record) => <div key={record.id} className="rounded-xl bg-slate-50 p-3"><div className="flex items-center justify-between gap-3"><strong className="text-sm text-slate-900">{record.position}</strong><Badge variant={record.verification_status === 'verified' ? 'success' : record.verification_status === 'rejected' ? 'danger' : 'warning'} size="sm">{record.verification_status}</Badge></div><p className="mt-1 text-xs text-slate-500">{record.establishment_name} · {record.start_date} {record.end_date ? `- ${record.end_date}` : '- Present'}</p></div>)}</div> : <p className="mt-4 rounded-xl bg-slate-50 p-3 text-xs text-slate-500">Add your previous roles to strengthen your work passport.</p>}
+					</div>
 				</div>
 
 				{/* Sidebar */}
@@ -243,16 +208,17 @@ export function WorkerProfilePage() {
 					<div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
 						<h3 className="text-sm font-black uppercase tracking-[0.18em] text-slate-700">Trust & visibility</h3>
 						<div className="mt-4 space-y-3 text-sm">
-							<div className="flex items-center justify-between gap-3"><span className="text-slate-500">Reference check</span><Badge variant={profile?.is_reference_checked ? 'success' : 'warning'} size="sm">{profile?.is_reference_checked ? 'Checked' : 'Pending'}</Badge></div>
-							<div className="flex items-center justify-between gap-3"><span className="text-slate-500">Background check</span><Badge variant={profile?.background_check_verified ? 'success' : 'neutral'} size="sm">{profile?.background_check_verified ? 'Verified' : 'Not verified'}</Badge></div>
-							<div className="flex items-center justify-between gap-3"><span className="text-slate-500">History sharing</span><Badge variant={profile?.consent_history_sharing ? 'success' : 'neutral'} size="sm">{profile?.consent_history_sharing ? 'Allowed' : 'Private'}</Badge></div>
+							<div className="flex items-center justify-between gap-3"><span className="flex items-center gap-1 text-slate-500">Reference check <span title="References help employers trust your work history."><Info className="h-3.5 w-3.5" /></span></span><Badge variant={profile?.is_reference_checked ? 'success' : 'warning'} size="sm">{profile?.is_reference_checked ? 'Checked' : 'Pending'}</Badge></div>
+							<div className="flex items-center justify-between gap-3"><span className="flex items-center gap-1 text-slate-500">Background check <span title="A verified background check strengthens employer confidence."><Info className="h-3.5 w-3.5" /></span></span><Badge variant={profile?.background_check_verified ? 'success' : 'neutral'} size="sm">{profile?.background_check_verified ? 'Verified' : 'Not verified'}</Badge></div>
+							<div className="flex items-center justify-between gap-3"><span className="flex items-center gap-1 text-slate-500">History sharing <span title="When enabled, employers can pay to access your verified employment history."><Info className="h-3.5 w-3.5" /></span></span><Badge variant={profile?.consent_history_sharing ? 'success' : 'neutral'} size="sm">{profile?.consent_history_sharing ? 'Allowed' : 'Private'}</Badge></div>
 							<div className="flex items-center justify-between gap-3"><span className="text-slate-500">National ID</span><span className="font-semibold text-slate-700">{profile?.national_id_masked || 'Not provided'}</span></div>
 						</div>
 					</div>
 
 					<div className="rounded-2xl border border-orange-200 bg-orange-50 p-5 shadow-sm">
 						<div className="flex items-center justify-between gap-3"><h3 className="text-sm font-black uppercase tracking-[0.18em] text-slate-700">Profile visibility</h3><span className="text-xs font-bold text-[#C2410C]">3 credits</span></div>
-						<p className="mt-2 text-sm text-slate-600">Boost your profile for 7 days so employers can spot you faster.</p>
+						<p className="mt-2 text-sm text-slate-600">Boosted profiles appear at the top of employer searches for 7 days.</p>
+						{profile?.profile_boost_until && new Date(profile.profile_boost_until) > new Date() && <p className="mt-2 text-xs font-bold text-amber-800">Active until {new Date(profile.profile_boost_until).toLocaleDateString('en-KE', { day: 'numeric', month: 'short' })}</p>}
 						<p className="mt-3 text-xs text-slate-600">Balance: <strong>{creditBalance ?? '...'}</strong> Kazi Credits</p>
 						{creditBalance === 0 && <p className="mt-2 text-xs font-medium text-amber-800">You need 3 credits. <Link to="/payments" className="font-bold underline">Buy Kazi Credits</Link></p>}
 						<Button className="mt-4 w-full" disabled={boosting || creditBalance === null || creditBalance < 3} onClick={() => setConfirmBoost(true)}>{profile?.profile_boost_until ? 'Boost again' : 'Boost profile for 7 days'}</Button>

@@ -1,6 +1,6 @@
 // frontend/src/features/workers/components/WorkerInfoCard.tsx
-import { BriefcaseBusiness } from 'lucide-react'
-import { useState } from 'react'
+import { BriefcaseBusiness, Edit3 } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import type { UpdateWorkerProfilePayload, WorkerAvailability, WorkerProfile } from '../types'
 import { FormField, FormSection } from '../../../shared/components/forms'
 import { Input } from '../../../shared/components/ui/Input'
@@ -26,9 +26,10 @@ interface WorkerInfoCardProps {
 	saving?: boolean
 	onSave?: () => Promise<void>
 	onDiscard?: () => void
+	focusField?: string
 }
 
-export function WorkerInfoCard({ profile, loading = false, values, onChange, skillOptions = [], availabilityOptions = [], occupationOptions = [], languageOptions = [], locationOptions = [], isDirty = false, saving = false, onSave, onDiscard }: WorkerInfoCardProps) {
+export function WorkerInfoCard({ profile, loading = false, values, onChange, skillOptions = [], availabilityOptions = [], occupationOptions = [], languageOptions = [], locationOptions = [], isDirty = false, saving = false, onSave, onDiscard, focusField }: WorkerInfoCardProps) {
 	const [selectedSkill, setSelectedSkill] = useState('')
 	const [selectedRole, setSelectedRole] = useState('')
 	const [selectedLanguage, setSelectedLanguage] = useState('')
@@ -39,6 +40,10 @@ export function WorkerInfoCard({ profile, loading = false, values, onChange, ski
 	const availableSkillOptions = skillOptions.filter((skill) => !currentSkills.includes(skill.label) && !currentSkills.includes(skill.value))
 	const availableRoleOptions = occupationOptions.filter((role) => !currentRoles.includes(role.label) && !currentRoles.includes(role.value))
 	const availableLanguageOptions = languageOptions.filter((language) => !currentLanguages.includes(language.label) && !currentLanguages.includes(language.value))
+	useEffect(() => {
+		if (!detailsModalOpen || !focusField) return
+		window.setTimeout(() => document.getElementById(`field-${focusField}`)?.focus(), 0)
+	}, [detailsModalOpen, focusField])
 	const addSkill = (value: string) => {
 		if (!value || currentSkills.includes(value)) return
 		const option = skillOptions.find((skill) => skill.value === value)
@@ -77,12 +82,37 @@ export function WorkerInfoCard({ profile, loading = false, values, onChange, ski
 
 	return (
 		<>
-			<div className="flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-				<div>
-					<h2 className="text-sm font-black text-slate-900">Professional details</h2>
-					<p className="mt-0.5 text-xs text-slate-500">Share the information employers use to assess your fit for roles.</p>
+			<div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+				<div className="flex items-center justify-between gap-3 border-b border-slate-100 pb-4">
+					<div>
+						<h2 className="text-sm font-black text-slate-900">Professional details</h2>
+						<p className="mt-0.5 text-xs text-slate-500">Share the information employers use to assess your fit for roles.</p>
+					</div>
+					<Button id="professional-details-trigger" type="button" variant="outline" size="sm" leftIcon={<Edit3 className="h-3.5 w-3.5" />} onClick={() => setDetailsModalOpen(true)}>Edit details</Button>
 				</div>
-				<Button id="professional-details-trigger" type="button" variant="outline" size="sm" onClick={() => setDetailsModalOpen(true)}>Edit details</Button>
+				<div className="grid grid-cols-2 gap-x-4 gap-y-4 sm:gap-x-6">
+					<Detail label="Full name" value={profile?.user.full_name || 'Not available'} />
+					<Detail label="Phone number" value={profile?.user.phone || 'Not provided'} />
+					<Detail label="Email address" value={values?.email ?? profile?.user.email ?? 'Not provided'} />
+					<Detail label="Gender" value={values?.gender || profile?.user.gender || 'Not provided'} capitalize />
+					<Detail label="Date of birth" value={values?.date_of_birth || profile?.user.date_of_birth || 'Not provided'} />
+					<Detail label="Preferred role" value={values?.primary_role || profile?.primary_role || 'Not provided'} />
+					<Detail label="Expected pay rate" value={`KSh ${values?.expected_daily_rate_ksh ?? profile?.expected_daily_rate_ksh ?? 0} per day`} />
+					<Detail label="Monthly salary" value={values?.expected_monthly_salary_ksh ? `KSh ${values.expected_monthly_salary_ksh}` : 'Not provided'} />
+					<Detail label="Location" value={values?.location || profile?.location || 'Not provided'} />
+					<Detail label="Availability" value={(values?.availability || profile?.availability || 'immediate').replace(/_/g, ' ')} capitalize />
+					<Detail label="Years of experience" value={`${values?.years_of_experience ?? profile?.years_of_experience ?? 0} years`} />
+					<Detail label="Last employer" value={values?.last_employer || profile?.last_employer || 'Not provided'} />
+				</div>
+				<div className="mt-5 border-t border-slate-100 pt-4">
+					<p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">Bio</p>
+					<p className="mt-2 text-sm leading-relaxed text-slate-700">{values?.bio || profile?.bio || 'No professional summary provided yet.'}</p>
+				</div>
+				{(currentRoles.length > 0 || currentSkills.length > 0 || currentLanguages.length > 0) && <div className="mt-5 border-t border-slate-100 pt-4 space-y-3">
+					{currentRoles.length > 0 && <SummaryChips label="Secondary roles" items={currentRoles} color="blue" />}
+					{currentSkills.length > 0 && <SummaryChips label="Skills" items={currentSkills} color="orange" />}
+					{currentLanguages.length > 0 && <SummaryChips label="Languages" items={currentLanguages} color="blue" />}
+				</div>}
 			</div>
 			<Modal isOpen={detailsModalOpen} onClose={() => setDetailsModalOpen(false)} title="Professional details" subtitle="Share the information employers use to assess your fit for roles." maxWidth="2xl">
 			<FormSection divider={false} title="Professional details" description="Update the details employers use to assess your fit for roles." icon={<BriefcaseBusiness className="h-4 w-4" />}>
@@ -103,7 +133,7 @@ export function WorkerInfoCard({ profile, loading = false, values, onChange, ski
 					<DatePicker value={values?.date_of_birth ?? profile?.user.date_of_birth ?? ''} onChange={(value) => onChange?.('date_of_birth', value)} maxDate={getAdultDateOfBirthMax()} quickPresets={false} disabled={!onChange} />
 				</FormField>
 				<FormField label="Preferred role">
-					<Input value={values?.primary_role ?? profile?.primary_role ?? ''} onChange={(event) => onChange?.('primary_role', event.target.value)} placeholder="Preferred role" readOnly={!onChange} />
+					<Input id="field-role_rate" value={values?.primary_role ?? profile?.primary_role ?? ''} onChange={(event) => onChange?.('primary_role', event.target.value)} placeholder="Preferred role" readOnly={!onChange} />
 				</FormField>
 				<FormField label="Expected pay rate">
 					<Input type="number" min="0" value={values?.expected_daily_rate_ksh ?? profile?.expected_daily_rate_ksh ?? ''} onChange={(event) => onChange?.('expected_daily_rate_ksh', Number(event.target.value))} placeholder="Daily rate in KSh" readOnly={!onChange} />
@@ -155,4 +185,12 @@ export function WorkerInfoCard({ profile, loading = false, values, onChange, ski
 			</Modal>
 		</>
 	)
+}
+
+function Detail({ label, value, capitalize = false }: { label: string; value: string; capitalize?: boolean }) {
+	return <div><p className="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">{label}</p><p className={`mt-1 text-sm font-semibold text-slate-800 ${capitalize ? 'capitalize' : ''}`}>{value}</p></div>
+}
+
+function SummaryChips({ label, items, color }: { label: string; items: string[]; color: 'blue' | 'orange' }) {
+	return <div><p className="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">{label}</p><div className="mt-2 flex flex-wrap gap-2">{items.map((item) => <Chip key={item} color={color}>{item}</Chip>)}</div></div>
 }
