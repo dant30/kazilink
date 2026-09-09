@@ -10,7 +10,7 @@ import { ErrorBoundary } from '../../../shared/components/ui/ErrorBoundary'
 import { ApplicationStatusBadge } from '../components'
 import { useApplication } from '../hooks'
 import { updateApplicationStatus } from '../services'
-import type { ApplicationStatusInput, JobApplicationStatus } from '../types'
+import type { ApplicationStatusInput, EngagementStatus, JobApplicationStatus } from '../types'
 
 const statusOptions: JobApplicationStatus[] = ['applied', 'shortlisted', 'interview_scheduled', 'hired', 'rejected']
 
@@ -18,13 +18,22 @@ export function ApplicationDetailPage() {
   const { user } = useAuthStore()
   const { applicationId } = useParams()
   const { application, loading, error } = useApplication(Number(applicationId))
-  const app = application as NonNullable<typeof application>
+  const [currentApplication, setCurrentApplication] = useState<typeof application>(null)
+  const app = (currentApplication ?? application) as NonNullable<typeof application>
   const [draftStatus, setDraftStatus] = useState<JobApplicationStatus>('applied')
   const [interviewDate, setInterviewDate] = useState('')
   const [interviewTime, setInterviewTime] = useState('09:00')
   const [interviewNote, setInterviewNote] = useState('')
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState('')
+  const [engagementStatus, setEngagementStatus] = useState<EngagementStatus>('completed')
+  const isHired = app?.status === 'hired'
+  const engagementActive = isHired && (app.engagement_status ?? 'active') === 'active'
+  const workerOwnsApplication = Boolean(user?.is_worker && !user?.is_employer)
+
+  useEffect(() => {
+    if (application) setCurrentApplication(application)
+  }, [application])
 
   useEffect(() => {
     if (app) {
@@ -32,6 +41,7 @@ export function ApplicationDetailPage() {
       setInterviewDate(app.interview_date ? app.interview_date.slice(0, 10) : '')
       setInterviewTime(app.interview_date?.slice(11, 16) || '09:00')
       setInterviewNote(app.interview_note ?? '')
+      setEngagementStatus('completed')
     }
   }, [app])
 
@@ -66,13 +76,15 @@ export function ApplicationDetailPage() {
       status: draftStatus,
       interview_date: draftStatus === 'interview_scheduled' && interviewDate ? `${interviewDate}T${interviewTime}` : null,
       interview_note: interviewNote || '',
+      ...(isHired && engagementActive ? { engagement_status: engagementStatus } : {}),
     }
 
     setSaving(true)
     setMessage('')
 
     try {
-      await updateApplicationStatus(app.id, payload)
+      const updatedApplication = await updateApplicationStatus(app.id, payload)
+      setCurrentApplication(updatedApplication)
       setMessage('Status updated successfully.')
     } catch (reason) {
       setMessage(reason instanceof Error ? reason.message : 'Unable to update status.')
@@ -155,7 +167,7 @@ export function ApplicationDetailPage() {
               </div>
             </div>
 
-            {canReview && (
+            {canReview && !isHired && (
               <div className="rounded-2xl border border-slate-200 bg-white p-5">
                 <h3 className="text-sm font-bold uppercase tracking-[0.18em] text-slate-500">Update decision</h3>
                 <div className="mt-4 space-y-4">
@@ -192,6 +204,31 @@ export function ApplicationDetailPage() {
                     </p>
                   )}
                 </div>
+              </div>
+            )}
+
+            {isHired && engagementActive && (canReview || workerOwnsApplication) && (
+              <div className="rounded-2xl border border-orange-200 bg-orange-50 p-5">
+                <h3 className="text-sm font-bold uppercase tracking-[0.18em] text-slate-600">Engagement outcome</h3>
+                <p className="mt-2 text-xs leading-5 text-slate-600">Close this engagement when the shift or role has finished. This enables employment history, ratings, and reviews.</p>
+                <Select
+                  label="Outcome"
+                  value={engagementStatus}
+                  onChange={(value) => setEngagementStatus(value as EngagementStatus)}
+                  options={canReview ? [
+                    { value: 'completed', label: 'Work completed' },
+                    { value: 'employer_terminated', label: 'Employer terminated role' },
+                  ] : [{ value: 'worker_quit', label: 'I left this role' }]}
+                />
+                <Button variant="primary" size="md" className="mt-4 w-full justify-center" onClick={handleStatusUpdate} isLoading={saving}>Close engagement</Button>
+              </div>
+            )}
+
+            {isHired && !engagementActive && (
+              <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5">
+                <h3 className="text-sm font-bold text-emerald-900">Engagement closed</h3>
+                <p className="mt-2 text-xs text-emerald-800">This role is marked as {app.engagement_status?.replace('_', ' ')}. The worker can now continue with employment history and reviews.</p>
+                {workerOwnsApplication && <Link to="/ratings" className="mt-4 inline-flex rounded-xl bg-emerald-700 px-4 py-2 text-xs font-bold text-white">Review employer</Link>}
               </div>
             )}
 

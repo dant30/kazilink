@@ -27,6 +27,7 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 class ReviewCreateSerializer(serializers.ModelSerializer):
     target_employer = serializers.PrimaryKeyRelatedField(queryset=EmployerProfile.objects.all(), required=False, allow_null=True)
+    role_performed = serializers.CharField(required=False, allow_blank=True)
 
     class Meta:
         model = Review

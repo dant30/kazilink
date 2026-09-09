@@ -6,7 +6,7 @@ from rest_framework.views import APIView
 from ..models import JobApplication
 from ..permissions import CanReviewApplication, CanViewApplication, IsEmployerReviewer, IsWorkerApplicant
 from ..serializers import ApplicationCreateSerializer, ApplicationStatusSerializer, JobApplicationSerializer
-from ..services import create_application, update_application_status
+from ..services import create_application, update_application_status, update_engagement
 
 
 class ApplicationListCreateView(generics.ListCreateAPIView):
@@ -66,7 +66,10 @@ class ApplicationStatusView(APIView):
 		serializer = ApplicationStatusSerializer(data=request.data)
 		serializer.is_valid(raise_exception=True)
 		try:
-			application = update_application_status(application=application, **serializer.validated_data)
+			if serializer.validated_data.get('engagement_status'):
+				application = update_engagement(application=application, engagement_status=serializer.validated_data['engagement_status'], engagement_note=serializer.validated_data.get('interview_note', ''))
+			else:
+				application = update_application_status(application=application, **serializer.validated_data)
 		except ValueError as exc:
 			return Response({'detail': str(exc)}, status=status.HTTP_400_BAD_REQUEST)
 		return Response(JobApplicationSerializer(application).data)
@@ -83,6 +86,11 @@ class EmployerApplicationsView(generics.ListAPIView):
 		status_filter = self.request.query_params.get('status')
 		if status_filter:
 			queryset = queryset.filter(status=status_filter)
+		engagement_filter = self.request.query_params.get('engagement_status')
+		if engagement_filter == 'closed':
+			queryset = queryset.exclude(engagement_status=JobApplication.EngagementStatus.ACTIVE)
+		elif engagement_filter:
+			queryset = queryset.filter(engagement_status=engagement_filter)
 		return queryset.order_by('-applied_date')
 
 
@@ -91,6 +99,15 @@ class WorkerApplicationsView(generics.ListAPIView):
 	serializer_class = JobApplicationSerializer
 
 	def get_queryset(self):
-		return JobApplication.objects.select_related('job__employer__user', 'worker__user').filter(
+		queryset = JobApplication.objects.select_related('job__employer__user', 'worker__user').filter(
 			worker__user=self.request.user
-		).order_by('-applied_date')
+		)
+		status_filter = self.request.query_params.get('status')
+		if status_filter:
+			queryset = queryset.filter(status=status_filter)
+		engagement_filter = self.request.query_params.get('engagement_status')
+		if engagement_filter == 'closed':
+			queryset = queryset.exclude(engagement_status=JobApplication.EngagementStatus.ACTIVE)
+		elif engagement_filter:
+			queryset = queryset.filter(engagement_status=engagement_filter)
+		return queryset.order_by('-applied_date')

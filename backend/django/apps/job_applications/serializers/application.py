@@ -17,6 +17,7 @@ class JobApplicationSerializer(serializers.ModelSerializer):
             'id', 'job', 'job_title', 'employer', 'employer_name', 'worker', 'worker_name',
             'worker_phone', 'cover_note', 'applied_date', 'status',
             'reviewed_by_employer', 'interview_date', 'interview_note',
+            'engagement_status', 'engagement_ended_at', 'engagement_note',
         )
         read_only_fields = (
             'id', 'job_title', 'employer_name', 'worker', 'worker_name',
@@ -32,10 +33,13 @@ class ApplicationCreateSerializer(serializers.ModelSerializer):
 
 class ApplicationStatusSerializer(serializers.Serializer):
     status = serializers.ChoiceField(choices=JobApplication.Status.choices)
+    engagement_status = serializers.ChoiceField(choices=JobApplication.EngagementStatus.choices, required=False)
     interview_date = serializers.DateTimeField(required=False, allow_null=True)
     interview_note = serializers.CharField(required=False, allow_blank=True)
 
     def validate(self, attrs):
+        if attrs.get('engagement_status') and attrs.get('status') != JobApplication.Status.HIRED:
+            raise serializers.ValidationError({'engagement_status': 'Engagement outcomes are only available for hired applications.'})
         if attrs.get('status') == JobApplication.Status.INTERVIEW_SCHEDULED and not attrs.get('interview_date'):
             raise serializers.ValidationError({'interview_date': 'An interview date is required.'})
         if attrs.get('interview_date') and attrs['interview_date'] < timezone.now():

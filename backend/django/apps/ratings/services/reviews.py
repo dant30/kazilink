@@ -14,7 +14,7 @@ def create_review(*, author=None, author_worker=None, validated_data):
     if author is not None:
         if target_worker is None or target_employer is not None:
             raise ValueError('Employers must select a worker to review.')
-        application = JobApplication.objects.filter(job=job, worker=target_worker, job__employer=author, status=JobApplication.Status.HIRED).first()
+        application = JobApplication.objects.filter(job=job, worker=target_worker, job__employer=author, status=JobApplication.Status.HIRED).exclude(engagement_status=JobApplication.EngagementStatus.ACTIVE).first()
         duplicate = Review.objects.filter(author=author, target_worker=target_worker, job=job).exists()
         author_fields = {'author': author, 'target_worker': target_worker}
         author_name = author.user.full_name
@@ -22,7 +22,7 @@ def create_review(*, author=None, author_worker=None, validated_data):
     else:
         if author_worker is None or target_employer is None or target_worker is not None:
             raise ValueError('Workers must select an employer to review.')
-        application = JobApplication.objects.filter(job=job, worker=author_worker, job__employer=target_employer, status=JobApplication.Status.HIRED).first()
+        application = JobApplication.objects.filter(job=job, worker=author_worker, job__employer=target_employer, status=JobApplication.Status.HIRED).exclude(engagement_status=JobApplication.EngagementStatus.ACTIVE).first()
         duplicate = Review.objects.filter(author_worker=author_worker, target_employer=target_employer, job=job).exists()
         author_fields = {'author_worker': author_worker, 'target_employer': target_employer}
         author_name = author_worker.user.full_name
@@ -40,7 +40,8 @@ def create_review(*, author=None, author_worker=None, validated_data):
         author_role=author_role,
         establishment_name=establishment.name if establishment else '',
         is_verified_hire=True,
-        **{key: value for key, value in validated_data.items() if key not in {'target_worker', 'target_employer', 'job'}},
+        role_performed=validated_data.get('role_performed') or job.title,
+        **{key: value for key, value in validated_data.items() if key not in {'target_worker', 'target_employer', 'job', 'role_performed'}},
     )
 
 

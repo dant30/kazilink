@@ -1,6 +1,8 @@
 from django.db import transaction
+from django.utils import timezone
 
 from apps.credits.services import spend_credits
+from apps.employment_history.models import EmploymentRecord
 
 from ..models import JobApplication
 
@@ -57,4 +59,42 @@ def update_application_status(*, application, status, interview_date=None, inter
     if status == JobApplication.Status.HIRED:
         application.job.status = application.job.Status.FILLED
         application.job.save(update_fields=['status'])
+    return application
+
+
+@transaction.atomic
+def update_engagement(*, application, engagement_status, engagement_note=''):
+    locked_application = JobApplication.objects.select_for_update().get(pk=application.pk)
+    application = JobApplication.objects.select_related('job__employer', 'job__establishment', 'worker').get(pk=locked_application.pk)
+    if application.status != JobApplication.Status.HIRED:
+        raise ValueError('Only hired applications can have an engagement outcome.')
+    if application.engagement_status != JobApplication.EngagementStatus.ACTIVE:
+        raise ValueError('This engagement has already been closed.')
+    if engagement_status == JobApplication.EngagementStatus.ACTIVE:
+        raise ValueError('Choose a closing outcome.')
+    application.engagement_status = engagement_status
+    application.engagement_ended_at = timezone.now()
+    application.engagement_note = engagement_note
+    application.save(update_fields=['engagement_status', 'engagement_ended_at', 'engagement_note'])
+    EmploymentRecord.objects.update_or_create(
+        worker=application.worker,
+        employer=application.job.employer,
+        establishment=application.job.establishment,
+        establishment_name=application.job.establishment.name if application.job.establishment else application.job.employer.business_name,
+        position=application.job.title,
+        defaults={
+            'establishment_type': application.job.establishment.establishment_type if application.job.establishment else '',
+            'location': application.job.location,
+            'start_date': application.applied_date.date(),
+            'end_date': application.engagement_ended_at.date(),
+            'is_current': False,
+            'responsibilities': [],
+            'reference_contact_name': application.job.employer.contact_person,
+            'reference_contact_phone': application.job.employer.user.phone,
+            'reference_role': 'Employer',
+            'verification_status': EmploymentRecord.VerificationStatus.PENDING,
+            'reference_verification_status': EmploymentRecord.ReferenceVerificationStatus.PENDING,
+            'verification_notes': engagement_note,
+        },
+    )
     return application

@@ -4,6 +4,7 @@ import type { ApplicationFilters, ApplicationStatusInput, JobApplication, JobApp
 export function listApplications(scope: 'mine' | 'employer' | 'admin' = 'mine', filters: ApplicationFilters = {}) {
   const params = new URLSearchParams()
   if (filters.status) params.set('status', filters.status)
+  if (filters.engagement_status) params.set('engagement_status', filters.engagement_status)
 
   const query = params.toString()
   if (scope === 'mine') return endpoints.applications.mine(query)

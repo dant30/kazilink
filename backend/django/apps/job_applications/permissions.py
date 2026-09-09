@@ -30,7 +30,7 @@ class CanReviewApplication(BasePermission):
 		return bool(
 			request.user
 			and request.user.is_authenticated
-			and (request.user.is_staff or request.user.is_superuser or request.user.is_employer)
+			and (request.user.is_staff or request.user.is_superuser or request.user.is_employer or request.user.is_worker)
 		)
 
 	def has_object_permission(self, request, view, obj):
@@ -38,4 +38,5 @@ class CanReviewApplication(BasePermission):
 			request.user.is_staff
 			or request.user.is_superuser
 			or obj.job.employer.user_id == request.user.id
+			or obj.worker.user_id == request.user.id
 		)

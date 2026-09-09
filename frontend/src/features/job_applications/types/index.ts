@@ -1,4 +1,5 @@
 export type JobApplicationStatus = 'applied' | 'shortlisted' | 'interview_scheduled' | 'hired' | 'rejected'
+export type EngagementStatus = 'active' | 'completed' | 'worker_quit' | 'employer_terminated'
 
 export type JobApplication = {
   id: number
@@ -15,14 +16,19 @@ export type JobApplication = {
   reviewed_by_employer: boolean
   interview_date?: string | null
   interview_note?: string
+  engagement_status?: EngagementStatus
+  engagement_ended_at?: string | null
+  engagement_note?: string
 }
 
 export type ApplicationFilters = {
   status?: JobApplicationStatus | ''
+  engagement_status?: EngagementStatus | 'closed' | ''
 }
 
 export type ApplicationStatusInput = {
   status: JobApplicationStatus
+  engagement_status?: EngagementStatus
   interview_date?: string | null
   interview_note?: string
 }

@@ -17,6 +17,6 @@ export type Review = {
 	is_verified_hire: boolean
 }
 
-export type ReviewInput = { target_worker?: number; target_employer?: number; job: number; rating: number; comment: string; role_performed: string }
+export type ReviewInput = { target_worker?: number; target_employer?: number; job: number; rating: number; comment: string; role_performed?: string }
 export type ReviewUpdateInput = Pick<ReviewInput, 'rating' | 'comment' | 'role_performed'>
 export type ReviewListResponse = Review[] | { count: number; next: string | null; previous: string | null; results: Review[] }
