@@ -24,6 +24,7 @@ import { ConfirmDialog } from '../../../shared/components/ui/ConfirmDialog'
 import { StatCard } from '../../../shared/components/cards/StatCard'
 import { Skeleton } from '../../../shared/components/ui/Skeleton'
 import { EmptyState } from '../../../shared/components/feedback'
+import { Avatar } from '../../../shared/components/ui/Avatar'
 import { workerServices } from '../services'
 import type { WorkerProfile } from '../types'
 
@@ -300,17 +301,7 @@ export function WorkersPage() {
                   <div>
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex items-center gap-3">
-                        {worker.avatar || worker.user.avatar ? (
-                          <img
-                            src={worker.avatar || worker.user.avatar || ''}
-                            alt=""
-                            className="h-12 w-12 rounded-2xl object-cover ring-2 ring-slate-100"
-                          />
-                        ) : (
-                          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-50 text-[#FF6B00] font-black text-sm border border-orange-100">
-                            {worker.user.full_name?.charAt(0) || <UserRound className="h-5 w-5" />}
-                          </div>
-                        )}
+                        <Avatar src={worker.avatar || worker.user.avatar} name={worker.user.full_name} size="lg" isVerified={Boolean(worker.is_reference_checked || worker.user.is_id_verified)} />
                         <div className="min-w-0">
                           <h3 className="font-black text-slate-900 group-hover:text-[#FF6B00] transition-colors truncate">
                             {worker.user.full_name}
@@ -447,9 +438,7 @@ export function WorkersPage() {
             <div className="space-y-4 pt-1">
               <div className="flex items-center justify-between gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-100">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-100 text-[#FF6B00] font-black text-base">
-                    {selectedWorker.user.full_name?.charAt(0)}
-                  </div>
+                  <Avatar src={selectedWorker.avatar || selectedWorker.user.avatar} name={selectedWorker.user.full_name} size="lg" isVerified={Boolean(selectedWorker.is_reference_checked || selectedWorker.user.is_id_verified)} />
                   <div>
                     <h3 className="font-black text-slate-900 text-sm">{selectedWorker.user.full_name}</h3>
                     <p className="text-xs text-slate-500 flex items-center gap-1">
