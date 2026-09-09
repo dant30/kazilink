@@ -101,6 +101,8 @@ export function WorkersPage() {
 
       const response = await endpoints.credits.wallet()
       setCreditBalance(response.wallet.balance)
+      setWorkers((current) => current.map((worker) => worker.id === unlockWorker.id ? { ...worker, history_unlocked: true } : worker))
+      setSelectedWorker((current) => current?.id === unlockWorker.id ? { ...current, history_unlocked: true } : current)
       setActionMessage(`Employment history unlocked for ${unlockWorker.user.full_name}.`)
       setUnlockWorker(null)
     } catch (reason) {
@@ -390,14 +392,15 @@ export function WorkersPage() {
                         <Button
                           size="sm"
                           variant="outline"
-                          disabled={creditBalance === null || creditBalance < 1}
+                          disabled={creditBalance === null || creditBalance < 1 || worker.history_unlocked}
+                          title={creditBalance === 0 ? 'You need 1 Kazi Credit to unlock history. Buy credits first.' : worker.history_unlocked ? 'Employment history already unlocked.' : 'Unlock employment history for 1 Kazi Credit.'}
                           onClick={(event) => {
                             event.stopPropagation()
                             setUnlockWorker(worker)
                           }}
                           className="w-full justify-center rounded-xl"
                         >
-                          Unlock history
+                          {worker.history_unlocked ? 'History unlocked' : 'Unlock history'}
                         </Button>
                       )}
                     </div>
@@ -417,6 +420,7 @@ export function WorkersPage() {
               title="No workers match these filters"
               description="Try adjusting your role, location, or search keywords."
               icon={<UserRound className="h-8 w-8 text-slate-400" />}
+              action={<Button variant="outline" size="sm" onClick={() => { setQuery(''); setLocation(''); setSelectedRole('All'); setVerifiedOnly(false) }}>View all workers</Button>}
               size="md"
             />
           )

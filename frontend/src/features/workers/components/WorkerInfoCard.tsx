@@ -8,6 +8,8 @@ import { Select } from '../../../shared/components/ui/Select'
 import { DatePicker } from '../../../shared/components/ui/DatePicker'
 import { Skeleton } from '../../../shared/components/ui/Skeleton'
 import { Chip } from '../../../shared/components/ui/Chip'
+import { Modal } from '../../../shared/components/ui/Modal'
+import { Button } from '../../../shared/components/ui/Button'
 import { getAdultDateOfBirthMax } from '../../../core/utils/date'
 
 interface WorkerInfoCardProps {
@@ -20,12 +22,17 @@ interface WorkerInfoCardProps {
 	occupationOptions?: Array<{ value: string; label: string }>
 	languageOptions?: Array<{ value: string; label: string }>
 	locationOptions?: Array<{ value: string; label: string }>
+	isDirty?: boolean
+	saving?: boolean
+	onSave?: () => Promise<void>
+	onDiscard?: () => void
 }
 
-export function WorkerInfoCard({ profile, loading = false, values, onChange, skillOptions = [], availabilityOptions = [], occupationOptions = [], languageOptions = [], locationOptions = [] }: WorkerInfoCardProps) {
+export function WorkerInfoCard({ profile, loading = false, values, onChange, skillOptions = [], availabilityOptions = [], occupationOptions = [], languageOptions = [], locationOptions = [], isDirty = false, saving = false, onSave, onDiscard }: WorkerInfoCardProps) {
 	const [selectedSkill, setSelectedSkill] = useState('')
 	const [selectedRole, setSelectedRole] = useState('')
 	const [selectedLanguage, setSelectedLanguage] = useState('')
+	const [detailsModalOpen, setDetailsModalOpen] = useState(false)
 	const currentSkills = values?.skills ?? profile?.skills ?? []
 	const currentRoles = values?.secondary_roles ?? profile?.secondary_roles ?? []
 	const currentLanguages = values?.languages ?? profile?.languages ?? []
@@ -69,7 +76,16 @@ export function WorkerInfoCard({ profile, loading = false, values, onChange, ski
 	}
 
 	return (
-		<FormSection title="Professional details" description="Share the information employers use to assess your fit for roles." icon={<BriefcaseBusiness className="h-4 w-4" />}>
+		<>
+			<div className="flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+				<div>
+					<h2 className="text-sm font-black text-slate-900">Professional details</h2>
+					<p className="mt-0.5 text-xs text-slate-500">Share the information employers use to assess your fit for roles.</p>
+				</div>
+				<Button id="professional-details-trigger" type="button" variant="outline" size="sm" onClick={() => setDetailsModalOpen(true)}>Edit details</Button>
+			</div>
+			<Modal isOpen={detailsModalOpen} onClose={() => setDetailsModalOpen(false)} title="Professional details" subtitle="Share the information employers use to assess your fit for roles." maxWidth="2xl">
+			<FormSection divider={false} title="Professional details" description="Update the details employers use to assess your fit for roles." icon={<BriefcaseBusiness className="h-4 w-4" />}>
 			<div className="grid gap-4 md:grid-cols-2">
 				<FormField label="Full name" required>
 					<Input value={profile?.user.full_name || 'Not available'} readOnly className="cursor-not-allowed bg-slate-100 text-slate-500" />
@@ -128,6 +144,15 @@ export function WorkerInfoCard({ profile, loading = false, values, onChange, ski
 						<p className="mt-1 text-right text-xs text-slate-500">{(values?.bio ?? profile?.bio ?? '').length}/500</p>
 					</div>
 				</FormField>
-		</FormSection>
+			</FormSection>
+			<div className="mt-6 flex items-center justify-between gap-3 border-t border-slate-200 pt-4">
+				<span className="text-xs font-semibold text-slate-500">{isDirty ? 'Unsaved changes to your profile' : 'All profile details saved'}</span>
+				<div className="flex gap-2">
+					{isDirty && <Button type="button" variant="outline" size="sm" onClick={onDiscard} disabled={saving}>Discard</Button>}
+					<Button type="button" size="sm" onClick={() => void onSave?.()} disabled={saving || !isDirty} isLoading={saving}>{saving ? 'Saving profile...' : 'Save profile'}</Button>
+				</div>
+			</div>
+			</Modal>
+		</>
 	)
 }
